@@ -1,2 +1,0 @@
-# FTP
-FTP on Android
