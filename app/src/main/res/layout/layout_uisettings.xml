@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:yzr="http://schemas.android.com/apk/res-auto"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:focusable="true"
+	android:focusableInTouchMode="true">
+
+	<com.yzrilyzr.ui.myToolBar
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		yzr:title="UI设置"
+		yzr:src0="preset/prev"
+		yzr:onClick0="exit"
+		yzr:onClick1="showAbout"
+		yzr:tip0="返回"
+		yzr:src1="preset/info"
+		yzr:tip1="关于"
+		android:id="@+id/layoutuisettingsmyToolBar1"/>
+
+	<ScrollView
+		android:layout_height="match_parent"
+		android:layout_width="fill_parent"
+		android:layout_marginTop="55dp">
+
+		<LinearLayout
+			android:layout_height="fill_parent"
+			android:layout_width="fill_parent"
+			android:orientation="vertical"
+			android:padding="5dp">
+
+			<com.yzrilyzr.ui.myTextViewTitleBack
+				android:layout_height="wrap_content"
+				android:text="界面颜色"
+				android:layout_width="360dp"/>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="5px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="主要颜色"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myColorView
+					android:layout_height="40dp"
+					android:layout_width="40dp"
+					android:id="@+id/layoutuisettingsImageView1"
+					android:onClick="s1"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="背景颜色"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myColorView
+					android:layout_height="40dp"
+					android:layout_width="40dp"
+					android:id="@+id/layoutuisettingsImageView2"
+					android:onClick="s2"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="高亮颜色"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myColorView
+					android:layout_height="40dp"
+					android:layout_width="40dp"
+					android:id="@+id/layoutuisettingsImageView3"
+					android:onClick="s3"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myTextViewTitleBack
+				android:layout_height="wrap_content"
+				android:text="文字显示"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="40dp"/>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="5px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="前景色"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myColorView
+					android:layout_height="40dp"
+					android:layout_width="40dp"
+					android:id="@+id/layoutuisettingsImageView4"
+					android:onClick="s4"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="背景色"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myColorView
+					android:layout_height="40dp"
+					android:layout_width="40dp"
+					android:id="@+id/layoutuisettingsImageView5"
+					android:onClick="s5"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="高亮色"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myColorView
+					android:layout_height="40dp"
+					android:layout_width="40dp"
+					android:id="@+id/layoutuisettingsImageView6"
+					android:onClick="s6"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="使用内置字体"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.mySwitch
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@android:drawable/ic_delete"
+					android:id="@+id/layoutuisettingsmySwitch1"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="文字大小"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myEditText
+					android:layout_height="40dp"
+					android:layout_width="80dp"
+					android:inputType="number"
+					android:gravity="center"
+					android:id="@+id/layoutuisettingsmyEditText1"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="标题文字大小"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myEditText
+					android:layout_height="40dp"
+					android:layout_width="80dp"
+					android:inputType="number"
+					android:gravity="center"
+					android:id="@+id/layoutuisettingsmyEditText2"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myTextViewTitleBack
+				android:layout_height="wrap_content"
+				android:text="其他显示设置"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="40dp"/>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="5px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="组件内边距"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myEditText
+					android:layout_height="40dp"
+					android:layout_width="80dp"
+					android:inputType="number"
+					android:gravity="center"
+					android:id="@+id/layoutuisettingsmyEditText3"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="开启阴影"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.mySwitch
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:src="@android:drawable/ic_delete"
+					android:id="@+id/layoutuisettingsmySwitch2"/>
+
+			</LinearLayout>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="1px"
+				android:layout_width="match_parent"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="fill_parent"
+				android:orientation="horizontal"
+				android:gravity="left|center"
+				android:padding="5dp">
+
+				<com.yzrilyzr.ui.myTextViewBack
+					android:layout_height="wrap_content"
+					android:text="圆角大小"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myEditText
+					android:layout_height="40dp"
+					android:layout_width="80dp"
+					android:inputType="number"
+					android:gravity="center"
+					android:id="@+id/layoutuisettingsmyEditText4"/>
+
+			</LinearLayout>
+
+		</LinearLayout>
+
+	</ScrollView>
+
+</FrameLayout>
+

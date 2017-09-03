@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:gravity="center">
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="vertical"
+		android:layout_weight="1.0"/>
+
+	<com.yzrilyzr.ui.myTextViewBack
+		android:layout_height="wrap_content"
+		android:text="FAQ"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_width="wrap_content"/>
+
+	<com.yzrilyzr.ui.myTextViewBack
+		android:layout_height="wrap_content"
+		android:text="为所欲为的开车"
+		android:textAppearance="?android:attr/textAppearanceLarge"
+		android:layout_width="wrap_content"
+		android:layout_marginTop="35dp"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="vertical"
+		android:layout_weight="1.0"/>
+
+	<com.yzrilyzr.ui.myTextViewBack
+		android:layout_height="wrap_content"
+		android:text="配置"
+		android:onClick="set"
+		android:clickable="true"
+		android:layout_width="wrap_content"
+		android:layout_gravity="bottom|right"/>
+
+</LinearLayout>
+

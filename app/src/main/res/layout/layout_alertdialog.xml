@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.yzrilyzr.ui.myLinearLayoutBack
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:yzr="http://schemas.android.com/apk/res/com.yzrilyzr.uidemo"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<com.yzrilyzr.ui.myTextViewTitleBack
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:id="@+id/layoutalertdialogTitle"
+		android:visibility="gone"
+		android:layout_marginTop="15dp"
+		android:layout_marginBottom="15dp"
+		android:layout_marginRight="10dp"
+		android:layout_marginLeft="10dp"/>
+
+	<com.yzrilyzr.ui.myLinearLayout
+		android:layout_height="4px"
+		android:layout_width="match_parent"/>
+	<ScrollView
+		android:layout_height="wrap_content"
+		android:layout_weight="1.0"
+		android:layout_width="match_parent">
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent">
+			<com.yzrilyzr.ui.myListView
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:id="@+id/layoutalertdialogListView1"
+				android:visibility="gone"/>
+			
+			<com.yzrilyzr.ui.myTextViewTitleBack
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:layout_margin="10dp"
+				android:id="@+id/layoutalertdialogMessage"
+				android:visibility="gone"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				android:id="@+id/layoutalertdialogView"
+				android:visibility="gone"/>
+
+		</LinearLayout>
+
+	</ScrollView>
+	
+
+	
+	<com.yzrilyzr.ui.myLinearLayout
+		android:layout_height="2px"
+		android:layout_width="match_parent"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="fill_parent"
+		android:orientation="horizontal"
+		android:gravity="center">
+
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="50dp"
+			android:layout_width="wrap_content"
+			android:id="@+id/layoutalertdialognocl"
+			android:visibility="gone"
+			android:gravity="center"
+			android:layout_weight="1.0"/>
+
+		<com.yzrilyzr.ui.myLinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="2px"
+			android:id="@+id/layoutalertdialogmyLinearLayout1"
+			android:visibility="gone"/>
+
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="50dp"
+			android:layout_width="wrap_content"
+			android:id="@+id/layoutalertdialogneuocl"
+			android:visibility="gone"
+			android:gravity="center"
+			android:layout_weight="1.0"/>
+
+		<com.yzrilyzr.ui.myLinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="2px"
+			android:id="@+id/layoutalertdialogmyLinearLayout2"
+			android:visibility="gone"/>
+
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="50dp"
+			android:layout_width="wrap_content"
+			android:id="@+id/layoutalertdialogpocl"
+			android:visibility="gone"
+			android:gravity="center"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+</com.yzrilyzr.ui.myLinearLayoutBack>
+

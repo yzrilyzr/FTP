@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent"
+	android:orientation="horizontal">
+
+	<ImageView
+		android:layout_height="40dp"
+		android:layout_width="40dp"
+		android:layout_margin="5dp"
+		android:id="@+id/msgentryImageView1"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="vertical"
+		android:layout_weight="1.0"
+		android:layout_margin="5dp"
+		android:id="@+id/msgentryLinearLayout1">
+
+		<com.yzrilyzr.ui.myTextView
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_width="wrap_content"
+			android:id="@+id/msgentryTextView1"
+			android:maxLines="1"/>
+
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_width="wrap_content"
+			android:id="@+id/msgentryTextView2"
+			android:padding="17dp"
+			android:gravity="clip_vertical|clip_horizontal"/>
+
+	</LinearLayout>
+
+	<ImageView
+		android:layout_height="40dp"
+		android:layout_width="40dp"
+		android:layout_margin="5dp"
+		android:id="@+id/msgentryImageView2"/>
+
+</LinearLayout>
+
