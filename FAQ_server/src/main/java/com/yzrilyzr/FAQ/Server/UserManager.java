@@ -123,6 +123,11 @@ public class UserManager extends Activity
 						dd.setText(u.sign);
 						ee.setText(u.ip);
 						ff.setText(u.email);
+						/*for(int i:u.friends){
+							EditText ed=new EditText(UserManager.this);
+							ed.setText(i+"");
+							v.addView(ed,-1,-2);
+						}*/
 						b.setTitle("管理用户");
 					}
 					b.setView(v2)

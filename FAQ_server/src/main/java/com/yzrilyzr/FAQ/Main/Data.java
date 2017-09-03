@@ -34,9 +34,9 @@ public class Data
 		u.faq=10000+new Random().nextInt(999999999);
 		u.sign="个性签名";
 		u.nick="新用户";
-		u.friends=new int[]{};
+		/*u.friends=new int[]{};
 		u.groups=new int[]{};
-		u.groups=new int[]{};
+		u.groups=new int[]{};*/
 		users.put(u.faq+"",u);
 		saveUserData();
 		return u;
@@ -108,9 +108,10 @@ public class Data
 				writeStr(br,us.sign);
 				writeStr(br,us.email);
 				writeStr(br,us.ip);
-				writeInt(br,us.friends.length);
-				for(int u=0;u<us.friends.length;u++)writeInt(br,us.friends[u]);writeInt(br,us.groups.length);
-				for(int u=0;u<us.groups.length;u++)writeInt(br,us.groups[u]);
+				writeInt(br,us.friends.size());
+				for(int u:us.friends)writeInt(br,u);
+				writeInt(br,us.groups.size());
+				for(int u:us.groups)writeInt(br,u);
 			}
 			br.flush();
 			br.close();
@@ -151,11 +152,11 @@ public class Data
 				us.email=readStr(br);
 				us.ip=readStr(br);
 				int frlen=readInt(br);
-				us.friends=new int[frlen];
-				for(int u=0;u<frlen;u++)us.friends[u]=readInt(br);
+				us.friends=new ArrayList<Integer>();
+				for(int u=0;u<frlen;u++)us.friends.add(readInt(br));
 				int grlen=readInt(br);
-				us.groups=new int[grlen];
-				for(int u=0;u<grlen;u++)us.groups[u]=readInt(br);
+				us.groups=new ArrayList<Integer>();
+				for(int u=0;u<grlen;u++)us.groups.add(readInt(br));
 				users.put(us.faq+"",us);
 			}
 			br.close();

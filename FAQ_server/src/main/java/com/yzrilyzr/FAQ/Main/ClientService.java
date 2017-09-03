@@ -206,24 +206,21 @@ public class ClientService extends Thread
 							}
 						}
 						else if(cmd==C.AFD){
-							int ffq=Integer.parseInt(str);
 							User u1=Data.users.get(user.faq+"");
 							User u2=Data.users.get(str);
 							boolean bo=false;
-							for(int n:u1.friends)if(n==ffq){bo=true;break;}
+							for(int n:u1.friends)if(n==u2.faq){bo=true;break;}
 							if(!bo){
-								int[] ff=new int[u1.friends.length+1];
-								System.arraycopy(u1.friends,0,ff,0,u1.friends.length);
-								ff[ff.length-1]=ffq;
-								u1.friends=ff;
-								int[] ff2=new int[u2.friends.length+1];
-								System.arraycopy(u2.friends,0,ff2,0,u2.friends.length);
-								ff2[ff2.length-1]=user.faq;
-								u2.friends=ff2;
+								u1.friends.add(u2.faq);
+								u2.friends.add(u1.faq);
 								Data.saveUserData();
-								sendMsg(C.MSG,new MessageObj(ffq,user.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
-								ClientService ll=Data.loginClient.get(ffq+"");
-								if(ll!=null)ll.sendMsg(C.MSG,new MessageObj(user.faq,ffq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
+								sendMsg(C.GUS,u1.o2s());
+								sendMsg(C.MSG,new MessageObj(u2.faq,u1.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
+								ClientService ll=Data.loginClient.get(u2.faq+"");
+								if(ll!=null){
+									ll.sendMsg(C.GUS,u2.o2s());
+									ll.sendMsg(C.MSG,new MessageObj(u1.faq,u2.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
+								}
 							}
 						}
 						else if(cmd==C.GUS)
@@ -235,8 +232,8 @@ public class ClientService extends Thread
 								else
 								{
 									User u2=(User)ToStrObj.s2o(uu.o2s());
-									u2.pwd="";u2.friends=new int[0];
-									u2.ip="";u2.email="";u2.groups=new int[0];
+									u2.pwd="";u2.friends=new ArrayList<Integer>();
+									u2.ip="";u2.email="";u2.groups=new ArrayList<Integer>();
 									sendMsg(C.GUS,u2.o2s());
 								}
 							}
