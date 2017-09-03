@@ -231,7 +231,7 @@ public class ClientService extends Thread
 								if(uu==null)sendMsg(C.GUS,"-1");
 								else
 								{
-									User u2=(User)ToStrObj.s2o(uu.o2s());
+									User u2=User.s2o(uu.o2s());
 									u2.pwd="";u2.friends=new ArrayList<Integer>();
 									u2.ip="";u2.email="";u2.groups=new ArrayList<Integer>();
 									sendMsg(C.GUS,u2.o2s());
