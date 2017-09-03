@@ -67,10 +67,9 @@ public void add(View v)
 							nick.setText(String.format("查无此%s",isUser?"人":"群"));
 							return;
 						}
-						ToStrObj obj=ToStrObj.s2o(msg);
 						if(isUser)
 						{
-							User u=(User)obj;
+							User u=User.s2o(msg);
 							if(u.faq!=faq)return;
 							nick.setText(u.nick);
 							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isUser?"个性签名":"描述",u.sign));
@@ -78,7 +77,7 @@ public void add(View v)
 						}
 						else
 						{
-							Group u=(Group)obj;
+							Group u=(Group) Group.s2o(msg);
 							if(u.faq!=faq)return;
 							nick.setText(u.nick);
 							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isUser?"个性签名":"描述",u.sign));
