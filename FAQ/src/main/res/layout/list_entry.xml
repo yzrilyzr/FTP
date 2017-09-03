@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="wrap_content"
+	android:layout_width="match_parent"
+	android:orientation="horizontal">
+
+	<ImageView
+		android:layout_height="50dp"
+		android:layout_width="50dp"
+		android:layout_margin="7dp"
+		android:id="@+id/listentryImageView1"/>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="vertical"
+		android:layout_margin="5dp"
+		android:layout_weight="1.0">
+
+		<com.yzrilyzr.ui.myTextViewTitleBack
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceMedium"
+			android:layout_width="match_parent"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:id="@+id/listentryTextView1"/>
+
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_width="match_parent"
+			android:maxLines="1"
+			android:ellipsize="end"
+			android:layout_marginTop="2dp"
+			android:id="@+id/listentryTextView2"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+		android:orientation="vertical"
+		android:layout_margin="7dp">
+
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="wrap_content"
+			android:textAppearance="?android:attr/textAppearanceSmall"
+			android:layout_width="match_parent"
+			android:maxLines="1"
+			android:layout_marginTop="2dp"
+			android:id="@+id/listentryTextView3"/>
+				
+			</LinearLayout>
+
+</LinearLayout>
+

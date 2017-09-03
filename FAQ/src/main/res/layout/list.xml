@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.yzrilyzr.ui.mySlidingMenu
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_height="match_parent"
+	android:layout_width="match_parent"
+	android:orientation="horizontal"
+	android:id="@+id/listmySlidingMenu1">
+
+	<LinearLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:orientation="vertical">
+
+			<FrameLayout
+				android:layout_height="200dp"
+				android:layout_width="match_parent">
+
+				<com.yzrilyzr.ui.myLinearLayout
+					android:layout_height="match_parent"
+					android:layout_width="match_parent"
+					android:src="@drawable/launch"/>
+
+				<ImageView
+					android:layout_height="50dp"
+					android:layout_width="50dp"
+					android:src="@android:drawable/ic_delete"
+					android:layout_marginLeft="20dp"
+					android:layout_marginTop="60dp"
+					android:id="@+id/listImageView1"/>
+
+				<com.yzrilyzr.ui.myTextViewTitle
+					android:layout_height="wrap_content"
+					android:layout_width="match_parent"
+					android:layout_marginLeft="80dp"
+					android:layout_marginTop="75dp"
+					android:id="@+id/listTextView1"
+					android:maxLines="1"
+					android:layout_marginRight="20dp"/>
+
+				<com.yzrilyzr.ui.myTextView
+					android:layout_height="wrap_content"
+					android:layout_width="match_parent"
+					android:layout_gravity="bottom"
+					android:layout_margin="20dp"
+					android:id="@+id/listTextView2"
+					android:maxLines="1"/>
+
+			</FrameLayout>
+
+		</LinearLayout>
+
+		<FrameLayout
+			xmlns:yzr="http://schemas.android.com/apk/res-auto"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:orientation="vertical">
+
+			<com.yzrilyzr.ui.myLinearLayoutBack
+				android:layout_height="match_parent"
+				android:layout_width="match_parent"
+				android:orientation="vertical">
+
+				<com.yzrilyzr.ui.myListView
+					android:layout_height="wrap_content"
+					android:layout_width="match_parent"
+					android:layout_weight="1.0"
+					android:id="@+id/listListView1"/>
+
+			</com.yzrilyzr.ui.myLinearLayoutBack>
+
+			<com.yzrilyzr.ui.myToolBar
+				android:layout_height="wrap_content"
+				android:layout_width="match_parent"
+				yzr:title="FAQ"
+				yzr:src0="@drawable/icon"
+				yzr:onClick0="menu"
+				yzr:tip0="菜单"
+				yzr:src1="@drawable/add"
+				yzr:onClick1="add"
+				yzr:tip1="添加"
+				android:id="@+id/listmyToolBar1"/>
+
+		</FrameLayout>
+
+	</LinearLayout>
+
+</com.yzrilyzr.ui.mySlidingMenu>
+
