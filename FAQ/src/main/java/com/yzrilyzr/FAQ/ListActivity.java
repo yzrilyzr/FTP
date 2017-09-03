@@ -1,6 +1,8 @@
 package com.yzrilyzr.FAQ;
 
+import android.widget.*;
 import com.yzrilyzr.ui.*;
+import java.util.*;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,33 +13,21 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
-import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
-import com.yzrilyzr.myclass.myActivity;
-import com.yzrilyzr.myclass.util;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 import com.yzrilyzr.FAQ.Main.T;
+import com.yzrilyzr.myclass.util;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Collections;
 
 public class ListActivity extends BaseActivity
 {
-	ListView list;
+	myViewPager page;
 	myToolBar toolbar;
 	mySlidingMenu menu;
+	ListView listMsg,listFri,listGro,listFor;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -45,7 +35,16 @@ public class ListActivity extends BaseActivity
 		Data.ctx=this;
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
-		list=(ListView) findViewById(R.id.listListView1);
+		listMsg=new myListView(ctx);
+		listFri=new myListView(ctx);
+		listGro=new myListView(ctx);
+		listFor=new myListView(ctx);
+		page=(myViewPager) findViewById(R.id.listViewPager);
+		page.setPages(listMsg,listFri,listGro,listFor);
+		((LinearLayout.LayoutParams)listFri.getLayoutParams()).weight=1f;
+		((LinearLayout.LayoutParams)listMsg.getLayoutParams()).weight=1f;
+		((LinearLayout.LayoutParams)listFor.getLayoutParams()).weight=1f;
+		((LinearLayout.LayoutParams)listGro.getLayoutParams()).weight=1f;
 		toolbar=(myToolBar) findViewById(R.id.listmyToolBar1);
 		menu=(mySlidingMenu)findViewById(R.id.listmySlidingMenu1);
 		myLoadingView lo=new myLoadingView(ctx);
@@ -60,8 +59,9 @@ public class ListActivity extends BaseActivity
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		t.setImageDrawable(hd2);
-		//Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
-		list();
+		Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
+		listMsg();
+		listFri();
 	}
 	public void add(View v)
 	{
@@ -101,37 +101,19 @@ public class ListActivity extends BaseActivity
 			.setNegativeButton("关闭",null)
 			.show();
 	}
-	public void logout()
-	{
-		new myAlertDialog(this)
-			.setTitle("强制下线提示")
-			.setCancelable(false)
-			.setMessage("您的帐号在其他客户端登录，您已被强制下线")
-			.setPositiveButton("确定",new myDialogInterface(){
-				public void click(View v,int i)
-				{
-					Intent e=new Intent(ctx,LoginActivity.class);
-					e.putExtra("al",false);
-					startActivity(e);
-					finish();
-				}})
-			.show();
-	}
 	@Override
-	public void rev(byte cmd, String msg)
+	public void rev(final byte cmd, final String msg)
 	{
 		// TODO: Implement this method
-		if(cmd==C.MSG)
-		{
-			runOnUiThread(new Runnable(){
+		runOnUiThread(new Runnable(){
 					@Override
 					public void run()
 					{
 						// TODO: Implement this method
-						list();
+						if(cmd==C.MSG)listMsg();
+						else if(cmd==C.GUS&&((User)ToStrObj.s2o(msg)).faq==Data.me.faq)listFri();
 					}
 				});
-		}
 	}
 	public void menu(View v)
 	{
@@ -154,8 +136,88 @@ public class ListActivity extends BaseActivity
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+	public void page1(View v)
+	{
+		page.setCurrentItem(0,true);
+	}
+	public void page2(View v)
+	{
+		page.setCurrentItem(1,true);
+	}
+	public void page3(View v)
+	{
+		page.setCurrentItem(2,true);
+	}
+	public void page4(View v)
+	{
+		page.setCurrentItem(3,true);
+	}
+	private void listFri()
+	{
+		listFri.setAdapter(new BaseAdapter(){
 
-	private void list()
+				@Override
+				public int getCount()
+				{
+					// TODO: Implement this method
+					return Data.me.friends.size();
+				}
+
+				@Override
+				public Object getItem(int p1)
+				{
+					// TODO: Implement this method
+					return null;
+				}
+
+				@Override
+				public long getItemId(int p1)
+				{
+					// TODO: Implement this method
+					return 0;
+				}
+
+				@Override
+				public View getView(int p1, View p2, ViewGroup p3)
+				{
+					// TODO: Implement this method
+					ViewGroup vg=(ViewGroup)LayoutInflater.from(ListActivity.this).inflate(R.layout.list_entry,null);
+					ImageView hd=(ImageView) vg.findViewById(R.id.listentryImageView1);
+					TextView ni=(TextView) vg.findViewById(R.id.listentryTextView1);
+					TextView ms=(TextView) vg.findViewById(R.id.listentryTextView2);
+					TextView ts=(TextView) vg.findViewById(R.id.listentryTextView3);
+					ts.setVisibility(8);
+					int faq=Data.me.friends.get(p1);
+					User u=Data.users.get(faq+"");
+					if(u!=null)
+					{
+						ni.setText(u.nick);
+						ms.setText(u.sign);
+					}
+					else ni.setText(faq+"");
+					byte[] b=Data.getHead(faq+"",false);
+					if(b!=null)
+					{
+						Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
+						hd.setImageDrawable(new myRoundDrawable(bm));
+					}
+					return vg;
+				}
+			});
+		listFri.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+				@Override
+				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
+				{
+					// TODO: Implement this method
+					Intent in=new Intent(ListActivity.this,MainActivity.class);
+					User u=Data.users.get(Data.me.friends.get(p3)+"");
+					if(u==null)return;
+					in.putExtra("user",u.o2s());
+					startActivity(in);
+				}
+			});
+	}
+	private void listMsg()
 	{
 		final ArrayList<MessageObj> msgu=new ArrayList<MessageObj>();
 		Iterator it=Data.msglist.entrySet().iterator();
@@ -173,7 +235,7 @@ public class ListActivity extends BaseActivity
 					else return 1;
 				}
 			});
-		list.setAdapter(new BaseAdapter(){
+		listMsg.setAdapter(new BaseAdapter(){
 
 				@Override
 				public int getCount()
@@ -228,7 +290,7 @@ public class ListActivity extends BaseActivity
 					return vg;
 				}
 			});
-		list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+		listMsg.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
 				{

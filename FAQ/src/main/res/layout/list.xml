@@ -65,11 +65,98 @@
 				android:layout_width="match_parent"
 				android:orientation="vertical">
 
-				<com.yzrilyzr.ui.myListView
+				<com.yzrilyzr.ui.myViewPager
 					android:layout_height="wrap_content"
 					android:layout_width="match_parent"
 					android:layout_weight="1.0"
-					android:id="@+id/listListView1"/>
+					android:id="@+id/listViewPager"/>
+
+				<com.yzrilyzr.ui.myLinearLayout
+					android:layout_height="wrap_content"
+					android:layout_width="match_parent"
+					android:orientation="horizontal">
+
+					<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:orientation="vertical"
+						android:layout_weight="1.0"
+						android:gravity="center"
+						android:onClick="page1">
+
+						<ImageView
+							android:layout_height="20dp"
+							android:layout_width="20dp"
+							android:src="@android:drawable/ic_delete"/>
+
+						<com.yzrilyzr.ui.myTextView
+							android:layout_height="wrap_content"
+							android:layout_width="wrap_content"
+							android:text="消息"/>
+
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:orientation="vertical"
+						android:layout_weight="1.0"
+						android:gravity="center"
+						android:onClick="page2">
+
+						<ImageView
+							android:layout_height="20dp"
+							android:layout_width="20dp"
+							android:src="@android:drawable/ic_delete"/>
+
+						<com.yzrilyzr.ui.myTextView
+							android:layout_height="wrap_content"
+							android:layout_width="wrap_content"
+							android:text="好友"/>
+
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:orientation="vertical"
+						android:layout_weight="1.0"
+						android:gravity="center"
+						android:onClick="page3">
+
+						<ImageView
+							android:layout_height="20dp"
+							android:layout_width="20dp"
+							android:src="@android:drawable/ic_delete"/>
+
+						<com.yzrilyzr.ui.myTextView
+							android:layout_height="wrap_content"
+							android:layout_width="wrap_content"
+							android:text="群组"/>
+
+					</LinearLayout>
+
+					<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:orientation="vertical"
+						android:layout_weight="1.0"
+						android:onClick="page4"
+						android:gravity="center">
+
+						<ImageView
+							android:layout_height="20dp"
+							android:layout_width="20dp"
+							android:src="@android:drawable/ic_delete"/>
+
+						<com.yzrilyzr.ui.myTextView
+							android:layout_height="wrap_content"
+							android:layout_width="wrap_content"
+							android:text="论坛"/>
+
+					</LinearLayout>
+
+				</com.yzrilyzr.ui.myLinearLayout>
 
 			</com.yzrilyzr.ui.myLinearLayoutBack>
 

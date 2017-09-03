@@ -1,17 +1,24 @@
 package com.yzrilyzr.FAQ;
 
-import android.content.*;
-import android.graphics.*;
-import android.text.*;
-import android.widget.*;
-import com.yzrilyzr.FAQ.Data.*;
-import com.yzrilyzr.FAQ.Main.*;
-import com.yzrilyzr.myclass.*;
-
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import com.yzrilyzr.FAQ.Data.ToStrObj;
+import com.yzrilyzr.FAQ.Data.User;
+import com.yzrilyzr.FAQ.Main.AES;
+import com.yzrilyzr.FAQ.Main.C;
+import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myRoundDrawable;
 
 public class LoginActivity extends BaseActivity
@@ -91,15 +98,6 @@ public class LoginActivity extends BaseActivity
 					else if(cmd==C.LSU)
 					{
 						ClientService.sendMsg(C.GUS,Data.me.faq+"");
-						byte[] by=Data.getHead(Data.me.faq+"",false);
-						if(by==null)ClientService.sendMsg(C.GHU,Data.me.faq+"");
-						else{
-							ClientService.toast(ctx,"登录成功");
-							startService(new Intent(ctx,MsgService.class));
-							ClientService.isLogin=true;
-							startActivity(new Intent(ctx,ListActivity.class));
-							finish();
-						}
 					}
 					else if(cmd==C.GHU){
 						byte[] by=Base64.decode(msg,0);
@@ -113,6 +111,16 @@ public class LoginActivity extends BaseActivity
 					else if(cmd==C.GUS)
 					{
 						Data.me=(User)ToStrObj.s2o(msg);
+						util.toast(ctx,Data.me.friends.size()+"");
+						byte[] by=Data.getHead(Data.me.faq+"",false);
+						if(by==null)ClientService.sendMsg(C.GHU,Data.me.faq+"");
+						else{
+							ClientService.toast(ctx,"登录成功");
+							startService(new Intent(ctx,MsgService.class));
+							ClientService.isLogin=true;
+							startActivity(new Intent(ctx,ListActivity.class));
+							finish();
+						}
 					}
 				}
 			});

@@ -33,6 +33,18 @@ public class myViewPager extends HorizontalScrollView
 				v.setLayoutParams(new LinearLayout.LayoutParams(screenWidth,-2));
 			}
 		}
+
+		@Override
+		protected void onSizeChanged(int w, int h, int oldw, int oldh)
+		{
+			// TODO: Implement this method
+			super.onSizeChanged(w, h, oldw, oldh);
+			for(int i = 0; i < ll.getChildCount(); i++) {
+				View view = ll.getChildAt(i);
+				view.setLayoutParams(new LinearLayout.LayoutParams(screenWidth,-2));
+			}
+		}
+		
 		public void setCurrentItem(int i,boolean b){
 			curScreen=i;
 			if(b)smoothScrollTo(screenWidth*i,0);
@@ -60,12 +72,12 @@ public class myViewPager extends HorizontalScrollView
 				return super.onTouchEvent(ev);
 			}
 		
-		@Override
+		/*@Override
 		protected void onLayout(boolean changed, int l, int t, int r, int b) {
 			super.onLayout(changed,l,t,r,b);
 			for(int i = 0; i < ll.getChildCount(); i++) {
 				View view = ll.getChildAt(i);
 				view.setLayoutParams(new LinearLayout.LayoutParams(screenWidth,-2));
 			}
-		}
+		}*/
 }
