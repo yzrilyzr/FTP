@@ -9,6 +9,6 @@ public class User extends ToStrObj
 {
 	public int faq;
 	public String pwd,nick,sign,ip,email;
-	public ArrayObj<Integer> friends=new ArrayObj<Integer>()
-	,groups=new ArrayObj<Integer>();
+	public ArrayObj<ToStrInt> friends=new ArrayObj<ToStrInt>()
+	,groups=new ArrayObj<ToStrInt>();
 }
