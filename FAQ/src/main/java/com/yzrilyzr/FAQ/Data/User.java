@@ -12,9 +12,9 @@ public class User extends ToStrObj
 {
 	public int faq;
 	public String pwd,nick,sign,ip,email;
-	public ArrayList<Integer> friends=new ArrayList<Integer>()
-	,groups=new ArrayList<Integer>();
-
+	public ToStrList<Integer> friends=new ToStrList<Integer>()
+	,groups=new ToStrList<Integer>();
+/*
 	@Override
 	public String o2s()
 	{
@@ -59,5 +59,5 @@ public class User extends ToStrObj
 		{
 			return null;
 		}
-	}
+	}*/
 }

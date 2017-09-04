@@ -65,7 +65,7 @@ public class MsgService extends Service implements ClientService.Listener
 			}
 			else if(cmd==C.GUS){
 				if("-1".equals(msg))return;
-				User u=User.s2o(msg);
+				User u=(User) ToStrObj.s2o(msg);
 				Data.users.put(u.faq+"",u);
 			}
 			else if(cmd==C.FLO){

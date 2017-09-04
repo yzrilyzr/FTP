@@ -69,7 +69,7 @@ public void add(View v)
 						}
 						if(isUser)
 						{
-							User u=User.s2o(msg);
+							User u=(User) ToStrObj.s2o(msg);
 							if(u.faq!=faq)return;
 							nick.setText(u.nick);
 							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isUser?"个性签名":"描述",u.sign));

@@ -111,7 +111,7 @@ public class ListActivity extends BaseActivity
 					{
 						// TODO: Implement this method
 						if(cmd==C.MSG)listMsg();
-						else if(cmd==C.GUS&&(User.s2o(msg)).faq==Data.me.faq)listFri();
+						else if(cmd==C.GUS&&((User)ToStrObj.s2o(msg)).faq==Data.me.faq)listFri();
 					}
 				});
 	}

@@ -110,7 +110,7 @@ public class LoginActivity extends BaseActivity
 					}
 					else if(cmd==C.GUS)
 					{
-						Data.me=User.s2o(msg);
+						Data.me=(User) ToStrObj.s2o(msg);
 						util.toast(ctx,Data.me.friends.size()+"");
 						byte[] by=Data.getHead(Data.me.faq+"",false);
 						if(by==null)ClientService.sendMsg(C.GHU,Data.me.faq+"");

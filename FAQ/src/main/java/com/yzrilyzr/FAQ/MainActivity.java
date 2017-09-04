@@ -25,7 +25,7 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 		AndroidBug5497Workaround.assistActivity(this);
-		to=User.s2o(getIntent().getStringExtra("user"));
+		to=(User) ToStrObj.s2o(getIntent().getStringExtra("user"));
 		setTitle(to.nick);
 		ll=(LinearLayout) findViewById(R.id.mainLinearLayout1);
 		et=(EditText) findViewById(R.id.mainEditText1);
