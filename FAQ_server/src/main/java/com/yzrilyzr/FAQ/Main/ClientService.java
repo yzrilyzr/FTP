@@ -210,6 +210,7 @@ public class ClientService extends Thread
 							User u2=Data.users.get(str);
 							boolean bo=false;
 							for(int n:u1.friends)if(n==u2.faq){bo=true;break;}
+							ctx.toast("<Client>(Thread)["+IP+"]:CMD:"+cmd+",AFD:"+bo);
 							if(!bo){
 								u1.friends.add(u2.faq);
 								u2.friends.add(u1.faq);
@@ -231,9 +232,9 @@ public class ClientService extends Thread
 								if(uu==null)sendMsg(C.GUS,"-1");
 								else
 								{
-									User u2=User.s2o(uu.o2s());
-									u2.pwd="";u2.friends=new ArrayList<Integer>();
-									u2.ip="";u2.email="";u2.groups=new ArrayList<Integer>();
+									User u2=(User)ToStrObj.s2o(uu.o2s());
+									u2.pwd="";
+									u2.ip="";u2.email="";
 									sendMsg(C.GUS,u2.o2s());
 								}
 							}

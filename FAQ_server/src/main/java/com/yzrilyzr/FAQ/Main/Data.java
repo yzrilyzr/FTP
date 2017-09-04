@@ -152,10 +152,10 @@ public class Data
 				us.email=readStr(br);
 				us.ip=readStr(br);
 				int frlen=readInt(br);
-				us.friends=new ArrayList<Integer>();
+				us.friends=new ToStrList<Integer>();
 				for(int u=0;u<frlen;u++)us.friends.add(readInt(br));
 				int grlen=readInt(br);
-				us.groups=new ArrayList<Integer>();
+				us.groups=new ToStrList<Integer>();
 				for(int u=0;u<grlen;u++)us.groups.add(readInt(br));
 				users.put(us.faq+"",us);
 			}
