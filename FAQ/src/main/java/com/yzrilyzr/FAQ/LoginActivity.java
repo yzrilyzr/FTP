@@ -8,12 +8,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import com.yzrilyzr.FAQ.Data.ToStrObj;
-import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.AES;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
@@ -97,30 +94,11 @@ public class LoginActivity extends BaseActivity
 					else if(cmd==C.PWE)ClientService.toast(ctx,"密码错误");
 					else if(cmd==C.LSU)
 					{
-						ClientService.sendMsg(C.GUS,Data.me.faq+"");
-					}
-					else if(cmd==C.GHU){
-						byte[] by=Base64.decode(msg,0);
-						Data.saveHead(false,by);
 						startService(new Intent(ctx,MsgService.class));
 						ClientService.toast(ctx,"登录成功");
 						ClientService.isLogin=true;
 						startActivity(new Intent(ctx,ListActivity.class));
 						finish();
-					}
-					else if(cmd==C.GUS)
-					{
-						Data.me=(User) ToStrObj.s2o(msg);
-						util.toast(ctx,Data.me.friends.size()+"");
-						byte[] by=Data.getHead(Data.me.faq+"",false);
-						if(by==null)ClientService.sendMsg(C.GHU,Data.me.faq+"");
-						else{
-							ClientService.toast(ctx,"登录成功");
-							startService(new Intent(ctx,MsgService.class));
-							ClientService.isLogin=true;
-							startActivity(new Intent(ctx,ListActivity.class));
-							finish();
-						}
 					}
 				}
 			});
@@ -138,6 +116,7 @@ public class LoginActivity extends BaseActivity
 				.putString("user",a)
 				.putString("pwd",AES.encrypt(a,b))
 				.commit();
+			Data.myfaq=Integer.parseInt(a);
 		}
 		catch (Exception e)
 		{}
