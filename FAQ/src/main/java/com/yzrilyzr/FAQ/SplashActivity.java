@@ -1,23 +1,21 @@
 package com.yzrilyzr.FAQ;
-import com.yzrilyzr.myclass.*;
-
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.view.Window;
+import android.view.View;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.SplashActivity;
+import com.yzrilyzr.myclass.util;
+import com.yzrilyzr.ui.myAlertDialog;
+import com.yzrilyzr.ui.myDialogInterface;
+import com.yzrilyzr.ui.myEditText;
 import com.yzrilyzr.ui.myIconDrawer;
 import com.yzrilyzr.ui.myIconDrawer.DrawType;
-import com.yzrilyzr.ui.uidata.icon;
 import com.yzrilyzr.ui.uidata;
-import android.view.View;
-import com.yzrilyzr.ui.myAlertDialog;
-import com.yzrilyzr.ui.myEditText;
-import com.yzrilyzr.ui.myDialogInterface;
-import android.content.SharedPreferences;
+import com.yzrilyzr.ui.uidata.icon;
 
-public class SplashActivity extends BaseActivity
+public class SplashActivity extends BaseActivity 
 {
 
 	static boolean isInit=false;
@@ -78,23 +76,25 @@ public class SplashActivity extends BaseActivity
 			setContentView(R.layout.splash);
 		}
 	}
-	public void set(View v){
+	public void set(View v)
+	{
 		final myEditText e=new myEditText(ctx);
 		e.setHint("服务器IP");
 		e.setText(ClientService.hostIp);
 		new myAlertDialog(ctx)
-		.setTitle("设置目标服务器IP")
-		.setView(e)
-		.setPositiveButton("保存",new myDialogInterface(){
-			public void click(View v,int i){
-				ClientService.hostIp=e.getText().toString();
-				getSharedPreferences("server",MODE_PRIVATE).edit()
-					.putString("ip",e.getText().toString())
-					.commit();
-			}
-		})
-		.setNegativeButton("取消",null)
-		.show();
+			.setTitle("设置目标服务器IP")
+			.setView(e)
+			.setPositiveButton("保存",new myDialogInterface(){
+				public void click(View v,int i)
+				{
+					ClientService.hostIp=e.getText().toString();
+					getSharedPreferences("server",MODE_PRIVATE).edit()
+						.putString("ip",e.getText().toString())
+						.commit();
+				}
+			})
+			.setNegativeButton("取消",null)
+			.show();
 		e.getLayoutParams().width=-1;
 	}
 	private static void initIcon()

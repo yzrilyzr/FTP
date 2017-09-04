@@ -1,17 +1,29 @@
 package com.yzrilyzr.FAQ;
 
-import android.graphics.*;
-import android.os.*;
-import android.text.*;
-import android.view.*;
 import android.widget.*;
-import com.yzrilyzr.FAQ.Data.*;
-import com.yzrilyzr.FAQ.Main.*;
-import com.yzrilyzr.ui.*;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.NinePatch;
+import android.graphics.Rect;
 import android.graphics.drawable.NinePatchDrawable;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.View.OnFocusChangeListener;
-import com.yzrilyzr.myclass.myActivity;
+import android.view.ViewGroup;
+import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Data.ToStrObj;
+import com.yzrilyzr.FAQ.Data.User;
+import com.yzrilyzr.FAQ.Main.C;
+import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.ui.myRoundDrawable;
+import com.yzrilyzr.ui.myToolBar;
 
 public class MainActivity extends BaseActivity
 {
@@ -70,7 +82,7 @@ public class MainActivity extends BaseActivity
 				}
 			});
     }
-	
+
 	@Override
 	public void rev(byte cmd, final String msg)
 	{
@@ -79,25 +91,34 @@ public class MainActivity extends BaseActivity
 		{
 			MessageObj m=(MessageObj)ToStrObj.s2o(msg);
 			if(m.from==to.faq)
-			runOnUiThread(new Runnable(){
-					@Override
-					public void run()
-					{
-						// TODO: Implement this method
-						MessageObj m=(MessageObj) ToStrObj.s2o(msg);
-						byte[] mh=Data.getHead(m.from+"",false);
-						addMsg(to.nick,false,false,BitmapFactory.decodeByteArray(mh,0,mh.length),m.msg);
-					}
-				});
+				runOnUiThread(new Runnable(){
+						@Override
+						public void run()
+						{
+							// TODO: Implement this method
+							MessageObj m=(MessageObj) ToStrObj.s2o(msg);
+							byte[] mh=Data.getHead(m.from,false);
+							addMsg(to.nick,false,false,BitmapFactory.decodeByteArray(mh,0,mh.length),m.msg);
+						}
+					});
 		}
 	}
 	public void send(View v)
 	{
 		String m=et.getText().toString();
 		et.setText("");
-		byte[] mh=Data.getHead(Data.me.faq+"",false);
-		addMsg(Data.me.nick,true,false,BitmapFactory.decodeByteArray(mh,0,mh.length),m);
-		if(!ClientService.sendMsg(C.MSG,new MessageObj(Data.me.faq,to.faq,(byte)0,false,m).setTime().o2s()))Toast.makeText(this,"发送失败",0).show();
+		byte[] mh=Data.getMyHead();
+		User u=Data.getMyself();
+		addMsg(u.nick,true,false,BitmapFactory.decodeByteArray(mh,0,mh.length),m);
+		if(!ClientService.sendMsg(C.MSG,new MessageObj(u.faq,to.faq,(byte)0,false,m).setTime().o2s()))Toast.makeText(this,"发送失败",0).show();
+	}
+
+	@Override
+	public void exit(View v)
+	{
+		// TODO: Implement this method
+		et.setEnabled(false);
+		super.exit(v);
 	}
 
 	private void addMsg(String fromNick,boolean isSend,boolean isGroup,Bitmap head,String msg)
@@ -114,10 +135,11 @@ public class MainActivity extends BaseActivity
 		//mat.postScale(isSend?1f:-1f,1f);
 		//b=Bitmap.createBitmap(b,0,0,b.getWidth(),b.getHeight(),mat,false);
 		byte[] nc=b.getNinePatchChunk();
-		if(NinePatch.isNinePatchChunk(nc)){
+		if(NinePatch.isNinePatchChunk(nc))
+		{
 			NinePatchDrawable n=new NinePatchDrawable(getResources(),b,nc,
-			new Rect(tv.getPaddingLeft(),tv.getPaddingTop(),tv.getPaddingRight(),tv.getPaddingBottom())
-			,null);
+													  new Rect(tv.getPaddingLeft(),tv.getPaddingTop(),tv.getPaddingRight(),tv.getPaddingBottom())
+													  ,null);
 			//n.setAutoMirrored(!isSend);
 			tv.setBackground(n);
 		}
@@ -136,5 +158,5 @@ public class MainActivity extends BaseActivity
 				}
 			},300);
 	}
-	
+
 }

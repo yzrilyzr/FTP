@@ -17,6 +17,7 @@ import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
+import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
@@ -50,18 +51,23 @@ public class ListActivity extends BaseActivity
 		myLoadingView lo=new myLoadingView(ctx);
 		lo.paint.setColor(uidata.UI_COLOR_BACK);
 		toolbar.addView(lo,2);
-		byte[] hd=Data.getHead(Data.me.faq+"",false);
+		Data.getMyself();
+		//Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
+		listMsg();
+	}
+
+	private void setMyInfo()
+	{
+		User me=Data.getMyself();
+		byte[] hd=Data.getMyHead();
 		myRoundDrawable hd2=new myRoundDrawable(BitmapFactory.decodeByteArray(hd,0,hd.length));
 		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(hd2);
-		((TextView)findViewById(R.id.listTextView1)).setText(Data.me.nick);
-		((TextView)findViewById(R.id.listTextView2)).setText(Data.me.sign);
+		((TextView)findViewById(R.id.listTextView1)).setText(me.nick);
+		((TextView)findViewById(R.id.listTextView2)).setText(me.sign);
 		toolbar.removeViewAt(2);
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		t.setImageDrawable(hd2);
-		Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
-		listMsg();
-		listFri();
 	}
 	public void add(View v)
 	{
@@ -106,14 +112,22 @@ public class ListActivity extends BaseActivity
 	{
 		// TODO: Implement this method
 		runOnUiThread(new Runnable(){
-					@Override
-					public void run()
+				@Override
+				public void run()
+				{
+					// TODO: Implement this method
+					if(cmd==C.MSG)listMsg();
+					else if(cmd==C.GUS)
 					{
-						// TODO: Implement this method
-						if(cmd==C.MSG)listMsg();
-						else if(cmd==C.GUS&&((User)ToStrObj.s2o(msg)).faq==Data.me.faq)listFri();
+						if("-1".equals(msg))return;
+						User u=(User) ToStrObj.s2o(msg);
+						if(u!=null&&u.faq==Data.myfaq){
+							setMyInfo();
+							listFri();
+						}
 					}
-				});
+				}
+			});
 	}
 	public void menu(View v)
 	{
@@ -155,12 +169,11 @@ public class ListActivity extends BaseActivity
 	private void listFri()
 	{
 		listFri.setAdapter(new BaseAdapter(){
-
 				@Override
 				public int getCount()
 				{
 					// TODO: Implement this method
-					return Data.me.friends.size();
+					return Data.getMyself().friends.size();
 				}
 
 				@Override
@@ -187,15 +200,19 @@ public class ListActivity extends BaseActivity
 					TextView ms=(TextView) vg.findViewById(R.id.listentryTextView2);
 					TextView ts=(TextView) vg.findViewById(R.id.listentryTextView3);
 					ts.setVisibility(8);
-					int faq=Data.me.friends.get(p1);
-					User u=Data.users.get(faq+"");
+					int faq=Data.getMyself().friends.get(p1);
+					User u=Data.getUser(faq);
 					if(u!=null)
 					{
 						ni.setText(u.nick);
 						ms.setText(u.sign);
 					}
-					else ni.setText(faq+"");
-					byte[] b=Data.getHead(faq+"",false);
+					else
+					{
+						ni.setText(faq+"");
+						ClientService.sendMsg(C.GUS,faq+"");
+					}
+					byte[] b=Data.getHead(faq,false);
 					if(b!=null)
 					{
 						Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
@@ -210,7 +227,7 @@ public class ListActivity extends BaseActivity
 				{
 					// TODO: Implement this method
 					Intent in=new Intent(ListActivity.this,MainActivity.class);
-					User u=Data.users.get(Data.me.friends.get(p3)+"");
+					User u=Data.getUser(Data.getMyself().friends.get(p3));
 					if(u==null)return;
 					in.putExtra("user",u.o2s());
 					startActivity(in);
@@ -277,10 +294,14 @@ public class ListActivity extends BaseActivity
 					}
 					else
 					{
-						User u=Data.users.get(o.from+"");
+						User u=Data.getUser(o.from);
 						if(u!=null)ni.setText(u.nick);
-						else ni.setText(o.from+"");
-						byte[] b=Data.getHead(o.from+"",o.isGroup);
+						else
+						{
+							ni.setText(o.from+"");
+							ClientService.sendMsg(C.GUS,o.from+"");
+						}
+						byte[] b=Data.getHead(o.from,o.isGroup);
 						if(b!=null)
 						{
 							Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
@@ -301,7 +322,7 @@ public class ListActivity extends BaseActivity
 					else
 					{
 						Intent in=new Intent(ListActivity.this,MainActivity.class);
-						User u=Data.users.get(o.from+"");
+						User u=Data.getUser(o.from);
 						if(u==null)return;
 						in.putExtra("user",u.o2s());
 						startActivity(in);

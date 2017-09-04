@@ -16,7 +16,6 @@ import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Main.T;
-import com.yzrilyzr.myclass.myActivity;
 import com.yzrilyzr.ui.myAlertDialog;
 import com.yzrilyzr.ui.myDialogInterface;
 import com.yzrilyzr.ui.myRoundDrawable;
@@ -36,10 +35,11 @@ public class SysMsgActivity extends BaseActivity
 		lv=(ListView) findViewById(R.id.sysmsgListView1);
 		setList();
 	}
-	private void setList(){
+	private void setList()
+	{
 		final ArrayList<MessageObj> sml=new ArrayList<MessageObj>();
 		for(MessageObj m:Data.msgs)
-		if(m.type==T.VMS)sml.add(m);
+			if(m.type==T.VMS)sml.add(m);
 		lv.setAdapter(new BaseAdapter(){
 				@Override
 				public int getCount()
@@ -74,15 +74,15 @@ public class SysMsgActivity extends BaseActivity
 					MessageObj o=sml.get(p1);
 					ms.setText(o.msg);
 					ts.setText(new SimpleDateFormat("HH:mm").format(new Date(o.time)));
-				User u=Data.users.get(o.from+"");
-						if(u!=null)ni.setText(u.nick);
-						else ni.setText(o.from+"");
-						byte[] b=Data.getHead(o.from+"",o.isGroup);
-						if(b!=null)
-						{
-							Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
-							hd.setImageDrawable(new myRoundDrawable(bm));
-						}
+					User u=Data.getUser(o.from);
+					if(u!=null)ni.setText(u.nick);
+					else ni.setText(o.from+"");
+					byte[] b=Data.getHead(o.from,o.isGroup);
+					if(b!=null)
+					{
+						Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
+						hd.setImageDrawable(new myRoundDrawable(bm));
+					}
 					return vg;
 				}
 			});
@@ -92,17 +92,17 @@ public class SysMsgActivity extends BaseActivity
 				{
 					final MessageObj m=sml.get(p3);
 					new myAlertDialog(ctx)
-					.setTitle("系统消息")
-					.setMessage(String.format("同意来自 %d 的请求:%s",m.from,m.msg))
+						.setTitle("系统消息")
+						.setMessage(String.format("同意来自 %d 的请求:%s",m.from,m.msg))
 						.setPositiveButton("同意",new myDialogInterface(){
-						public void click(View v,int i)
-						{
-							if(!m.isGroup)ClientService.sendMsg(C.AFD,m.from+"");
-						}
-					})
-					.setNegativeButton("拒绝",null)
-					.setNeutralButton("关闭",null)
-					.show();
+							public void click(View v,int i)
+							{
+								if(!m.isGroup)ClientService.sendMsg(C.AFD,m.from+"");
+							}
+						})
+						.setNegativeButton("拒绝",null)
+						.setNeutralButton("关闭",null)
+						.show();
 				}});
 	}
 }

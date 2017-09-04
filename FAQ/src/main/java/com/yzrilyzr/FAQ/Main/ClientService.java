@@ -16,6 +16,7 @@ public class ClientService
 	static String deckey=null;
 	private static boolean running=true;
 	public static boolean isLogin=false;
+	private static String myfaq,mypwd;
 	public interface Listener
 	{
 		public abstract void rev(byte cmd,String msg);
@@ -96,7 +97,7 @@ public class ClientService
 								deckey=null;
 								connect();
 								Thread.sleep(1000);
-								login(Data.me.faq+"",Data.me.pwd);
+								login(myfaq,mypwd);
 								isc=false;
 							}
 							catch (Exception e)
@@ -203,11 +204,10 @@ public class ClientService
 		//sendMsg("LGN");
 		try
 		{
-			Data.me=new User();
-			Data.me.faq=Integer.parseInt(fa);
-			Data.me.pwd=pwd;
 			sendMsg(C.USL,fa);
 			sendMsg(C.PWL,pwd);
+			myfaq=fa;
+			mypwd=pwd;
 		}
 		catch(Throwable e)
 		{

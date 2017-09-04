@@ -2,7 +2,6 @@ package com.yzrilyzr.FAQ.Main;
 
 import java.io.*;
 
-import android.util.Base64;
 import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
@@ -13,8 +12,24 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Data
 {
-	public static User me;
+	public static int myfaq=0;
+	private static User me=null;
 	public static ListActivity ctx;
+	static{
+		Thread.setDefaultUncaughtExceptionHandler(new java.lang.Thread.UncaughtExceptionHandler(){
+				@Override
+				public void uncaughtException(Thread p1, Throwable p2)
+				{
+					// TODO: Implement this method
+					try
+					{
+						ClientService.sendMsg(C.LOG,util.getStackTrace(p2));
+					}
+					catch(Throwable e)
+					{}
+				}
+			});
+	}
 	public static void saveHead(boolean isg,byte[] b)
 	{
 		try
@@ -30,12 +45,34 @@ public class Data
 		{}
 
 	}
-	public static byte[] getHead(String faq,boolean isg)
+	public static User getUser(int faq)
+	{
+		User u=users.get(faq+"");
+		if(u==null)ClientService.sendMsg(C.GUS,faq+"");
+		else if(u.faq==myfaq)me=u;
+		return u;
+	}
+	public static User getMyself()
+	{
+		if(me!=null)return me;
+		return getUser(myfaq);
+	}
+	public static byte[] getMyHead()
+	{
+		return getHead(myfaq,false);
+	}
+	public static byte[] getHead(int faq,boolean isg)
 	{
 		try
 		{
-
-			BufferedInputStream is=new BufferedInputStream(new FileInputStream(util.mainDir+"/head/"+faq+(isg?".group":".user")+".png"));
+			String p=String.format("%s/head/%d%s.png",util.mainDir,faq,isg?".group":".user");
+			File f=new File(p);
+			if(!f.exists())
+			{
+				ClientService.sendMsg(isg?C.GHG:C.GHU,faq+"");
+				return null;
+			}
+			BufferedInputStream is=new BufferedInputStream(new FileInputStream(p));
 			byte[] by=new byte[is.available()];
 			is.read(by);
 			is.close();

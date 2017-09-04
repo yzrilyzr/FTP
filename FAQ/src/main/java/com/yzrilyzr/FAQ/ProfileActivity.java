@@ -26,9 +26,10 @@ public class ProfileActivity extends BaseActivity
 		{
 			isUser=true;
 			ClientService.sendMsg(C.GUS,faq+"");
-			byte[] hd=Data.getHead(faq+"",!isUser);
+			byte[] hd=Data.getHead(faq,!isUser);
 			if(hd==null)ClientService.sendMsg(C.GHU,faq+"");
-			else{
+			else
+			{
 				Bitmap b=BitmapFactory.decodeByteArray(hd,0,hd.length);
 				((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(new myRoundDrawable(b));
 			}
@@ -38,17 +39,18 @@ public class ProfileActivity extends BaseActivity
 			faq=getIntent().getIntExtra("gro",-1);
 			isUser=false;
 			ClientService.sendMsg(C.GGR,faq+"");
-			byte[] hd=Data.getHead(faq+"",!isUser);
+			byte[] hd=Data.getHead(faq,!isUser);
 			if(hd==null)ClientService.sendMsg(C.GHG,faq+"");
-			else{
+			else
+			{
 				Bitmap b=BitmapFactory.decodeByteArray(hd,0,hd.length);
 				((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(new myRoundDrawable(b));
 			}
 		}
 	}
-public void add(View v)
+	public void add(View v)
 	{
-		ClientService.sendMsg(C.MSG,new MessageObj(Data.me.faq,faq,T.VMS,false,String.format("%s 请求添加您为好友",Data.me.nick)).setTime().o2s());
+		ClientService.sendMsg(C.MSG,new MessageObj(Data.myfaq,faq,T.VMS,false,String.format("%s 请求添加您为好友",Data.getMyself().nick)).setTime().o2s());
 		util.toast(ctx,"已发送请求，等待同意");
 	}
 	@Override
