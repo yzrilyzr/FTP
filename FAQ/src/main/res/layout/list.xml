@@ -23,7 +23,7 @@
 				<com.yzrilyzr.ui.myLinearLayout
 					android:layout_height="match_parent"
 					android:layout_width="match_parent"
-					android:src="@drawable/launch"/>
+					android:src="@drawable/launcher"/>
 
 				<ImageView
 					android:layout_height="50dp"
@@ -164,7 +164,7 @@
 				android:layout_height="wrap_content"
 				android:layout_width="match_parent"
 				yzr:title="FAQ"
-				yzr:src0="@drawable/icon"
+				yzr:src0="@drawable/launcher"
 				yzr:onClick0="menu"
 				yzr:tip0="菜单"
 				yzr:src1="@drawable/add"

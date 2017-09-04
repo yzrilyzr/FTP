@@ -51,6 +51,7 @@ public class ListActivity extends BaseActivity
 		myLoadingView lo=new myLoadingView(ctx);
 		lo.paint.setColor(uidata.UI_COLOR_BACK);
 		toolbar.addView(lo,2);
+		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(new myRoundDrawable(ctx,R.drawable.launcher));
 		Data.getMyself();
 		//Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
 		listMsg();
@@ -289,7 +290,7 @@ public class ListActivity extends BaseActivity
 					ts.setText(new SimpleDateFormat("HH:mm").format(new Date(o.time)));
 					if(o.type==T.VMS)
 					{
-						hd.setImageDrawable(new myRoundDrawable(ctx,R.drawable.launch));
+						hd.setImageDrawable(new myRoundDrawable(ctx,R.drawable.launcher));
 						ni.setText("系统消息");
 					}
 					else

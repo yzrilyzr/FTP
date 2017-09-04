@@ -34,7 +34,7 @@ public class LoginActivity extends BaseActivity
 		autoLog=getIntent().getBooleanExtra("al",true);
 		u=(EditText) findViewById(R.id.loginEditText1);
 		iv=(ImageView) findViewById(R.id.loginImageView1);
-		iv.setImageDrawable(defhead=new myRoundDrawable(this,R.drawable.launch));
+		iv.setImageDrawable(defhead=new myRoundDrawable(this,R.drawable.launcher));
 		u.addTextChangedListener(new TextWatcher(){
 				@Override
 				public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4)
