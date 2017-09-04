@@ -51,7 +51,11 @@ public class ListActivity extends BaseActivity
 		myLoadingView lo=new myLoadingView(ctx);
 		lo.paint.setColor(uidata.UI_COLOR_BACK);
 		toolbar.addView(lo,2);
-		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(new myRoundDrawable(ctx,R.drawable.launcher));
+		myRoundDrawable hd2=new myRoundDrawable(ctx,R.drawable.launcher);
+		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(hd2);
+		myTitleButton t=toolbar.getButton(0);
+		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
+		t.setImageDrawable(hd2);
 		Data.getMyself();
 		//Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
 		listMsg();
@@ -61,14 +65,17 @@ public class ListActivity extends BaseActivity
 	{
 		User me=Data.getMyself();
 		byte[] hd=Data.getMyHead();
-		myRoundDrawable hd2=new myRoundDrawable(BitmapFactory.decodeByteArray(hd,0,hd.length));
-		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(hd2);
+		if(hd!=null)
+		{
+			myRoundDrawable hd2=new myRoundDrawable(BitmapFactory.decodeByteArray(hd,0,hd.length));
+			((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(hd2);
+			myTitleButton t=toolbar.getButton(0);
+			t.setScaleType(ImageView.ScaleType.CENTER_CROP);
+			t.setImageDrawable(hd2);
+		}
 		((TextView)findViewById(R.id.listTextView1)).setText(me.nick);
 		((TextView)findViewById(R.id.listTextView2)).setText(me.sign);
 		toolbar.removeViewAt(2);
-		myTitleButton t=toolbar.getButton(0);
-		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
-		t.setImageDrawable(hd2);
 	}
 	public void add(View v)
 	{
@@ -122,7 +129,8 @@ public class ListActivity extends BaseActivity
 					{
 						if("-1".equals(msg))return;
 						User u=(User) ToStrObj.s2o(msg);
-						if(u!=null&&u.faq==Data.myfaq){
+						if(u!=null&&u.faq==Data.myfaq)
+						{
 							setMyInfo();
 							listFri();
 						}
