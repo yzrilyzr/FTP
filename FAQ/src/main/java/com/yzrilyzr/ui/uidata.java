@@ -15,9 +15,9 @@ public class uidata{
 	public static int UI_TEXTCOLOR_MAIN=0xffffffff;
 	public static int UI_TEXTCOLOR_BACK=0xff000000;
 	public static int UI_TEXTCOLOR_HL=0xffaaaaaa;
-	public static int UI_COLOR_MAIN=0xffff9800;
-	public static int UI_COLOR_BACK=0xffffdbaa;
-	public static int UI_COLOR_MAINHL=0xffffddcc;
+	public static int UI_COLOR_MAIN=0xff3f51b5;
+	public static int UI_COLOR_BACK=0xffc5cae9;
+	public static int UI_COLOR_MAINHL=0xffe8eaf6;
 	public static float UI_DENSITY=0.0F;
 	public static float UI_RADIUS=3.0f;
 	public static boolean isInit=false;
