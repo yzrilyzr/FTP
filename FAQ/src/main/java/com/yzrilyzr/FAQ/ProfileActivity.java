@@ -1,19 +1,21 @@
 package com.yzrilyzr.FAQ;
-import android.graphics.*;
-import android.widget.*;
-import com.yzrilyzr.FAQ.Data.*;
-import com.yzrilyzr.FAQ.Main.*;
-
 import android.os.Bundle;
 import android.view.View;
-import com.yzrilyzr.myclass.myActivity;
-import com.yzrilyzr.ui.myRoundDrawable;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.yzrilyzr.FAQ.Data.Group;
+import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Data.ToStrObj;
+import com.yzrilyzr.FAQ.Data.User;
+import com.yzrilyzr.FAQ.Main.C;
+import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
-import android.util.Base64;
 
 public class ProfileActivity extends BaseActivity
 {
-	boolean isUser=true;
+	boolean isGroup=false;
 	int faq;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -24,28 +26,16 @@ public class ProfileActivity extends BaseActivity
 		faq=getIntent().getIntExtra("faq",-1);
 		if(faq!=-1)
 		{
-			isUser=true;
+			Data.getUser(faq);
 			ClientService.sendMsg(C.GUS,faq+"");
-			byte[] hd=Data.getHead(faq,!isUser);
-			if(hd==null)ClientService.sendMsg(C.GHU,faq+"");
-			else
-			{
-				Bitmap b=BitmapFactory.decodeByteArray(hd,0,hd.length);
-				((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(new myRoundDrawable(b));
-			}
+			((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(Data.getHeadDrawable(faq,isGroup));
 		}
 		else if(faq==-1)
 		{
 			faq=getIntent().getIntExtra("gro",-1);
-			isUser=false;
+			isGroup=true;
 			ClientService.sendMsg(C.GGR,faq+"");
-			byte[] hd=Data.getHead(faq,!isUser);
-			if(hd==null)ClientService.sendMsg(C.GHG,faq+"");
-			else
-			{
-				Bitmap b=BitmapFactory.decodeByteArray(hd,0,hd.length);
-				((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(new myRoundDrawable(b));
-			}
+			((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(Data.getHeadDrawable(faq,isGroup));
 		}
 	}
 	public void add(View v)
@@ -66,15 +56,15 @@ public class ProfileActivity extends BaseActivity
 						TextView nick=(TextView) findViewById(R.id.profileTextView1);
 						if("-1".equals(msg))
 						{
-							nick.setText(String.format("查无此%s",isUser?"人":"群"));
+							nick.setText(String.format("查无此%s",isGroup?"群":"人"));
 							return;
 						}
-						if(isUser)
+						if(!isGroup)
 						{
 							User u=(User) ToStrObj.s2o(msg);
 							if(u.faq!=faq)return;
 							nick.setText(u.nick);
-							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isUser?"个性签名":"描述",u.sign));
+							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isGroup?"描述":"个性签名",u.sign));
 							((TextView) findViewById(R.id.profileTextView3)).setText(String.format("FAQ:%d",u.faq));
 						}
 						else
@@ -82,26 +72,19 @@ public class ProfileActivity extends BaseActivity
 							Group u=(Group) Group.s2o(msg);
 							if(u.faq!=faq)return;
 							nick.setText(u.nick);
-							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isUser?"个性签名":"描述",u.sign));
+							((TextView) findViewById(R.id.profileTextView2)).setText(String.format("%s:%s",isGroup?"描述":"个性签名",u.sign));
 							((TextView) findViewById(R.id.profileTextView3)).setText(String.format("FAQ:%d",u.faq));
 						}
 
 					}
 				});
 		else if(cmd==C.GHG||cmd==C.GHU)
-		{
-			if("-1".equals(msg))return;
-			byte[] b=Base64.decode(msg,0);
-			int f=Data.getInt(new byte[]{b[0],b[1],b[2],b[3]});
-			if(f!=faq)return;
-			final Bitmap bm=BitmapFactory.decodeByteArray(b,4,b.length-4);
 			runOnUiThread(new Runnable(){
 					@Override
 					public void run()
 					{
-						((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(new myRoundDrawable(bm));
+						((ImageView)findViewById(R.id.profileImageView1)).setImageDrawable(Data.getHeadDrawable(faq,isGroup));
 					}});
-		}
 	}
 
 

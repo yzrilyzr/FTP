@@ -23,7 +23,6 @@ public class LoginActivity extends BaseActivity
 	Activity ctx=this;
 	EditText u,p;
 	ImageView iv;
-	myRoundDrawable defhead;
 	boolean autoLog=true;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -34,7 +33,7 @@ public class LoginActivity extends BaseActivity
 		autoLog=getIntent().getBooleanExtra("al",true);
 		u=(EditText) findViewById(R.id.loginEditText1);
 		iv=(ImageView) findViewById(R.id.loginImageView1);
-		iv.setImageDrawable(defhead=new myRoundDrawable(this,R.drawable.launcher));
+		iv.setImageDrawable(Data.DefaultHead);
 		u.addTextChangedListener(new TextWatcher(){
 				@Override
 				public void beforeTextChanged(CharSequence p1, int p2, int p3, int p4)
@@ -46,7 +45,12 @@ public class LoginActivity extends BaseActivity
 				public void onTextChanged(CharSequence p1, int p2, int p3, int p4)
 				{
 					// TODO: Implement this method
-					setHead(p1.toString());
+					try
+					{
+						setHead(Integer.parseInt(p1.toString()));
+					}
+					catch(Throwable e)
+					{}
 				}
 
 				@Override
@@ -72,12 +76,10 @@ public class LoginActivity extends BaseActivity
 		catch(Throwable e)
 		{}
 	}
-	private void setHead(String s)
+	private void setHead(int faq)
 	{
-		Bitmap h=BitmapFactory.decodeFile(util.mainDir+"/head/"+s+".user.png");
-		myRoundDrawable hd2=null;
-		if(h==null)hd2=defhead;
-		else hd2=new myRoundDrawable(h);
+		myRoundDrawable hd2=Data.getHeadDrawable(faq,false);
+		if(hd2==null)hd2=Data.DefaultHead;
 		iv.setImageDrawable(hd2);
 	}
 
@@ -111,7 +113,7 @@ public class LoginActivity extends BaseActivity
 		else ClientService.login(a,b);
 		try
 		{
-			setHead(a);
+			setHead(Integer.parseInt(a));
 			getSharedPreferences("login",MODE_PRIVATE).edit()
 				.putString("user",a)
 				.putString("pwd",AES.encrypt(a,b))

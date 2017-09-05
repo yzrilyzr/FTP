@@ -51,28 +51,23 @@ public class ListActivity extends BaseActivity
 		myLoadingView lo=new myLoadingView(ctx);
 		lo.paint.setColor(uidata.UI_COLOR_BACK);
 		toolbar.addView(lo,2);
-		myRoundDrawable hd2=new myRoundDrawable(ctx,R.drawable.launcher);
-		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(hd2);
+		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(Data.DefaultHead);
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
-		t.setImageDrawable(hd2);
+		t.setImageDrawable(Data.DefaultHead);
 		Data.getMyself();
 		//Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
 		listMsg();
+		System.gc();
 	}
 
 	private void setMyInfo()
 	{
 		User me=Data.getMyself();
-		byte[] hd=Data.getMyHead();
-		if(hd!=null)
-		{
-			myRoundDrawable hd2=new myRoundDrawable(BitmapFactory.decodeByteArray(hd,0,hd.length));
-			((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(hd2);
-			myTitleButton t=toolbar.getButton(0);
-			t.setScaleType(ImageView.ScaleType.CENTER_CROP);
-			t.setImageDrawable(hd2);
-		}
+		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(Data.getMyHeadDrawable());
+		myTitleButton t=toolbar.getButton(0);
+		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
+		t.setImageDrawable(Data.getMyHeadDrawable());
 		((TextView)findViewById(R.id.listTextView1)).setText(me.nick);
 		((TextView)findViewById(R.id.listTextView2)).setText(me.sign);
 		toolbar.removeViewAt(2);
@@ -216,17 +211,8 @@ public class ListActivity extends BaseActivity
 						ni.setText(u.nick);
 						ms.setText(u.sign);
 					}
-					else
-					{
-						ni.setText(faq+"");
-						ClientService.sendMsg(C.GUS,faq+"");
-					}
-					byte[] b=Data.getHead(faq,false);
-					if(b!=null)
-					{
-						Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
-						hd.setImageDrawable(new myRoundDrawable(bm));
-					}
+					else ni.setText(faq+"");
+					hd.setImageDrawable(Data.getHeadDrawable(faq,false));
 					return vg;
 				}
 			});
@@ -298,7 +284,7 @@ public class ListActivity extends BaseActivity
 					ts.setText(new SimpleDateFormat("HH:mm").format(new Date(o.time)));
 					if(o.type==T.VMS)
 					{
-						hd.setImageDrawable(new myRoundDrawable(ctx,R.drawable.launcher));
+						hd.setImageDrawable(Data.DefaultHead);
 						ni.setText("系统消息");
 					}
 					else
@@ -310,12 +296,7 @@ public class ListActivity extends BaseActivity
 							ni.setText(o.from+"");
 							ClientService.sendMsg(C.GUS,o.from+"");
 						}
-						byte[] b=Data.getHead(o.from,o.isGroup);
-						if(b!=null)
-						{
-							Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
-							hd.setImageDrawable(new myRoundDrawable(bm));
-						}
+						hd.setImageDrawable(Data.getHeadDrawable(o.from,o.isGroup));
 					}
 					return vg;
 				}

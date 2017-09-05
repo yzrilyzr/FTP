@@ -2,19 +2,30 @@ package com.yzrilyzr.FAQ.Main;
 
 import java.io.*;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import com.yzrilyzr.FAQ.Data.Group;
 import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.ListActivity;
 import com.yzrilyzr.myclass.util;
+import com.yzrilyzr.ui.myRoundDrawable;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Data
 {
+	public static final ArrayList<MessageObj> msgs=new ArrayList<MessageObj>();
+	public static final ArrayList<MessageObj> msgBuffer=new ArrayList<MessageObj>();
+	public static ConcurrentHashMap<String,MessageObj> msglist=new ConcurrentHashMap<String,MessageObj>();
+	public static ConcurrentHashMap<String,User> users=new ConcurrentHashMap<String,User>();
+	public static ConcurrentHashMap<String,Group> groups=new ConcurrentHashMap<String,Group>();
 	public static int myfaq=0;
 	private static User me=null;
 	public static ListActivity ctx;
+	public static myRoundDrawable DefaultHead;
+	private static ConcurrentHashMap<String,Bitmap> head=new ConcurrentHashMap<String,Bitmap>();
 	static{
 		Thread.setDefaultUncaughtExceptionHandler(new java.lang.Thread.UncaughtExceptionHandler(){
 				@Override
@@ -29,6 +40,17 @@ public class Data
 					{}
 				}
 			});
+	}
+	public static myRoundDrawable getMyHeadDrawable(){
+		return getHeadDrawable(myfaq,false);
+	}
+	public static myRoundDrawable getHeadDrawable(int faq,boolean isg){
+		Bitmap b= head.get(faq+"");
+		if(b==null){
+			getHead(faq,isg);
+			return null;
+		}
+		return new myRoundDrawable(b);
 	}
 	public static void saveHead(boolean isg,byte[] b)
 	{
@@ -45,6 +67,13 @@ public class Data
 		{}
 
 	}
+	public static Group getGroup(int faq)
+	{
+		Group u=groups.get(faq+"");
+		if(u==null)ClientService.sendMsg(C.GGR,faq+"");
+		return u;
+	}
+	
 	public static User getUser(int faq)
 	{
 		User u=users.get(faq+"");
@@ -76,6 +105,7 @@ public class Data
 			byte[] by=new byte[is.available()];
 			is.read(by);
 			is.close();
+			head.put(faq+"",BitmapFactory.decodeByteArray(by,0,by.length));
 			return by;
 		}
 		catch(Throwable e)
@@ -102,10 +132,6 @@ public class Data
 		catch (Exception e)
 		{}
 	}
-	public static final ArrayList<MessageObj> msgs=new ArrayList<MessageObj>();
-	public static final ArrayList<MessageObj> msgBuffer=new ArrayList<MessageObj>();
-	public static ConcurrentHashMap<String,MessageObj> msglist=new ConcurrentHashMap<String,MessageObj>();
-	public static ConcurrentHashMap<String,User> users=new ConcurrentHashMap<String,User>();
 	public static void writeHashmap(ConcurrentHashMap<?,ToStrObj> map,String file)
 	{
 		try

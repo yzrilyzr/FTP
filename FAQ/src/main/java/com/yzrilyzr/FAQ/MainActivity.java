@@ -22,7 +22,6 @@ import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
-import com.yzrilyzr.ui.myRoundDrawable;
 import com.yzrilyzr.ui.myToolBar;
 
 public class MainActivity extends BaseActivity
@@ -97,8 +96,7 @@ public class MainActivity extends BaseActivity
 						{
 							// TODO: Implement this method
 							MessageObj m=(MessageObj) ToStrObj.s2o(msg);
-							byte[] mh=Data.getHead(m.from,false);
-							addMsg(to.nick,false,false,BitmapFactory.decodeByteArray(mh,0,mh.length),m.msg);
+							addMsg(Data.getUser(m.from),m);
 						}
 					});
 		}
@@ -107,9 +105,8 @@ public class MainActivity extends BaseActivity
 	{
 		String m=et.getText().toString();
 		et.setText("");
-		byte[] mh=Data.getMyHead();
 		User u=Data.getMyself();
-		addMsg(u.nick,true,false,BitmapFactory.decodeByteArray(mh,0,mh.length),m);
+		addMsg(u,new MessageObj(u.faq,to.faq,(byte)0,false,m));
 		if(!ClientService.sendMsg(C.MSG,new MessageObj(u.faq,to.faq,(byte)0,false,m).setTime().o2s()))Toast.makeText(this,"发送失败",0).show();
 	}
 
@@ -121,19 +118,16 @@ public class MainActivity extends BaseActivity
 		super.exit(v);
 	}
 
-	private void addMsg(String fromNick,boolean isSend,boolean isGroup,Bitmap head,String msg)
+	private void addMsg(User us,MessageObj msg)
 	{
 		ViewGroup vg=(ViewGroup) LayoutInflater.from(this).inflate(R.layout.msg_entry,null);
-		((LinearLayout)vg.findViewById(R.id.msgentryLinearLayout1)).setGravity(isSend?Gravity.RIGHT:Gravity.LEFT);
+		((LinearLayout)vg.findViewById(R.id.msgentryLinearLayout1)).setGravity(us.faq==Data.myfaq?Gravity.RIGHT:Gravity.LEFT);
 		TextView ni=(TextView) vg.findViewById(R.id.msgentryTextView1);
-		ni.setVisibility(isGroup?0:8);
-		if(fromNick!=null)ni.setText(fromNick);
+		ni.setVisibility(msg.isGroup?0:8);
+		ni.setText(us.nick);
 		TextView tv=(TextView) vg.findViewById(R.id.msgentryTextView2);
-		tv.setText(msg);
+		tv.setText(msg.msg);
 		Bitmap b=BitmapFactory.decodeResource(getResources(),R.drawable.aio_user_bg_nor);
-		//Matrix mat=new Matrix();
-		//mat.postScale(isSend?1f:-1f,1f);
-		//b=Bitmap.createBitmap(b,0,0,b.getWidth(),b.getHeight(),mat,false);
 		byte[] nc=b.getNinePatchChunk();
 		if(NinePatch.isNinePatchChunk(nc))
 		{
@@ -143,11 +137,10 @@ public class MainActivity extends BaseActivity
 			//n.setAutoMirrored(!isSend);
 			tv.setBackground(n);
 		}
-		myRoundDrawable de=new myRoundDrawable(head);
 		ImageView iv1=(ImageView) vg.findViewById(R.id.msgentryImageView1);
 		ImageView iv2=(ImageView) vg.findViewById(R.id.msgentryImageView2);
-		if(isSend)iv2.setImageDrawable(de);
-		else iv1.setImageDrawable(de);
+		if(us.faq==Data.myfaq)iv2.setImageDrawable(Data.getMyHeadDrawable());
+		else iv1.setImageDrawable(Data.getHeadDrawable(us.faq,msg.isGroup));
 		ll.addView(vg);
 		new Handler().postDelayed(new Runnable(){
 				@Override

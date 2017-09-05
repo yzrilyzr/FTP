@@ -1,6 +1,4 @@
 package com.yzrilyzr.FAQ;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +16,6 @@ import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.ui.myAlertDialog;
 import com.yzrilyzr.ui.myDialogInterface;
-import com.yzrilyzr.ui.myRoundDrawable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,12 +74,7 @@ public class SysMsgActivity extends BaseActivity
 					User u=Data.getUser(o.from);
 					if(u!=null)ni.setText(u.nick);
 					else ni.setText(o.from+"");
-					byte[] b=Data.getHead(o.from,o.isGroup);
-					if(b!=null)
-					{
-						Bitmap bm=BitmapFactory.decodeByteArray(b,0,b.length);
-						hd.setImageDrawable(new myRoundDrawable(bm));
-					}
+					hd.setImageDrawable(Data.getHeadDrawable(o.from,o.isGroup));
 					return vg;
 				}
 			});

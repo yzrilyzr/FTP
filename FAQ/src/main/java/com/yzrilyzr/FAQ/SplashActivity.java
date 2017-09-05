@@ -1,18 +1,16 @@
 package com.yzrilyzr.FAQ;
+import com.yzrilyzr.ui.*;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.SplashActivity;
 import com.yzrilyzr.myclass.util;
-import com.yzrilyzr.ui.myAlertDialog;
-import com.yzrilyzr.ui.myDialogInterface;
-import com.yzrilyzr.ui.myEditText;
-import com.yzrilyzr.ui.myIconDrawer;
 import com.yzrilyzr.ui.myIconDrawer.DrawType;
-import com.yzrilyzr.ui.uidata;
 import com.yzrilyzr.ui.uidata.icon;
 
 public class SplashActivity extends BaseActivity 
@@ -32,6 +30,7 @@ public class SplashActivity extends BaseActivity
 		}
 		isInit=true;
 		super.onCreate(savedInstanceState);
+		Data.DefaultHead=new myRoundDrawable(ctx,R.drawable.launcher);
 		if(ClientService.isLogin)
 		{
 			startActivity(new Intent(SplashActivity.this,ListActivity.class));
