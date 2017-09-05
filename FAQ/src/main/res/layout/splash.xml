@@ -6,22 +6,25 @@
 	android:orientation="vertical"
 	android:gravity="center">
 
-	<LinearLayout
-		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:orientation="vertical"
-		android:layout_weight="1.0"/>
+	<com.yzrilyzr.ui.myLoadingView
+		android:layout_height="50dp"
+		android:layout_width="50dp"
+		android:layout_gravity="top|right"/>
 
-	<com.yzrilyzr.ui.myTextViewBack
+	<ImageView
+		android:layout_height="150dp"
+		android:layout_width="150dp"
+		android:src="@drawable/launcher"/>
+
+	<com.yzrilyzr.ui.myTextViewTitleBack
 		android:layout_height="wrap_content"
 		android:text="FAQ"
-		android:textAppearance="?android:attr/textAppearanceLarge"
-		android:layout_width="wrap_content"/>
+		android:layout_width="wrap_content"
+		android:layout_marginTop="35dp"/>
 
-	<com.yzrilyzr.ui.myTextViewBack
+	<com.yzrilyzr.ui.myTextViewTitleBack
 		android:layout_height="wrap_content"
 		android:text="为所欲为的开车"
-		android:textAppearance="?android:attr/textAppearanceLarge"
 		android:layout_width="wrap_content"
 		android:layout_marginTop="35dp"/>
 
@@ -30,6 +33,11 @@
 		android:layout_width="wrap_content"
 		android:orientation="vertical"
 		android:layout_weight="1.0"/>
+
+	<com.yzrilyzr.ui.myTextViewBack
+		android:layout_height="wrap_content"
+		android:text="Copyright © 2017 yzrilyzr"
+		android:layout_width="wrap_content"/>
 
 	<com.yzrilyzr.ui.myTextViewBack
 		android:layout_height="wrap_content"

@@ -28,7 +28,7 @@ public class ListActivity extends BaseActivity
 	myViewPager page;
 	myToolBar toolbar;
 	mySlidingMenu menu;
-	ListView listMsg,listFri,listGro,listFor;
+	ListView listMsg,listFri,listGro,listFor,listCld;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -40,12 +40,14 @@ public class ListActivity extends BaseActivity
 		listFri=new myListView(ctx);
 		listGro=new myListView(ctx);
 		listFor=new myListView(ctx);
+		listCld=new myListView(ctx);
 		page=(myViewPager) findViewById(R.id.listViewPager);
-		page.setPages(listMsg,listFri,listGro,listFor);
+		page.setPages(listMsg,listFri,listGro,listFor,listCld);
 		((LinearLayout.LayoutParams)listFri.getLayoutParams()).weight=1f;
 		((LinearLayout.LayoutParams)listMsg.getLayoutParams()).weight=1f;
 		((LinearLayout.LayoutParams)listFor.getLayoutParams()).weight=1f;
 		((LinearLayout.LayoutParams)listGro.getLayoutParams()).weight=1f;
+		((LinearLayout.LayoutParams)listCld.getLayoutParams()).weight=1f;
 		toolbar=(myToolBar) findViewById(R.id.listmyToolBar1);
 		menu=(mySlidingMenu)findViewById(R.id.listmySlidingMenu1);
 		myLoadingView lo=new myLoadingView(ctx);
@@ -167,6 +169,10 @@ public class ListActivity extends BaseActivity
 	public void page4(View v)
 	{
 		page.setCurrentItem(3,true);
+	}
+	public void page5(View v)
+	{
+		page.setCurrentItem(4,true);
 	}
 	private void listFri()
 	{

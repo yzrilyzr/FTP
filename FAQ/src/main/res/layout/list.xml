@@ -155,7 +155,25 @@
 							android:text="论坛"/>
 
 					</LinearLayout>
+					<LinearLayout
+						android:layout_height="wrap_content"
+						android:layout_width="wrap_content"
+						android:orientation="vertical"
+						android:layout_weight="1.0"
+						android:onClick="page5"
+						android:gravity="center">
 
+						<ImageView
+							android:layout_height="20dp"
+							android:layout_width="20dp"
+							android:src="@android:drawable/ic_delete"/>
+
+						<com.yzrilyzr.ui.myTextView
+							android:layout_height="wrap_content"
+							android:layout_width="wrap_content"
+							android:text="云盘"/>
+
+					</LinearLayout>
 				</com.yzrilyzr.ui.myLinearLayout>
 
 			</com.yzrilyzr.ui.myLinearLayoutBack>
