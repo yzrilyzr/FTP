@@ -55,10 +55,8 @@ public class ListActivity extends BaseActivity
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		t.setImageDrawable(Data.DefaultHead);
-		Data.getMyself();
-		//Data.msglist.put("1303895279",new MessageObj(1303895279,Data.me.faq,(byte)0,false,"t"));
+		ClientService.sendMsg(C.GUS,Data.myfaq+"");
 		listMsg();
-		System.gc();
 	}
 
 	private void setMyInfo()
