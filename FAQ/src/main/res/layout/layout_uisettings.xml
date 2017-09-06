@@ -8,22 +8,9 @@
 	android:focusable="true"
 	android:focusableInTouchMode="true">
 
-	<com.yzrilyzr.ui.myToolBar
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		yzr:title="UI设置"
-		yzr:src0="preset/prev"
-		yzr:onClick0="exit"
-		yzr:onClick1="showAbout"
-		yzr:tip0="返回"
-		yzr:src1="preset/info"
-		yzr:tip1="关于"
-		android:id="@+id/layoutuisettingsmyToolBar1"/>
-
 	<ScrollView
 		android:layout_height="match_parent"
-		android:layout_width="fill_parent"
-		android:layout_marginTop="55dp">
+		android:layout_width="fill_parent">
 
 		<LinearLayout
 			android:layout_height="fill_parent"
@@ -355,6 +342,16 @@
 		</LinearLayout>
 
 	</ScrollView>
-
+	<com.yzrilyzr.ui.myToolBar
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		yzr:title="界面设置"
+		yzr:src0="preset/prev"
+		yzr:onClick0="exit"
+		yzr:onClick1="showAbout"
+		yzr:tip0="返回"
+		yzr:src1="preset/info"
+		yzr:tip1="关于"
+		android:id="@+id/layoutuisettingsmyToolBar1"/>
 </FrameLayout>
 

@@ -1,13 +1,14 @@
 package com.yzrilyzr.ui;
-import android.widget.*;
-import android.content.*;
-import android.util.*;
-import android.view.*;
-import com.nineoldandroids.view.*;
-import android.content.res.*;
-import android.app.*;
-//import com.yzrilyzr.uidemo.*;
-import com.yzrilyzr.myclass.*;
+import android.app.Activity;
+import android.content.Context;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import com.nineoldandroids.view.ViewHelper;
+import com.yzrilyzr.myclass.util;
 
 public class mySlidingMenu extends HorizontalScrollView
 {
@@ -87,7 +88,8 @@ public class mySlidingMenu extends HorizontalScrollView
 			{
 				this.smoothScrollTo(mMenuWidth, 0);
 				isOpen = false;
-			} else
+			}
+			else
 			{
 				this.smoothScrollTo(0, 0);
 				isOpen = true;
@@ -120,7 +122,8 @@ public class mySlidingMenu extends HorizontalScrollView
 			isOpen = false;
 		}
 	}
-	public boolean getIsOpen(){return isOpen;}
+	public boolean getIsOpen()
+	{return isOpen;}
 	/**
 	 * 切换菜单状态
 	 */
@@ -129,7 +132,8 @@ public class mySlidingMenu extends HorizontalScrollView
 		if (isOpen)
 		{
 			closeMenu();
-		} else
+		}
+		else
 		{
 			openMenu();
 		}
@@ -148,11 +152,16 @@ public class mySlidingMenu extends HorizontalScrollView
 		ViewHelper.setScaleY(mMenu, leftScale);
 		ViewHelper.setAlpha(mMenu, 0.6f + 0.4f * (1 - scale));
 		ViewHelper.setTranslationX(mMenu, mMenuWidth * scale * 0.6f);
-
-		ViewHelper.setPivotX(mContent, 0);
-		ViewHelper.setPivotY(mContent, mContent.getHeight() / 2);
-		ViewHelper.setScaleX(mContent, rightScale);
-		ViewHelper.setScaleY(mContent, rightScale);
-
+		if(mMenuWidth>=l)
+		{
+			ViewHelper.setPivotX(mContent, 0);
+			ViewHelper.setPivotY(mContent, mContent.getHeight() / 2);
+			ViewHelper.setScaleX(mContent, rightScale);
+			ViewHelper.setScaleY(mContent, rightScale);
+			ViewHelper.setAlpha(mContent,1);
+		}
+		else{
+			ViewHelper.setAlpha(mContent, 0.6f + 0.4f * (2-scale));
+		}
 	}
 }

@@ -9,50 +9,11 @@
 	<LinearLayout
 		android:layout_height="match_parent"
 		android:layout_width="match_parent"
-		android:orientation="horizontal">
+		android:orientation="horizontal"
+		android:background="@drawable/bg">
 
-		<LinearLayout
-			android:layout_height="match_parent"
-			android:layout_width="match_parent"
-			android:orientation="vertical">
-
-			<FrameLayout
-				android:layout_height="200dp"
-				android:layout_width="match_parent">
-
-				<com.yzrilyzr.ui.myLinearLayout
-					android:layout_height="match_parent"
-					android:layout_width="match_parent"
-					android:src="@drawable/launcher"/>
-
-				<ImageView
-					android:layout_height="50dp"
-					android:layout_width="50dp"
-					android:src="@android:drawable/ic_delete"
-					android:layout_marginLeft="20dp"
-					android:layout_marginTop="60dp"
-					android:id="@+id/listImageView1"/>
-
-				<com.yzrilyzr.ui.myTextViewTitle
-					android:layout_height="wrap_content"
-					android:layout_width="match_parent"
-					android:layout_marginLeft="80dp"
-					android:layout_marginTop="75dp"
-					android:id="@+id/listTextView1"
-					android:maxLines="1"
-					android:layout_marginRight="20dp"/>
-
-				<com.yzrilyzr.ui.myTextView
-					android:layout_height="wrap_content"
-					android:layout_width="match_parent"
-					android:layout_gravity="bottom"
-					android:layout_margin="20dp"
-					android:id="@+id/listTextView2"
-					android:maxLines="1"/>
-
-			</FrameLayout>
-
-		</LinearLayout>
+		<include
+			layout="@layout/list_menu"/>
 
 		<FrameLayout
 			xmlns:yzr="http://schemas.android.com/apk/res-auto"
@@ -155,6 +116,7 @@
 							android:text="论坛"/>
 
 					</LinearLayout>
+
 					<LinearLayout
 						android:layout_height="wrap_content"
 						android:layout_width="wrap_content"
@@ -174,6 +136,7 @@
 							android:text="云盘"/>
 
 					</LinearLayout>
+
 				</com.yzrilyzr.ui.myLinearLayout>
 
 			</com.yzrilyzr.ui.myLinearLayoutBack>

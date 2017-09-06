@@ -20,6 +20,7 @@
         </activity>
 		<service android:name=".MsgService"/>
 		<activity android:name=".SysMsgActivity"/>
+		<activity android:name="com.yzrilyzr.ui.uiSettingsActivity"/>
 		<activity android:name=".ProfileActivity"/>
 		<activity android:name=".LoginActivity"/>
 		<activity android:name=".MainActivity"/>

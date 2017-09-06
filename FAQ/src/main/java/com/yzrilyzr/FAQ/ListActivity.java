@@ -22,6 +22,7 @@ import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
 import java.text.SimpleDateFormat;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class ListActivity extends BaseActivity
 {
@@ -34,6 +35,7 @@ public class ListActivity extends BaseActivity
 	{
 		// TODO: Implement this method
 		Data.ctx=this;
+		getWindow().setBackgroundDrawable(null);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
 		listMsg=new myListView(ctx);
@@ -53,10 +55,56 @@ public class ListActivity extends BaseActivity
 		myLoadingView lo=new myLoadingView(ctx);
 		lo.paint.setColor(uidata.UI_COLOR_BACK);
 		toolbar.addView(lo,2);
-		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(Data.DefaultHead);
+		((ImageView)findViewById(R.id.listmenuImageView1)).setImageDrawable(Data.DefaultHead);
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		t.setImageDrawable(Data.DefaultHead);
+		ListView lv=(ListView) findViewById(R.id.listmenuListView1);
+		final String[] s="设置,界面设置,帮助,关于".split(",");
+		lv.setAdapter(new BaseAdapter(){
+				@Override
+				public int getCount()
+				{
+					// TODO: Implement this method
+					return s.length;
+				}
+
+				@Override
+				public Object getItem(int p1)
+				{
+					// TODO: Implement this method
+					return null;
+				}
+
+				@Override
+				public long getItemId(int p1)
+				{
+					// TODO: Implement this method
+					return 0;
+				}
+
+				@Override
+				public View getView(int p1, View p2, ViewGroup p3)
+				{
+					// TODO: Implement this method
+					ViewGroup vg=(ViewGroup) LayoutInflater.from(ctx).inflate(R.layout.list_menu_entry,null);
+					ImageView iv=(ImageView) vg.getChildAt(0);
+					TextView te=(TextView) vg.getChildAt(1);
+					te.setText(s[p1]);
+					return vg;
+				}
+			});
+		lv.setOnItemClickListener(new OnItemClickListener(){
+				@Override
+				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
+				{
+					// TODO: Implement this method
+					if(p3==0){}
+					else if(p3==1)startActivity(new Intent(ctx,uiSettingsActivity.class));
+					else if(p3==2){}
+					else if(p3==3){}
+				}
+			});
 		ClientService.sendMsg(C.GUS,Data.myfaq+"");
 		listMsg();
 	}
@@ -64,12 +112,12 @@ public class ListActivity extends BaseActivity
 	private void setMyInfo()
 	{
 		User me=Data.getMyself();
-		((ImageView)findViewById(R.id.listImageView1)).setImageDrawable(Data.getMyHeadDrawable());
+		((ImageView)findViewById(R.id.listmenuImageView1)).setImageDrawable(Data.getMyHeadDrawable());
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		t.setImageDrawable(Data.getMyHeadDrawable());
-		((TextView)findViewById(R.id.listTextView1)).setText(me.nick);
-		((TextView)findViewById(R.id.listTextView2)).setText(me.sign);
+		((TextView)findViewById(R.id.listmenumyTextViewTitle1)).setText(me.nick);
+		((TextView)findViewById(R.id.listmenumyTextView1)).setText(me.sign);
 		toolbar.removeViewAt(2);
 	}
 	public void add(View v)
