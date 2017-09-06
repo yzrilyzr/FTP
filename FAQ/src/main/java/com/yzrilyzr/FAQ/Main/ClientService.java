@@ -7,6 +7,7 @@ import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.myclass.util;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientService
 {
@@ -21,7 +22,7 @@ public class ClientService
 	{
 		public abstract void rev(byte cmd,String msg);
 	}
-	private static ArrayList<Listener> msginf=new ArrayList<Listener>();
+	private static CopyOnWriteArrayList<Listener> msginf=new CopyOnWriteArrayList<Listener>();
 	public static void connect() throws IOException
 	{
 		if(socket==null)
@@ -213,18 +214,4 @@ public class ClientService
 		{
 		}
 	}
-	
-	public static void toast(final Activity ctx,final Object o)
-	{
-		ctx.runOnUiThread(new Runnable(){
-				@Override
-				public void run()
-				{
-					// TODO: Implement this method
-					Toast.makeText(ctx,o+"",0).show();
-				}
-			});
-	}
-	
-
 }

@@ -22,6 +22,7 @@ import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myToolBar;
 
 public class MainActivity extends BaseActivity
@@ -107,7 +108,7 @@ public class MainActivity extends BaseActivity
 		et.setText("");
 		User u=Data.getMyself();
 		addMsg(u,new MessageObj(u.faq,to.faq,(byte)0,false,m));
-		if(!ClientService.sendMsg(C.MSG,new MessageObj(u.faq,to.faq,(byte)0,false,m).setTime().o2s()))Toast.makeText(this,"发送失败",0).show();
+		if(!ClientService.sendMsg(C.MSG,new MessageObj(u.faq,to.faq,(byte)0,false,m).setTime().o2s()))util.toast(this,"发送失败");
 	}
 
 	@Override

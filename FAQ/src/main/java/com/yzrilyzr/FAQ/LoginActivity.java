@@ -92,12 +92,12 @@ public class LoginActivity extends BaseActivity
 				public void run()
 				{
 					// TODO: Implement this method
-					if(cmd==C.USE)ClientService.toast(ctx,"用户名错误");
-					else if(cmd==C.PWE)ClientService.toast(ctx,"密码错误");
+					if(cmd==C.USE)util.toast(ctx,"用户名错误");
+					else if(cmd==C.PWE)util.toast(ctx,"密码错误");
 					else if(cmd==C.LSU)
 					{
 						startService(new Intent(ctx,MsgService.class));
-						ClientService.toast(ctx,"登录成功");
+						util.toast(ctx,"登录成功");
 						ClientService.isLogin=true;
 						startActivity(new Intent(ctx,ListActivity.class));
 						finish();
@@ -109,7 +109,7 @@ public class LoginActivity extends BaseActivity
 	{
 		final String a=u.getText().toString();
 		final String b=p.getText().toString();
-		if("".equals(a)||"".equals(b))ClientService.toast(ctx,"帐号或密码不能为空");
+		if("".equals(a)||"".equals(b))util.toast(ctx,"帐号或密码不能为空");
 		else ClientService.login(a,b);
 		try
 		{
@@ -126,7 +126,7 @@ public class LoginActivity extends BaseActivity
 
 	public void help(View v)
 	{
-
+		util.toast(ctx,"有问题请找管理员联系");
 	}
 	public void register(View v)
 	{

@@ -15,6 +15,9 @@ import android.view.inputmethod.InputMethodManager;
 import java.lang.reflect.Method;
 import java.util.List;
 import android.os.Handler;
+import android.view.LayoutInflater;
+import com.yzrilyzr.FAQ.R;
+import android.view.ViewGroup;
 
 public class util
 {
@@ -23,7 +26,19 @@ public class util
 	public static String mainDir=Environment.getExternalStorageDirectory().getAbsolutePath()+"/yzr的app/FAQ";
     public static void toast(final Context c,final String s)
     {
-        Toast.makeText(c,s,0).show();
+		new Handler(c.getMainLooper()).post(new Runnable(){
+				@Override
+				public void run()
+				{
+					// TODO: Implement this method
+					Toast t=new Toast(c);
+					ViewGroup v=(ViewGroup) LayoutInflater.from(c).inflate(R.layout.layout_toast,null);
+					t.setView(v);
+					((TextView)v.getChildAt(0)).setText(s);
+					t.show();
+					
+				}
+			});
     }
     public static void alert(final Context c,final String s)
     {

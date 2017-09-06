@@ -62,7 +62,7 @@ public class SplashActivity extends BaseActivity
 							}
 							catch (Exception e)
 							{
-								ClientService.toast(SplashActivity.this,"无法连接到服务器\n5秒后重试");
+								util.toast(SplashActivity.this,"无法连接到服务器\n5秒后重试");
 								try
 								{
 									Thread.sleep(4000);
