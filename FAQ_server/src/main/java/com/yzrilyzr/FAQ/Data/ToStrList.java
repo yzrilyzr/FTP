@@ -1,9 +1,10 @@
 package com.yzrilyzr.FAQ.Data;
-import java.io.*;
-
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-public class ToStrList<T extends Object> extends CopyOnWriteArrayList implements Serializable
+public class ToStrList<TT extends Object> extends CopyOnWriteArrayList implements Serializable
 {
 	private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException{
 		clear();
@@ -12,7 +13,7 @@ public class ToStrList<T extends Object> extends CopyOnWriteArrayList implements
 	}
 	private void writeObject(ObjectOutputStream s) throws IOException{
 		s.writeInt(size());
-		for(T t:this)s.writeObject(t);
+		for(TT t:this)s.writeObject(t);
 	}
 	
 }

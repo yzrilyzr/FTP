@@ -1,15 +1,26 @@
 package com.yzrilyzr.FAQ.Main;
 
-import com.yzrilyzr.FAQ.Data.*;
 import java.io.*;
-import java.net.*;
-import java.util.*;
-import javax.mail.*;
-import javax.mail.internet.*;
 
 import android.util.Base64;
+import com.yzrilyzr.FAQ.Data.Group;
+import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Data.ToStrObj;
+import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Server.MainActivity;
+import java.net.Socket;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.Properties;
+import java.util.Random;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 public class ClientService extends Thread
 {
@@ -67,6 +78,13 @@ public class ClientService extends Thread
 						while(buff.available()<4)
 						{}
 						msglen=getInt(new byte[]{(byte)buff.read(),(byte)buff.read(),(byte)buff.read(),(byte)buff.read()});
+						if(msglen>10240)
+						{
+							byte[] err=new byte[buff.available()];
+							buff.read(err);
+							str=new String(err);
+							throw new HttpRequest(new String(getIBytes(msglen))+str);
+						}
 						while(buff.available()<1)
 						{}
 						byte cmd=(byte)buff.read();
@@ -95,7 +113,8 @@ public class ClientService extends Thread
 							{
 								sendMsg(C.LSU);
 								ClientService sc=Data.loginClient.get(user.faq+"");
-								if(sc!=null){
+								if(sc!=null)
+								{
 									sc.sendMsg(C.FLO,"您的帐号在另外一个客户端登录，您已被强制下线");
 									Data.loginClient.remove(user.faq+"");
 								}
@@ -205,20 +224,24 @@ public class ClientService extends Thread
 								sendMsg(C.GGR,u2.o2s());
 							}
 						}
-						else if(cmd==C.AFD){
+						else if(cmd==C.AFD)
+						{
 							User u1=Data.users.get(user.faq+"");
 							User u2=Data.users.get(str);
 							boolean bo=false;
-							for(int n:u1.friends)if(n==u2.faq){bo=true;break;}
+							for(int n:u1.friends)if(n==u2.faq)
+								{bo=true;break;}
 							ctx.toast("<Client>(Thread)["+IP+"]:CMD:"+cmd+",AFD:"+bo);
-							if(!bo){
+							if(!bo)
+							{
 								u1.friends.add(u2.faq);
 								u2.friends.add(u1.faq);
 								Data.saveUserData();
 								sendMsg(C.GUS,u1.o2s());
 								sendMsg(C.MSG,new MessageObj(u2.faq,u1.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
 								ClientService ll=Data.loginClient.get(u2.faq+"");
-								if(ll!=null){
+								if(ll!=null)
+								{
 									ll.sendMsg(C.GUS,u2.o2s());
 									ll.sendMsg(C.MSG,new MessageObj(u1.faq,u2.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
 								}
@@ -240,6 +263,29 @@ public class ClientService extends Thread
 							}
 						}
 						else ctx.toast("<Client>(Thread)["+IP+"]:CMD:"+cmd+",Receive:"+str);
+					}
+				}
+				catch(HttpRequest h)
+				{
+					String getf=h.m.substring(h.m.indexOf("/"));
+					getf=getf.substring(1,getf.indexOf(" "));
+					if("".equals(getf))getf="index.html";
+					getf=URLDecoder.decode(getf);
+					File fi=new File(Data.datafile+"/http");
+					if(!fi.exists())fi.mkdirs();
+					fi=new File(String.format("%s/http/%s",Data.datafile,getf));
+					if(fi.exists())
+					{
+						BufferedInputStream read=new BufferedInputStream(new FileInputStream(fi));
+						ctx.toast("<Client>(Thread)["+IP+"]:"+h.m);
+						Writer.write("HTTP/1.1 200 OK\r\n".getBytes());
+						Writer.write("Server:FAQ_server/1.0\r\n".getBytes());
+						Writer.write(String.format("Content-Length:%d\r\n",read.available()).getBytes());
+						Writer.write("Content-Type:text/html;charset=UTF-8\r\n".getBytes());
+						Writer.write("\r\n".getBytes());
+						byte[] bb=new byte[4096];
+						while(read.read(bb)!=-1)Writer.write(bb);
+						read.close();
 					}
 				}
 				catch(Throwable e)
@@ -380,6 +426,14 @@ public class ClientService extends Thread
 		catch( IOException e)
 		{ 
 			return "读取失败"; 
+		}
+	}
+	private class HttpRequest extends Throwable
+	{
+		public String m;
+		public HttpRequest(String s)
+		{
+			m=s;
 		}
 	}
 }
