@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMessage;
 
 public class ClientService extends Thread
 {
+	public String TAG="Client";
 	public Socket socket;
 	public boolean isActive=true;
 	public boolean running=true;
@@ -60,12 +61,12 @@ public class ClientService extends Thread
 			IP=socket.getInetAddress().getHostAddress();
 			if(Data.blacklist.get(IP)!=null)
 			{
-				ctx.toast("<Client>(Thread)["+IP+"]:This ip is at blacklist");
+				Toast(TAG,"Thread","此ip在黑名单");
 				socket.close();
 				return;
 			}
 			if(Data.mailCd.get(IP)==null)Data.mailCd.put(IP,"0");
-			ctx.toast("<Client>(Thread)["+IP+"]:Connected,Location:"+(LOCATION=getAddressByIP(IP)));
+			Toast(TAG,"Thread","已连接,地区:"+(LOCATION=getAddressByIP(IP)));
 			BufferedInputStream buff=new BufferedInputStream(socket.getInputStream());
 			while(running)
 			{
@@ -144,7 +145,7 @@ public class ClientService extends Thread
 						}
 						else if(cmd==C.LOG)
 						{
-							ctx.toast("<Client>(Thread)["+IP+"]:Log:"+str);
+							Toast(TAG,"Thread","日志:"+str);
 						}
 						else if(cmd==C.VFC)
 						{
@@ -152,7 +153,7 @@ public class ClientService extends Thread
 							if(System.currentTimeMillis()-cd>300000)
 							{
 								verifycode=(new Random().nextInt(899999)+100000)+"";
-								ctx.toast("<Client>(Thread)["+IP+"]:Log:VFC"+verifycode);
+								Toast(TAG,"Thread","验证码"+verifycode);
 								sendEmail("faq_service@163.co","a","FAQ注册验证码("+str.substring(3)+")",str.substring(3),"本次验证码:"+verifycode+"\n请尽快注册");
 								Data.mailCd.put(IP,""+System.currentTimeMillis());
 							}
@@ -164,7 +165,7 @@ public class ClientService extends Thread
 						else if(cmd==C.MSG)
 						{
 							MessageObj m=(MessageObj) ToStrObj.s2o(str);
-							ctx.toast("<Client>(Thread)["+IP+"]:CMD:"+cmd+",From:"+m.from+",To:"+m.to+",Type:"+m.type+",IsGroup:"+m.isGroup+",Msg:"+m.msg);
+							Toast(TAG,"Thread",String.format("指令:%d,来自:%d,发给:%d,种类:%d,是否群组:%b,消息:%s",cmd,m.from,m.to,m.type,m.isGroup,m.msg));
 							if(m.isGroup)
 							{
 								Group g=Data.groups.get(m.to+"");
@@ -231,7 +232,7 @@ public class ClientService extends Thread
 							boolean bo=false;
 							for(int n:u1.friends)if(n==u2.faq)
 								{bo=true;break;}
-							ctx.toast("<Client>(Thread)["+IP+"]:CMD:"+cmd+",AFD:"+bo);
+							Toast(TAG,"Thread","指令:"+cmd+",添加好友:"+bo);
 							if(!bo)
 							{
 								u1.friends.add(u2.faq);
@@ -262,46 +263,50 @@ public class ClientService extends Thread
 								}
 							}
 						}
-						else ctx.toast("<Client>(Thread)["+IP+"]:CMD:"+cmd+",Receive:"+str);
+						else Toast(TAG,"Thread","指令:"+cmd+",接收:"+str);
 					}
 				}
 				catch(HttpRequest h)
 				{
-					String getf=h.m.substring(h.m.indexOf("/"));
-					getf=getf.substring(1,getf.indexOf(" "));
-					if("".equals(getf))getf="index.html";
-					getf=URLDecoder.decode(getf);
-					File fi=new File(Data.datafile+"/http");
-					if(!fi.exists())fi.mkdirs();
-					fi=new File(String.format("%s/http/%s",Data.datafile,getf));
-					if(fi.exists())
+					if(h.m!=null&&h.m.contains("HTTP"))
 					{
-						BufferedInputStream read=new BufferedInputStream(new FileInputStream(fi));
-						ctx.toast("<Client>(Thread)["+IP+"]:"+h.m);
-						Writer.write("HTTP/1.1 200 OK\r\n".getBytes());
-						Writer.write("Server:FAQ_server/1.0\r\n".getBytes());
-						Writer.write(String.format("Content-Length:%d\r\n",read.available()).getBytes());
-						Writer.write("Content-Type:text/html;charset=UTF-8\r\n".getBytes());
-						Writer.write("\r\n".getBytes());
-						byte[] bb=new byte[4096];
-						while(read.read(bb)!=-1)Writer.write(bb);
-						read.close();
+						String getf=h.m.substring(h.m.indexOf("/"));
+						getf=getf.substring(1,getf.indexOf(" "));
+						if("".equals(getf))getf="index.html";
+						getf=URLDecoder.decode(getf);
+						File fi=new File(Data.datafile+"/http");
+						if(!fi.exists())fi.mkdirs();
+						fi=new File(String.format("%s/http/%s",Data.datafile,getf));
+						if(fi.exists())
+						{
+							BufferedInputStream read=new BufferedInputStream(new FileInputStream(fi));
+							Toast(TAG,"Thread",h.m);
+							Writer.write("HTTP/1.1 200 OK\r\n".getBytes());
+							Writer.write("Server:FAQ_server/1.0\r\n".getBytes());
+							Writer.write(String.format("Content-Length:%d\r\n",read.available()).getBytes());
+							Writer.write("Content-Type:text/html;charset=UTF-8\r\n".getBytes());
+							Writer.write("\r\n".getBytes());
+							byte[] bb=new byte[4096];
+							int indes=0;
+							while((indes=read.read(bb))!=-1)Writer.write(bb,0,indes);
+							read.close();
+						}
 					}
 				}
 				catch(Throwable e)
 				{
-					ctx.toast("<Client>(Thread)["+IP+"]:Unknown request:"+str+",Caused by:"+Data.getStackTrace(e));
+					Toast(TAG,"ParseError","未知请求:"+str+",原因:"+Data.getStackTrace(e));
 				}
 
 			}
 			Writer.close();
 			buff.close();
 			isActive=false;
-			ctx.toast("<Client>(Thread)["+IP+"]:Disconnected");
+			Toast(TAG,"Thread","断开连接");
 		}
 		catch(Throwable e)
 		{
-			ctx.toast("<Error>(Thread)["+IP+"]:"+Data.getStackTrace(e));
+			Toast("Error","Thread",Data.getStackTrace(e));
 			running=false;
 			isActive=false;
 		}
@@ -368,63 +373,69 @@ public class ClientService extends Thread
 		}
 		catch (Exception e)
 		{
-			ctx.toast("<Error>(Send)["+IP+"]:"+Data.getStackTrace(e));
+			Toast("Error","sendMsg",Data.getStackTrace(e));
 		}
 		if(CMD!=C.HBT&&CMD!=C.MSG&&CMD!=C.GUS&&
-		   CMD!=C.GHG&&CMD!=C.GHU)ctx.toast("<Client>(Send)["+IP+"]:CMD:"+CMD+",Msg:"+s);
+		CMD!=C.GHG&&CMD!=C.GHU)Toast(TAG,"sendMsg","指令:"+CMD+",消息:"+s);
+	}
+	public void Toast(String tag,String at,String msg){
+		ctx.toast(String.format("<%s>(%s)[%s]:%s",tag,at,IP,msg));
 	}
 	public static void sendEmail(final String sender,final String pwd,final String sub,final String to,final String s)
 	{
 		new Thread(new Runnable(){
-				@Override
-				public void run()
+			@Override
+			public void run()
+			{
+				// TODO Auto-generated method stub
+				try
 				{
-					// TODO Auto-generated method stub
-					try
-					{
-						Properties props = new Properties();
-						props.put("mail.smtp.host", "smtp.163.com");
-						props.put("mail.smtp.auth", "true");
-						props.setProperty("mail.transport.protocol", "smtp");
-						Session session = Session.getInstance(props);
-						MimeMessage message = new MimeMessage(session);
-						message.setSubject(sub);
-						message.setFrom(new InternetAddress(sender));
-						message.setRecipient(Message.RecipientType.CC,new InternetAddress(sender));
-						message.setRecipient(Message.RecipientType.TO,new InternetAddress(to));
-						message.setText(s);
-						message.setSentDate(new Date());
-						message.saveChanges();
-						Transport transport = session.getTransport();
-						transport.connect(sender,pwd);
-						transport.sendMessage(message,message.getAllRecipients());
-						transport.close();
-					}
-					catch (Throwable e)
-					{
-						MainActivity.toast(Data.getStackTrace(e));
-					}
+					Properties props = new Properties();
+					props.put("mail.smtp.host", "smtp.163.com");
+					props.put("mail.smtp.auth", "true");
+					props.setProperty("mail.transport.protocol", "smtp");
+					Session session = Session.getInstance(props);
+					MimeMessage message = new MimeMessage(session);
+					message.setSubject(sub);
+					message.setFrom(new InternetAddress(sender));
+					message.setRecipient(Message.RecipientType.CC,new InternetAddress(sender));
+					message.setRecipient(Message.RecipientType.TO,new InternetAddress(to));
+					message.setText(s);
+					message.setSentDate(new Date());
+					message.saveChanges();
+					Transport transport = session.getTransport();
+					transport.connect(sender,pwd);
+					transport.sendMessage(message,message.getAllRecipients());
+					transport.close();
 				}
-			}).start();
+				catch (Throwable e)
+				{
+					MainActivity.toast(Data.getStackTrace(e));
+				}
+			}
+		}).start();
 	}
-	public static String getAddressByIP(String strIP)
+	public String getAddressByIP(String strIP)
 	{ 
 		try
 		{
-			URL url = new URL("http://m.ip138.com/ip.asp?ip=" + strIP); 
+			URL url = new URL("http://m.tool.chinaz.com/ipsel?IP="+ strIP); 
 			URLConnection conn = url.openConnection(); 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "GBK")); 
+			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8")); 
 			String line = null; 
 			StringBuffer result = new StringBuffer(); 
-			while((line = reader.readLine()) != null)result.append(line); 
+			while((line = reader.readLine()) != null)result.append(line);
 			reader.close();
-			strIP=new String(result.toString().getBytes("GB2312"));
-			strIP = strIP.substring(strIP.indexOf("本站主数据：")+6,strIP.indexOf("参考数据一"));
-			strIP=strIP.substring(0,strIP.indexOf(" "));
+			strIP=result.toString();
+			//Toast(TAG,"gL",strIP);
+			strIP = strIP.substring(strIP.indexOf("物理位置")+28);
+			strIP=strIP.substring(0,strIP.indexOf("</b>"));
+			//strIP=strIP.substring(0,strIP.indexOf(" "));
 			return strIP;
 		}
 		catch( IOException e)
-		{ 
+		{
+			Toast(TAG,"getLocation",e.toString());
 			return "读取失败"; 
 		}
 	}

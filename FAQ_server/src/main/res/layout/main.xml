@@ -13,6 +13,12 @@
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
+			android:text="开/关服"
+			android:onClick="open"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
 			android:text="用户管理"
 			android:onClick="us"/>
 
@@ -34,16 +40,11 @@
 		android:layout_height="match_parent"
 		android:layout_width="match_parent">
 
-		<HorizontalScrollView
+		<TextView
 			android:layout_height="wrap_content"
-			android:layout_width="wrap_content">
-
-			<TextView
-				android:layout_height="wrap_content"
-				android:layout_width="match_parent"
-				android:id="@+id/mainTextView1"/>
-
-		</HorizontalScrollView>
+			android:layout_width="match_parent"
+			android:id="@+id/mainTextView1"
+			android:textSize="12sp"/>
 
 	</ScrollView>
 
