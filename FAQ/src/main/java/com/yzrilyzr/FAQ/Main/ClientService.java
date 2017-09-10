@@ -14,7 +14,7 @@ public class ClientService
 	public static Socket socket;
 	public static BufferedOutputStream Writer;
 	public static String hostIp="112.194.46.115";
-	static String deckey=null;
+	public static String deckey=null;
 	private static boolean running=true;
 	public static boolean isLogin=false;
 	private static String myfaq,mypwd;
@@ -56,16 +56,14 @@ public class ClientService
 							try
 							{
 								int msglen=0;
-								//for(int p=0;p<by.length;p+=(msglen+5))
-								{
-									while(buff.available()<4)
+									while(buff.available()<4&&running)
 									{}
 									msglen=Data.getInt(new byte[]{(byte)buff.read(),(byte)buff.read(),(byte)buff.read(),(byte)buff.read()});
-									while(buff.available()<1)
+									while(buff.available()<1&&running)
 									{}
 									byte cmd=(byte)buff.read();
 									byte[] by=new byte[msglen];
-									while(buff.available()<msglen)
+									while(buff.available()<msglen&&running)
 									{}
 									buff.read(by);
 									String str=new String(by);
@@ -82,7 +80,6 @@ public class ClientService
 										for(Listener o:msginf)
 											o.rev(cmd,str);
 									}
-								}
 							}
 							catch(Throwable e)
 							{

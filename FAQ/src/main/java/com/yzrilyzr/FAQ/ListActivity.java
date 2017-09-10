@@ -23,6 +23,7 @@ import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
 import java.text.SimpleDateFormat;
 import android.widget.AdapterView.OnItemClickListener;
+import android.view.View.OnClickListener;
 
 public class ListActivity extends BaseActivity
 {
@@ -30,6 +31,7 @@ public class ListActivity extends BaseActivity
 	myToolBar toolbar;
 	mySlidingMenu menu;
 	ListView listMsg,listFri,listGro,listFor,listCld;
+	ViewGroup[] bbutton=new ViewGroup[5];
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -59,6 +61,25 @@ public class ListActivity extends BaseActivity
 		myTitleButton t=toolbar.getButton(0);
 		t.setScaleType(ImageView.ScaleType.CENTER_CROP);
 		t.setImageDrawable(Data.DefaultHead);
+		ViewGroup vg=(ViewGroup) findViewById(R.id.listmyLinearLayout1);
+		for(int i=0;i<5;i++)
+		{
+			ViewGroup v=(ViewGroup) vg.getChildAt(i);
+			final int ii=i;
+			bbutton[i]=v;
+			v.setOnClickListener(new OnClickListener(){
+					@Override
+					public void onClick(View p1)
+					{
+						// TODO: Implement this method
+						for(ViewGroup v:bbutton)
+							if(v==p1)v.getChildAt(0).setBackgroundColor(uidata.UI_COLOR_BACK);
+							else v.getChildAt(0).setBackgroundColor(uidata.UI_COLOR_MAIN);
+						page.setCurrentItem(ii,true);
+					}
+				});
+		}
+		bbutton[1].getChildAt(0).setBackgroundColor(uidata.UI_COLOR_BACK);
 		ListView lv=(ListView) findViewById(R.id.listmenuListView1);
 		final String[] s="设置,界面设置,帮助,关于".split(",");
 		lv.setAdapter(new BaseAdapter(){
@@ -89,6 +110,12 @@ public class ListActivity extends BaseActivity
 					// TODO: Implement this method
 					ViewGroup vg=(ViewGroup) LayoutInflater.from(ctx).inflate(R.layout.list_menu_entry,null);
 					ImageView iv=(ImageView) vg.getChildAt(0);
+					Bitmap ic=null;
+					if(p1==0)ic=uidata.icon.settings;
+					else if(p1==1)ic=BitmapFactory.decodeResource(getResources(),R.drawable.uiedit);
+					else if(p1==2)ic=BitmapFactory.decodeResource(getResources(),R.drawable.help);
+					else if(p1==3)ic=uidata.icon.info;
+					iv.setImageBitmap(ic);
 					TextView te=(TextView) vg.getChildAt(1);
 					te.setText(s[p1]);
 					return vg;
@@ -99,10 +126,12 @@ public class ListActivity extends BaseActivity
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
 				{
 					// TODO: Implement this method
-					if(p3==0){}
+					if(p3==0)
+					{}
 					else if(p3==1)startActivity(new Intent(ctx,uiSettingsActivity.class));
-					else if(p3==2){}
-					else if(p3==3){}
+					else if(p3==2)
+					{}
+					else if(p3==3)startActivity(new Intent(ctx,AboutActivity.class));
 				}
 			});
 		ClientService.sendMsg(C.GUS,Data.myfaq+"");
@@ -201,26 +230,6 @@ public class ListActivity extends BaseActivity
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-	public void page1(View v)
-	{
-		page.setCurrentItem(0,true);
-	}
-	public void page2(View v)
-	{
-		page.setCurrentItem(1,true);
-	}
-	public void page3(View v)
-	{
-		page.setCurrentItem(2,true);
-	}
-	public void page4(View v)
-	{
-		page.setCurrentItem(3,true);
-	}
-	public void page5(View v)
-	{
-		page.setCurrentItem(4,true);
 	}
 	private void listFri()
 	{

@@ -26,6 +26,15 @@ public class SplashActivity extends BaseActivity
 		if(!isInit)
 		{
 			uidata.readData(this);
+			if(uidata.mod)
+			{
+				StringBuilder sb=new StringBuilder();
+				sb.append('请').append('勿').append('使').append('用')
+					.append('盗').append('版').append('软').append('件');
+				util.toast(ctx,sb.toString());
+				finish();
+				return;
+			}
 			initIcon();
 		}
 		isInit=true;
@@ -48,6 +57,7 @@ public class SplashActivity extends BaseActivity
 							try
 							{
 								ClientService.connect();
+								while(ClientService.deckey==null){}
 								isc=false;
 								Thread.sleep(500);
 								runOnUiThread(new Runnable(){

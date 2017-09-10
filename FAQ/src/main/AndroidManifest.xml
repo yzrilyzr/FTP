@@ -24,6 +24,7 @@
 		<activity android:name=".ProfileActivity"/>
 		<activity android:name=".LoginActivity"/>
 		<activity android:name=".MainActivity"/>
+		<activity android:name=".AboutActivity"/>
 		<activity android:name=".ListActivity"
 			android:taskAffinity="com.yzrilyzr.FAQ"
 			android:launchMode="singleTask"/>

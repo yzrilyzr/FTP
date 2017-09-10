@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:yzr="http://schemas.android.com/apk/res-auto"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+
+	<ScrollView
+		android:layout_height="match_parent"
+		android:layout_width="match_parent">
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:orientation="vertical"
+			android:gravity="center">
+
+			<ImageView
+				android:layout_height="200dp"
+				android:layout_width="200dp"
+				android:src="@drawable/launcher"
+				android:layout_marginTop="20dp"/>
+
+			<com.yzrilyzr.ui.myTextViewTitleBack
+				android:layout_height="wrap_content"
+				android:text="FAQ"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="20dp"/>
+
+			<com.yzrilyzr.ui.myTextViewTitleBack
+				android:layout_height="wrap_content"
+				android:text="为所欲为的开车"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="10dp"/>
+
+			<com.yzrilyzr.ui.myTextViewBack
+				android:layout_height="wrap_content"
+				android:text="内测版(还没有完善，别吐槽哪个又点不起)"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="10dp"/>
+
+			<com.yzrilyzr.ui.myTextViewBack
+				android:layout_height="wrap_content"
+				android:text="Copyright © 2017 yzrilyzr"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="10dp"
+				android:id="@+id/aboutmyTextView1"/>
+
+			<com.yzrilyzr.ui.myTextViewBack
+				android:layout_height="wrap_content"
+				android:text="All Rights Reserved"
+				android:layout_width="wrap_content"
+				android:layout_marginTop="10dp"/>
+			<com.yzrilyzr.ui.myButton
+				android:layout_height="wrap_content"
+				android:text="特别提示"
+				android:layout_width="250dp"
+				android:onClick="info"
+				android:layout_marginTop="10dp"/>
+			<com.yzrilyzr.ui.myButton
+				android:layout_height="wrap_content"
+				android:text="Bug反馈"
+				android:layout_width="250dp"
+				android:onClick="bug"
+				android:layout_marginTop="10dp"/>
+
+		</LinearLayout>
+
+	</ScrollView>
+
+	<com.yzrilyzr.ui.myToolBar
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		yzr:title="关于FAQ"
+		yzr:tip0="返回"
+		yzr:onClick0="exit"
+		yzr:src0="preset/prev"/>
+
+</FrameLayout>
+

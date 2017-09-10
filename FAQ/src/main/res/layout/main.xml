@@ -41,9 +41,9 @@
 				android:id="@+id/mainEditText1"/>
 
 			<com.yzrilyzr.ui.myButton
-				android:layout_height="wrap_content"
+				android:layout_height="35dp"
 				android:text="发送"
-				android:layout_width="wrap_content"
+				android:layout_width="55dp"
 				android:onClick="send"
 				android:id="@+id/mainButton1"/>
 
