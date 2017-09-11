@@ -42,47 +42,57 @@ public class SplashActivity extends BaseActivity
 		Data.DefaultHead=new myRoundDrawable(ctx,R.drawable.launcher);
 		if(ClientService.isLogin)
 		{
-			startActivity(new Intent(SplashActivity.this,ListActivity.class));
+			startActivity(new Intent(ctx,ListActivity.class));
 			finish();
 		}
 		else
 		{
-			new Thread(new Runnable(){
-					@Override
-					public void run()
-					{
-						// TODO: Implement this method
-						boolean isc=true;
-						while(isc)
-							try
-							{
-								ClientService.connect();
-								while(ClientService.deckey==null){}
-								isc=false;
-								Thread.sleep(500);
-								runOnUiThread(new Runnable(){
-										@Override
-										public void run()
-										{
-											// TODO: Implement this metho
-											startActivity(new Intent(SplashActivity.this,LoginActivity.class));
-											finish();
-										}
-									});
-							}
-							catch (Exception e)
-							{
-								util.toast(SplashActivity.this,"无法连接到服务器\n5秒后重试");
+			if(!ClientService.running)
+			{
+				new Thread(new Runnable(){
+						@Override
+						public void run()
+						{
+							// TODO: Implement this method
+							boolean isc=true;
+							while(isc)
 								try
 								{
-									Thread.sleep(4000);
+									ClientService.connect();
+									while(ClientService.deckey==null)
+									{}
+									isc=false;
+									Thread.sleep(500);
+									runOnUiThread(new Runnable(){
+											@Override
+											public void run()
+											{
+												// TODO: Implement this metho
+												Intent in=new Intent(ctx,LoginActivity.class);
+												in.putExtra("al",true);
+												startActivity(in);
+												finish();
+											}
+										});
 								}
-								catch (InterruptedException ey)
-								{}
-							}
-					}
-				}).start();
-			setContentView(R.layout.splash);
+								catch (Exception e)
+								{
+									util.toast(ctx,"无法连接到服务器\n5秒后重试");
+									try
+									{
+										Thread.sleep(4000);
+									}
+									catch (InterruptedException ey)
+									{}
+								}
+						}
+					}).start();
+				setContentView(R.layout.splash);
+			}
+			else {
+				startActivity(new Intent(ctx,LoginActivity.class));
+				finish();
+			}
 		}
 	}
 	public void set(View v)

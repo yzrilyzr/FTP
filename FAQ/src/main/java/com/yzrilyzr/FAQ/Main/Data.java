@@ -6,13 +6,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import com.yzrilyzr.FAQ.Data.Group;
 import com.yzrilyzr.FAQ.Data.MessageObj;
-import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.ListActivity;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myRoundDrawable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
 
 public class Data
 {
@@ -34,10 +36,24 @@ public class Data
 					// TODO: Implement this method
 					try
 					{
-						ClientService.sendMsg(C.LOG,util.getStackTrace(p2));
+						String s=util.getStackTrace(p2);
+						util.write(util.mainDir+"/ERROR_LOG.txt",s);
+						ClientService.sendMsg(C.LOG,s);
 					}
 					catch(Throwable e)
 					{}
+					System.exit(0);
+				}
+			});
+	}
+	public static void sortMsgByTime(List<MessageObj> msgu,final int l){
+		Collections.sort(msgu,new Comparator<MessageObj>(){
+				@Override
+				public int compare(MessageObj p1, MessageObj p2)
+				{
+					// TODO: Implement this method
+					if(p1.time>p2.time)return -1*l;
+					else return 1*l;
 				}
 			});
 	}
@@ -119,6 +135,10 @@ public class Data
 		{
 			if(msgBuffer.size()==0)return;
 			RandomAccessFile r=new RandomAccessFile(util.mainDir+"/msg","rw");
+			byte[] len=new byte[4];
+			r.read(len);
+			int l=getInt(len)+msgBuffer.size();
+			r.write(getIBytes(l));
 			r.seek(r.length());
 			for(MessageObj m:msgBuffer)
 			{
@@ -130,15 +150,6 @@ public class Data
 			r.close();
 		}
 		catch (Exception e)
-		{}
-	}
-	public static void writeHashmap(ConcurrentHashMap<?,ToStrObj> map,String file)
-	{
-		try
-		{
-			BufferedOutputStream b=new BufferedOutputStream(new FileOutputStream(util.mainDir+"/"+file));
-		}
-		catch (FileNotFoundException e)
 		{}
 	}
 	public static byte[] getIBytes(int data)  

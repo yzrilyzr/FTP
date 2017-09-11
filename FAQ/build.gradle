@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "com.yzrilyzr.FAQ"
-        minSdkVersion 14
-        targetSdkVersion 21
+        minSdkVersion 11
+        targetSdkVersion 16
         versionCode 1
-        versionName "1.0"
+        versionName "内测版"
     }
     buildTypes {
         release {

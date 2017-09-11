@@ -15,7 +15,7 @@ public class ClientService
 	public static BufferedOutputStream Writer;
 	public static String hostIp="112.194.46.115";
 	public static String deckey=null;
-	private static boolean running=true;
+	public static boolean running=false;
 	public static boolean isLogin=false;
 	private static String myfaq,mypwd;
 	public interface Listener
@@ -27,13 +27,11 @@ public class ClientService
 	{
 		if(socket==null)
 		{
-			running=true;
-			//hostIp="192.168.0.2";
-			//hostIp="192.168.43.1";
 			socket=new Socket(hostIp,10000);
 			socket.setKeepAlive(true);
 			socket.setTcpNoDelay(true);
 			socket.setSendBufferSize(10240);
+			running=true;
 			startService();
 			Writer=new BufferedOutputStream(socket.getOutputStream());
 			sendMsg(C.ENC);
@@ -52,7 +50,7 @@ public class ClientService
 						BufferedInputStream buff=new BufferedInputStream(socket.getInputStream());
 						while(running)
 						{
-							if(System.currentTimeMillis()-HBTtime>5000l)running=false;
+							if(System.currentTimeMillis()-HBTtime>40000l)running=false;
 							try
 							{
 								int msglen=0;
@@ -87,6 +85,8 @@ public class ClientService
 							}
 
 						}
+						running=false;
+						socket.close();
 						socket=null;
 						boolean isc=true;
 						while(isc)
@@ -94,7 +94,7 @@ public class ClientService
 							{
 								deckey=null;
 								connect();
-								Thread.sleep(1000);
+								while(ClientService.deckey==null){}
 								login(myfaq,mypwd);
 								isc=false;
 							}

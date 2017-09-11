@@ -24,6 +24,9 @@ import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myToolBar;
+import java.util.ArrayList;
+import java.util.Collections;
+import com.yzrilyzr.FAQ.Main.T;
 
 public class MainActivity extends BaseActivity
 {
@@ -81,7 +84,19 @@ public class MainActivity extends BaseActivity
 					// TODO: Implement this method
 				}
 			});
+			init();
     }
+
+	private void init()
+	{
+		ArrayList<MessageObj> msg=new ArrayList<MessageObj>();
+		for(MessageObj ms:Data.msgs)
+			if(ms.from==to.faq||ms.to==to.faq)msg.add(ms);
+		Data.sortMsgByTime(msg,-1);
+		for(MessageObj m:msg){
+			addMsg(Data.getUser(m.from),m);
+		}
+	}
 
 	@Override
 	public void rev(byte cmd, final String msg)
@@ -107,8 +122,15 @@ public class MainActivity extends BaseActivity
 		String m=et.getText().toString();
 		et.setText("");
 		User u=Data.getMyself();
-		addMsg(u,new MessageObj(u.faq,to.faq,(byte)0,false,m));
-		if(!ClientService.sendMsg(C.MSG,new MessageObj(u.faq,to.faq,(byte)0,false,m).setTime().o2s()))util.toast(this,"发送失败");
+		MessageObj obj=new MessageObj(u.faq,to.faq,T.MSG,false,m).setTime();
+		addMsg(u,obj);
+		Data.msgBuffer.add(obj);
+		Data.msgs.add(obj);
+		MessageObj obj2=(MessageObj) ToStrObj.s2o( obj.o2s());
+		obj2.from=obj.to;
+		obj2.to=obj.from;
+		Data.msglist.put(obj.to+"",obj2);
+		if(!ClientService.sendMsg(C.MSG,obj.o2s()))util.toast(this,"发送失败");
 	}
 
 	@Override

@@ -23,14 +23,14 @@ public class LoginActivity extends BaseActivity
 	Activity ctx=this;
 	EditText u,p;
 	ImageView iv;
-	boolean autoLog=true;
+	boolean autoLog=false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		// TODO: Implement this method
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
-		autoLog=getIntent().getBooleanExtra("al",true);
+		autoLog=getIntent().getBooleanExtra("al",false);
 		u=(EditText) findViewById(R.id.loginEditText1);
 		iv=(ImageView) findViewById(R.id.loginImageView1);
 		iv.setImageDrawable(Data.DefaultHead);

@@ -54,9 +54,9 @@
 				android:layout_marginTop="10dp"/>
 			<com.yzrilyzr.ui.myButton
 				android:layout_height="wrap_content"
-				android:text="特别提示"
+				android:text="我们的网站"
 				android:layout_width="250dp"
-				android:onClick="info"
+				android:onClick="web"
 				android:layout_marginTop="10dp"/>
 			<com.yzrilyzr.ui.myButton
 				android:layout_height="wrap_content"

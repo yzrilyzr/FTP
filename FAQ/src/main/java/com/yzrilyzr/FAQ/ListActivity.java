@@ -73,15 +73,15 @@ public class ListActivity extends BaseActivity
 					{
 						// TODO: Implement this method
 						for(ViewGroup v:bbutton)
-							if(v==p1)v.getChildAt(0).setBackgroundColor(uidata.UI_COLOR_BACK);
-							else v.getChildAt(0).setBackgroundColor(uidata.UI_COLOR_MAIN);
+							if(v==p1)v.getChildAt(0).setBackgroundColor(0xffaaaaaa);
+							else v.getChildAt(0).setBackground(null);
 						page.setCurrentItem(ii,true);
 					}
 				});
 		}
-		bbutton[1].getChildAt(0).setBackgroundColor(uidata.UI_COLOR_BACK);
+		bbutton[0].getChildAt(0).setBackgroundColor(0xffaaaaaa);
 		ListView lv=(ListView) findViewById(R.id.listmenuListView1);
-		final String[] s="设置,界面设置,帮助,关于".split(",");
+		final String[] s="设置,界面设置,帮助,关于,退出登录".split(",");
 		lv.setAdapter(new BaseAdapter(){
 				@Override
 				public int getCount()
@@ -115,6 +115,7 @@ public class ListActivity extends BaseActivity
 					else if(p1==1)ic=BitmapFactory.decodeResource(getResources(),R.drawable.uiedit);
 					else if(p1==2)ic=BitmapFactory.decodeResource(getResources(),R.drawable.help);
 					else if(p1==3)ic=uidata.icon.info;
+					else if(p1==4)ic=BitmapFactory.decodeResource(getResources(),R.drawable.exit_w);
 					iv.setImageBitmap(ic);
 					TextView te=(TextView) vg.getChildAt(1);
 					te.setText(s[p1]);
@@ -132,6 +133,13 @@ public class ListActivity extends BaseActivity
 					else if(p3==2)
 					{}
 					else if(p3==3)startActivity(new Intent(ctx,AboutActivity.class));
+					else if(p3==4){
+						stopService(new Intent(ctx,MsgService.class));
+						for(BaseActivity a:BaseActivity.activities)a.finish();
+						System.gc();
+						startActivity(new Intent(ctx,LoginActivity.class));
+						ClientService.isLogin=false;
+					}
 				}
 			});
 		ClientService.sendMsg(C.GUS,Data.myfaq+"");
@@ -299,15 +307,7 @@ public class ListActivity extends BaseActivity
 			MessageObj e=(MessageObj)((Map.Entry) it.next()).getValue();
 			msgu.add(e);
 		}
-		Collections.sort(msgu,new Comparator<MessageObj>(){
-				@Override
-				public int compare(MessageObj p1, MessageObj p2)
-				{
-					// TODO: Implement this method
-					if(p1.time>p2.time)return -1;
-					else return 1;
-				}
-			});
+		Data.sortMsgByTime(msgu,1);
 		listMsg.setAdapter(new BaseAdapter(){
 
 				@Override

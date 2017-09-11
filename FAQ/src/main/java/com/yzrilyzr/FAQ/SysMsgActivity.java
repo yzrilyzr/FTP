@@ -37,6 +37,7 @@ public class SysMsgActivity extends BaseActivity
 		final ArrayList<MessageObj> sml=new ArrayList<MessageObj>();
 		for(MessageObj m:Data.msgs)
 			if(m.type==T.VMS)sml.add(m);
+		Data.sortMsgByTime(sml,1);
 		lv.setAdapter(new BaseAdapter(){
 				@Override
 				public int getCount()

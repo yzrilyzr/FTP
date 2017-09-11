@@ -5,6 +5,8 @@ import android.widget.TextView;
 import com.yzrilyzr.myclass.myActivity;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.uidata;
+import android.content.Intent;
+import com.yzrilyzr.FAQ.Main.ClientService;
 
 public class AboutActivity extends myActivity
 {
@@ -29,7 +31,9 @@ public class AboutActivity extends myActivity
 	public void bug(View v){
 		
 	}
-	public void info(View v){
-		
+	public void web(View v){
+		Intent in=new Intent(ctx,BrowserActivity.class);
+		in.putExtra("url","http://"+ClientService.hostIp+":10000");
+		startActivity(in);
 	}
 }
