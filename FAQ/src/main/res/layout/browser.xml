@@ -27,27 +27,61 @@
 			android:id="@+id/browserWebView1"
 			android:layout_weight="1.0"/>
 
-		<LinearLayout
+		<com.yzrilyzr.ui.myLinearLayoutBack
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
 			android:orientation="horizontal">
 
-			<ImageButton
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<com.yzrilyzr.ui.myImageButton
 				android:layout_height="45dp"
 				android:layout_width="45dp"
-				android:src="@drawable/undo"/>
+				android:src="@drawable/undo"
+				android:onClick="back"/>
 
-			<ImageButton
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<com.yzrilyzr.ui.myImageButton
 				android:layout_height="45dp"
 				android:layout_width="45dp"
-				android:src="@drawable/redo"/>
+				android:src="@drawable/redo"
+				android:onClick="forw"/>
 
-			<ImageButton
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<com.yzrilyzr.ui.myImageButton
 				android:layout_height="45dp"
 				android:layout_width="45dp"
-				android:src="@drawable/close"/>
+				android:src="@drawable/close"
+				android:onClick="stop"/>
 
-		</LinearLayout>
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<com.yzrilyzr.ui.myImageButton
+				android:layout_height="45dp"
+				android:layout_width="45dp"
+				android:src="@drawable/repeat"
+				android:onClick="ref"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+		</com.yzrilyzr.ui.myLinearLayoutBack>
 
 	</LinearLayout>
 

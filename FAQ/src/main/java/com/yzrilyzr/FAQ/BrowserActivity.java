@@ -41,5 +41,8 @@ myToolBar tool;
 		String ur=getIntent().getStringExtra("url");
 		if(ur!=null)webv.loadUrl(ur);
 	}
-	
+	public void back(View v){if(webv.canGoBack())webv.goBack();}
+	public void forw(View v){if(webv.canGoForward())webv.goForward();}
+	public void ref(View v){webv.reload();}
+	public void stop(View v){webv.stopLoading();}
 }

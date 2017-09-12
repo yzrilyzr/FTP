@@ -45,54 +45,52 @@ public class SplashActivity extends BaseActivity
 			startActivity(new Intent(ctx,ListActivity.class));
 			finish();
 		}
+		else if(ClientService.running)
+		{
+			startActivity(new Intent(ctx,LoginActivity.class));
+			finish();
+		}
 		else
 		{
-			if(!ClientService.running)
-			{
-				new Thread(new Runnable(){
-						@Override
-						public void run()
-						{
-							// TODO: Implement this method
-							boolean isc=true;
-							while(isc)
+			new Thread(new Runnable(){
+					@Override
+					public void run()
+					{
+						// TODO: Implement this method
+						boolean isc=true;
+						while(isc)
+							try
+							{
+								ClientService.connect();
+								while(ClientService.deckey==null)
+								{Thread.sleep(1);}
+								isc=false;
+								Thread.sleep(300);
+								runOnUiThread(new Runnable(){
+										@Override
+										public void run()
+										{
+											// TODO: Implement this metho
+											Intent in=new Intent(ctx,LoginActivity.class);
+											in.putExtra("al",true);
+											startActivity(in);
+											finish();
+										}
+									});
+							}
+							catch (Exception e)
+							{
+								util.toast(ctx,"无法连接到服务器\n5秒后重试");
 								try
 								{
-									ClientService.connect();
-									while(ClientService.deckey==null)
-									{}
-									isc=false;
-									Thread.sleep(500);
-									runOnUiThread(new Runnable(){
-											@Override
-											public void run()
-											{
-												// TODO: Implement this metho
-												Intent in=new Intent(ctx,LoginActivity.class);
-												in.putExtra("al",true);
-												startActivity(in);
-												finish();
-											}
-										});
+									Thread.sleep(4000);
 								}
-								catch (Exception e)
-								{
-									util.toast(ctx,"无法连接到服务器\n5秒后重试");
-									try
-									{
-										Thread.sleep(4000);
-									}
-									catch (InterruptedException ey)
-									{}
-								}
-						}
-					}).start();
-				setContentView(R.layout.splash);
-			}
-			else {
-				startActivity(new Intent(ctx,LoginActivity.class));
-				finish();
-			}
+								catch (InterruptedException ey)
+								{}
+							}
+					}
+				}).start();
+			setContentView(R.layout.splash);
 		}
 	}
 	public void set(View v)

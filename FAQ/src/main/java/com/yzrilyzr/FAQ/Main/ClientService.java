@@ -54,30 +54,30 @@ public class ClientService
 							try
 							{
 								int msglen=0;
-									while(buff.available()<4&&running)
-									{}
-									msglen=Data.getInt(new byte[]{(byte)buff.read(),(byte)buff.read(),(byte)buff.read(),(byte)buff.read()});
-									while(buff.available()<1&&running)
-									{}
-									byte cmd=(byte)buff.read();
-									byte[] by=new byte[msglen];
-									while(buff.available()<msglen&&running)
-									{}
-									buff.read(by);
-									String str=new String(by);
-									if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
-									//str=new String(Base64.decode(str,0));
-									if(cmd==C.HBT)
-									{
-										HBTtime=System.currentTimeMillis();
-										sendMsg(C.HBT);
-									}
-									else if(cmd==C.ENC)deckey=str;
-									else
-									{
-										for(Listener o:msginf)
-											o.rev(cmd,str);
-									}
+								while(buff.available()<4&&running)
+								{}
+								msglen=Data.getInt(new byte[]{(byte)buff.read(),(byte)buff.read(),(byte)buff.read(),(byte)buff.read()});
+								while(buff.available()<1&&running)
+								{}
+								byte cmd=(byte)buff.read();
+								byte[] by=new byte[msglen];
+								while(buff.available()<msglen&&running)
+								{}
+								buff.read(by);
+								String str=new String(by);
+								if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
+								//str=new String(Base64.decode(str,0));
+								if(cmd==C.HBT)
+								{
+									HBTtime=System.currentTimeMillis();
+									sendMsg(C.HBT);
+								}
+								else if(cmd==C.ENC)deckey=str;
+								else
+								{
+									for(Listener o:msginf)
+										o.rev(cmd,str);
+								}
 							}
 							catch(Throwable e)
 							{
@@ -94,18 +94,13 @@ public class ClientService
 							{
 								deckey=null;
 								connect();
-								while(ClientService.deckey==null){}
+								while(ClientService.deckey==null)
+								{Thread.sleep(1);}
 								login(myfaq,mypwd);
 								isc=false;
 							}
 							catch (Exception e)
 							{
-								try
-								{
-									Thread.sleep(1000);
-								}
-								catch (InterruptedException ey)
-								{}
 							}
 					}
 					catch(Throwable e)
