@@ -17,28 +17,72 @@
 			android:gravity="center">
 
 			<ImageView
-				android:layout_height="200dp"
-				android:layout_width="200dp"
+				android:layout_height="160dp"
+				android:layout_width="160dp"
 				android:src="@drawable/launcher"
-				android:layout_marginTop="20dp"/>
+				android:layout_marginTop="15dp"/>
 
 			<com.yzrilyzr.ui.myTextViewTitleBack
 				android:layout_height="wrap_content"
 				android:text="FAQ"
 				android:layout_width="wrap_content"
-				android:layout_marginTop="20dp"/>
+				android:layout_marginTop="15dp"/>
 
 			<com.yzrilyzr.ui.myTextViewTitleBack
 				android:layout_height="wrap_content"
 				android:text="为所欲为的开车"
 				android:layout_width="wrap_content"
-				android:layout_marginTop="10dp"/>
+				android:layout_marginTop="5dp"/>
 
 			<com.yzrilyzr.ui.myTextViewBack
 				android:layout_height="wrap_content"
 				android:text="内测版(还没有完善，别吐槽哪个又点不起)"
 				android:layout_width="wrap_content"
+				android:layout_marginTop="5dp"/>
+
+			<com.yzrilyzr.ui.myButton
+				android:layout_height="wrap_content"
+				android:text="我们的网站"
+				android:layout_width="250dp"
+				android:onClick="web"
 				android:layout_marginTop="10dp"/>
+
+			<com.yzrilyzr.ui.myButton
+				android:layout_height="wrap_content"
+				android:text="检查更新"
+				android:layout_width="250dp"
+				android:onClick="upd"
+				android:layout_marginTop="10dp"/>
+
+			<LinearLayout
+				android:layout_height="wrap_content"
+				android:layout_width="250dp"
+				android:orientation="horizontal"
+				android:layout_marginTop="10dp">
+
+				<com.yzrilyzr.ui.myButton
+					android:layout_height="wrap_content"
+					android:text="Bug反馈"
+					android:layout_width="120dp"
+					android:onClick="bug"/>
+
+				<RelativeLayout
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:layout_weight="1.0"/>
+
+				<com.yzrilyzr.ui.myButton
+					android:layout_height="wrap_content"
+					android:text="关于"
+					android:layout_width="120dp"
+					android:onClick="abo"/>
+
+			</LinearLayout>
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
 
 			<com.yzrilyzr.ui.myTextViewBack
 				android:layout_height="wrap_content"
@@ -51,19 +95,7 @@
 				android:layout_height="wrap_content"
 				android:text="All Rights Reserved"
 				android:layout_width="wrap_content"
-				android:layout_marginTop="10dp"/>
-			<com.yzrilyzr.ui.myButton
-				android:layout_height="wrap_content"
-				android:text="我们的网站"
-				android:layout_width="250dp"
-				android:onClick="web"
-				android:layout_marginTop="10dp"/>
-			<com.yzrilyzr.ui.myButton
-				android:layout_height="wrap_content"
-				android:text="Bug反馈"
-				android:layout_width="250dp"
-				android:onClick="bug"
-				android:layout_marginTop="10dp"/>
+				android:layout_marginTop="5dp"/>
 
 		</LinearLayout>
 

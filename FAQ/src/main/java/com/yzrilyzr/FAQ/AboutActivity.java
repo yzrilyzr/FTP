@@ -1,14 +1,24 @@
 package com.yzrilyzr.FAQ;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import com.yzrilyzr.myclass.myActivity;
+import com.yzrilyzr.FAQ.Main.C;
+import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.uidata;
-import android.content.Intent;
-import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.ui.myAlertDialog;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.DataInputStream;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
-public class AboutActivity extends myActivity
+public class AboutActivity extends BaseActivity
 {
 
 	@Override
@@ -36,4 +46,55 @@ public class AboutActivity extends myActivity
 		in.putExtra("url","http://"+ClientService.hostIp+":10000");
 		startActivity(in);
 	}
+	public void abo(View v){
+		StringBuilder me=new StringBuilder();
+		try
+		{
+			BufferedReader dis=new BufferedReader(new InputStreamReader(getAssets().open("txt/about")));
+			String buff=null;
+			while((buff=dis.readLine())!=null){
+				me.append(buff);
+				me.append("\n");
+			}
+			dis.close();
+		}
+		catch (IOException e)
+		{}
+		new myAlertDialog(ctx)
+		.setTitle("关于")
+		.setMessage(me.toString())
+		.setPositiveButton("确定",null)
+		.show();
+	}
+public void upd(View v){
+	ClientService.sendMsg(C.UPD);
+}
+
+@Override
+public void rev(byte cmd, String msg)
+{
+	// TODO: Implement this method
+	if(cmd==C.UPD){
+		try
+		{
+			final int i=Data.getInt(msg.getBytes());
+			final PackageInfo info = getPackageManager().getPackageInfo(getPackageName(),0);
+			runOnUiThread(new Runnable(){
+					@Override
+					public void run()
+					{
+						// TODO: Implement this method
+						if(i>info.versionCode){
+							util.toast(ctx,"发现新版本\n请到上面的网站下载");
+						}
+						else util.toast(ctx,"当前已经是最新版本");
+					}
+				});
+			
+		}
+		catch (PackageManager.NameNotFoundException e)
+		{}
+	}
+}
+
 }

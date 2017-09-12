@@ -8,6 +8,8 @@ import com.yzrilyzr.myclass.util;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 public class ClientService
 {
@@ -27,10 +29,14 @@ public class ClientService
 	{
 		if(socket==null)
 		{
-			socket=new Socket(hostIp,10000);
+			socket=new Socket();
 			socket.setKeepAlive(true);
 			socket.setTcpNoDelay(true);
 			socket.setSendBufferSize(10240);
+			socket.setTrafficClass(0x04|0x10);
+			socket.setSoTimeout(40000);
+			socket.setReceiveBufferSize(10240);
+			socket.connect(new InetSocketAddress(hostIp,10000),40000);
 			running=true;
 			startService();
 			Writer=new BufferedOutputStream(socket.getOutputStream());

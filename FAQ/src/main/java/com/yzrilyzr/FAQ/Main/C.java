@@ -26,5 +26,6 @@ public final class C
 	AGR=21,
 	GHU=22,
 	GHG=23,
-	FLO=24;
+	FLO=24,
+	UPD=25;
 }
