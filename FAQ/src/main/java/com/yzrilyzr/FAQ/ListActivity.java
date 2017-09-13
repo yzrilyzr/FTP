@@ -2,7 +2,6 @@ package com.yzrilyzr.FAQ;
 
 import android.widget.*;
 import com.yzrilyzr.ui.*;
-import java.util.*;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -12,18 +11,23 @@ import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView.OnItemClickListener;
 import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.FAQ.Main.StreamSender;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
 import java.text.SimpleDateFormat;
-import android.widget.AdapterView.OnItemClickListener;
-import android.view.View.OnClickListener;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ListActivity extends BaseActivity
 {
@@ -133,7 +137,8 @@ public class ListActivity extends BaseActivity
 					else if(p3==2)
 					{}
 					else if(p3==3)startActivity(new Intent(ctx,AboutActivity.class));
-					else if(p3==4){
+					else if(p3==4)
+					{
 						stopService(new Intent(ctx,MsgService.class));
 						for(BaseActivity a:BaseActivity.activities)a.finish();
 						System.gc();
@@ -144,8 +149,8 @@ public class ListActivity extends BaseActivity
 			});
 		ClientService.sendMsg(C.GUS,Data.myfaq+"");
 		listMsg();
+		new StreamSender("/sdcard/音乐/自制/陈浩然的龙卷风(洛天依+30,言和+20).mp3",new MessageObj(1000,1000,T.FLE,false,"")).send();
 	}
-
 	private void setMyInfo()
 	{
 		User me=Data.getMyself();

@@ -10,11 +10,13 @@ import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.ListActivity;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myRoundDrawable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Data
 {
@@ -46,7 +48,8 @@ public class Data
 				}
 			});
 	}
-	public static void sortMsgByTime(List<MessageObj> msgu,final int l){
+	public static void sortMsgByTime(List<MessageObj> msgu,final int l)
+	{
 		Collections.sort(msgu,new Comparator<MessageObj>(){
 				@Override
 				public int compare(MessageObj p1, MessageObj p2)
@@ -57,12 +60,15 @@ public class Data
 				}
 			});
 	}
-	public static myRoundDrawable getMyHeadDrawable(){
+	public static myRoundDrawable getMyHeadDrawable()
+	{
 		return getHeadDrawable(myfaq,false);
 	}
-	public static myRoundDrawable getHeadDrawable(int faq,boolean isg){
+	public static myRoundDrawable getHeadDrawable(int faq,boolean isg)
+	{
 		Bitmap b= head.get(faq+"");
-		if(b==null){
+		if(b==null)
+		{
 			getHead(faq,isg);
 			return null;
 		}
@@ -89,7 +95,7 @@ public class Data
 		if(u==null)ClientService.sendMsg(C.GGR,faq+"");
 		return u;
 	}
-	
+
 	public static User getUser(int faq)
 	{
 		User u=users.get(faq+"");
@@ -161,6 +167,20 @@ public class Data
 		bytes[3] = (byte) ((data & 0xff000000) >> 24);  
 		return bytes;  
 	}  
+	public static byte[] getLBytes(long data)  
+	{  
+		byte[] bytes = new byte[8];  
+		bytes[0] = (byte) (data & 0xff);  
+		bytes[1] = (byte) ((data & 0xff00) >> 8);  
+		bytes[2] = (byte) ((data & 0xff0000) >> 16);  
+		bytes[3] = (byte) ((data & 0xff000000) >> 24);  
+		bytes[4] = (byte) ((data & 0xff00000000) >> 32);  
+		bytes[5] = (byte) ((data & 0xff0000000000) >> 40);  
+		bytes[6] = (byte) ((data & 0xff000000000000) >> 48);  
+		bytes[7] = (byte) ((data & 0xff00000000000000) >> 56);  
+		return bytes;  
+	}  
+	
 	public static byte[] getFBytes(float data)  
 	{  
 		//return getIBytes((int)data);/*
@@ -174,5 +194,52 @@ public class Data
 	public static float getFloat(byte[] bytes)  
 	{  
 		return Float.intBitsToFloat(getInt(bytes));  
-	}  
+	}
+	public static String getFileSha1(String path)
+	{  
+		try
+		{  
+			File file=new File(path);  
+			FileInputStream in = new FileInputStream(file);  
+			MessageDigest messagedigest=MessageDigest.getInstance("SHA-1");  
+			byte[] buffer = new byte[10240];  
+			int len = 0;  
+			while ((len = in.read(buffer)) >0)
+			{   
+				messagedigest.update(buffer, 0, len);  
+			}
+			return byte2hex(messagedigest.digest());  
+		}
+		catch (Exception e)
+		{  
+		}  
+		return null;  
+	}
+	public static String getByteSha1(byte[] b)
+	{  
+		try
+		{  
+			MessageDigest messagedigest= MessageDigest.getInstance("SHA-1");  
+			messagedigest.update(b);  
+			return byte2hex(messagedigest.digest());  
+		}
+		catch (Exception e)
+		{  
+		}  
+		return null;  
+	}
+	public static String byte2hex(byte[] b) {
+		StringBuffer hs = new StringBuffer(b.length);
+		String stmp = "";
+		int len = b.length;
+		for (int n = 0; n < len; n++) {
+			stmp = Integer.toHexString(b[n] & 0xFF);
+			if (stmp.length() == 1)
+				hs = hs.append("0").append(stmp);
+			else {
+				hs = hs.append(stmp);
+			}
+		}
+		return String.valueOf(hs);
+	}
 }

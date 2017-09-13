@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.net.SocketAddress;
 import java.net.InetSocketAddress;
+import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Data.ToStrObj;
+import android.util.Base64;
 
 public class ClientService
 {
@@ -198,6 +201,10 @@ public class ClientService
 			return false;
 		}
 	}
+	public static void sendStream(InputStream is)
+	{
+
+	}
 	public static void login(String fa,String pwd)
 	{
 		//sendMsg("LGN");
@@ -212,4 +219,5 @@ public class ClientService
 		{
 		}
 	}
+	
 }

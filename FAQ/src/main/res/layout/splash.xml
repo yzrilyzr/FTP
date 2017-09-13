@@ -52,6 +52,9 @@
 		android:clickable="true"
 		android:layout_width="wrap_content"
 		android:layout_gravity="bottom|right"/>
-
+	<SurfaceView
+		android:layout_height="1px"
+		android:layout_width="1px"
+		android:id="@+id/listSurfaceView1"/>
 </LinearLayout>
 

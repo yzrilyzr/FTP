@@ -52,7 +52,69 @@
 		<LinearLayout
 			android:layout_height="wrap_content"
 			android:layout_width="match_parent"
-			android:orientation="horizontal"/>
+			android:orientation="horizontal">
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<ImageView
+				android:layout_height="35dp"
+				android:layout_width="35dp"
+				android:src="@drawable/picture"
+				android:scaleType="fitXY"/>
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<ImageView
+				android:layout_height="35dp"
+				android:layout_width="35dp"
+				android:src="@drawable/camera"
+				android:scaleType="fitXY"/>
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<ImageView
+				android:layout_height="35dp"
+				android:layout_width="35dp"
+				android:src="@drawable/file"
+				android:scaleType="fitXY"/>
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<ImageView
+				android:layout_height="35dp"
+				android:layout_width="35dp"
+				android:src="@drawable/mic"
+				android:scaleType="fitXY"/>
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+			<ImageView
+				android:layout_height="35dp"
+				android:layout_width="35dp"
+				android:src="@drawable/emotion"
+				android:scaleType="fitXY"/>
+
+			<RelativeLayout
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"/>
+
+		</LinearLayout>
 
 	</LinearLayout>
 

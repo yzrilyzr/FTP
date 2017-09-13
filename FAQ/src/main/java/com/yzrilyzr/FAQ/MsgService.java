@@ -18,6 +18,8 @@ import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
+import android.graphics.Color;
+import android.net.Uri;
 
 public class MsgService extends Service implements ClientService.Listener
 {
@@ -57,7 +59,7 @@ public class MsgService extends Service implements ClientService.Listener
 				Data.msgBuffer.add(m);
 				Data.msgs.add(m);
 			}
-			else
+			else if(m.type==T.MSG)
 			{
 				String from=m.from+"";
 				Data.msglist.put(from,m);
@@ -69,33 +71,33 @@ public class MsgService extends Service implements ClientService.Listener
 					byte[] hd=Data.getHead(m.from,false);
 					if(hd==null)ClientService.sendMsg(C.GHU,from);
 				}
+				runOnUiThread(new Runnable(){
+						@Override
+						public void run()
+						{
+							// TODO: Implement this method
+							byte[] b=Data.getHead(m.from,m.isGroup);
+							Bitmap bmp=null;
+							if(b!=null)bmp=BitmapFactory.decodeByteArray(b,0,b.length);
+							else bmp=BitmapFactory.decodeResource(getResources(),R.drawable.launcher);
+							Intent intent=new Intent(MsgService.this,MainActivity.class);
+							User us=Data.getUser(m.from);
+							intent.putExtra("user",us.o2s());
+							PendingIntent p=PendingIntent.getActivity(MsgService.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+							Notification n=new Notification.Builder(MsgService.this)
+								.setSmallIcon(R.drawable.launcher)
+								.setLargeIcon(bmp)
+								.setTicker(String.format("<%s>:%s",us.nick,m.msg))
+								.setContentText(m.msg)
+								.setContentTitle(us.nick)
+								.setContentIntent(p)
+								.getNotification();
+							n.sound=Uri.parse("android.resource://"+getPackageName()+ "/" + R.raw.notification);
+							n.flags=Notification.FLAG_AUTO_CANCEL;
+							((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(0,n);
+						}
+					});
 			}
-			runOnUiThread(new Runnable(){
-					@Override
-					public void run()
-					{
-						// TODO: Implement this method
-						byte[] b=Data.getHead(m.from,m.isGroup);
-						Bitmap bmp=null;
-						if(b!=null)bmp=BitmapFactory.decodeByteArray(b,0,b.length);
-						else bmp=BitmapFactory.decodeResource(getResources(),R.drawable.launcher);
-						Intent intent=new Intent(MsgService.this,MainActivity.class);
-						User us=Data.getUser(m.from);
-						intent.putExtra("user",us.o2s());
-						PendingIntent p=PendingIntent.getActivity(MsgService.this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
-						Notification n=new Notification.Builder(MsgService.this)
-							.setSmallIcon(R.drawable.launcher)
-							.setLargeIcon(bmp)
-							.setTicker(String.format("<%s>:%s",us.nick,m.msg))
-							.setContentText(m.msg)
-							.setContentTitle(us.nick)
-							.setContentIntent(p)
-							.setDefaults(Notification.DEFAULT_ALL)
-							.getNotification();
-						n.flags=Notification.FLAG_AUTO_CANCEL;
-						((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).notify(0,n);
-					}
-				});
 		}
 		else if(cmd==C.GUS)
 		{
