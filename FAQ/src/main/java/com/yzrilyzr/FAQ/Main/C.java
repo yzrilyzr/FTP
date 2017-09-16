@@ -4,19 +4,15 @@ public final class C
 {
 	public static final byte
 	HBT=1,
-	ENC=2,
-	USL=3,
-	PWL=4,
-	PWE=5,
-	USE=6,
-	LSU=7,
-	RSU=8,
-	VFE=9,
-	RFL=10,
-	PWR=11,
-	VFR=12,
-	EMR=13,
-	VFD=14,
+	ENC=2,//加密
+	LGN=3,//用户登录
+	LFL=5,//登录失败
+	LSU=7,//登录成功
+	RSU=8,//注册成功
+	VFE=9,//验证码错误
+	RFL=10,//注册失败
+	REG=11,//注册用户
+	VFD=14,//验证码冷却
 	VFC=15,
 	LOG=16,
 	MSG=17,

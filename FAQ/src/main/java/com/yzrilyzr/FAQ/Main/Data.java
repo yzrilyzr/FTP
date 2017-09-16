@@ -195,51 +195,5 @@ public class Data
 	{  
 		return Float.intBitsToFloat(getInt(bytes));  
 	}
-	public static String getFileSha1(String path)
-	{  
-		try
-		{  
-			File file=new File(path);  
-			FileInputStream in = new FileInputStream(file);  
-			MessageDigest messagedigest=MessageDigest.getInstance("SHA-1");  
-			byte[] buffer = new byte[10240];  
-			int len = 0;  
-			while ((len = in.read(buffer)) >0)
-			{   
-				messagedigest.update(buffer, 0, len);  
-			}
-			return byte2hex(messagedigest.digest());  
-		}
-		catch (Exception e)
-		{  
-		}  
-		return null;  
-	}
-	public static String getByteSha1(byte[] b)
-	{  
-		try
-		{  
-			MessageDigest messagedigest= MessageDigest.getInstance("SHA-1");  
-			messagedigest.update(b);  
-			return byte2hex(messagedigest.digest());  
-		}
-		catch (Exception e)
-		{  
-		}  
-		return null;  
-	}
-	public static String byte2hex(byte[] b) {
-		StringBuffer hs = new StringBuffer(b.length);
-		String stmp = "";
-		int len = b.length;
-		for (int n = 0; n < len; n++) {
-			stmp = Integer.toHexString(b[n] & 0xFF);
-			if (stmp.length() == 1)
-				hs = hs.append("0").append(stmp);
-			else {
-				hs = hs.append(stmp);
-			}
-		}
-		return String.valueOf(hs);
-	}
+
 }

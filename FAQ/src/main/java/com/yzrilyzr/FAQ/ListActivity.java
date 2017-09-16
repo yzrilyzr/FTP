@@ -20,7 +20,7 @@ import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
-import com.yzrilyzr.FAQ.Main.StreamSender;
+import com.yzrilyzr.FAQ.Main.FileService;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
 import java.text.SimpleDateFormat;
@@ -149,7 +149,7 @@ public class ListActivity extends BaseActivity
 			});
 		ClientService.sendMsg(C.GUS,Data.myfaq+"");
 		listMsg();
-		new StreamSender("/sdcard/音乐/自制/陈浩然的龙卷风(洛天依+30,言和+20).mp3",new MessageObj(1000,1000,T.FLE,false,"")).send();
+		//new StreamSender("/sdcard/音乐/自制/陈浩然的龙卷风(洛天依+30,言和+20).mp3",new MessageObj(1000,1000,T.FLE,false,"")).send();
 	}
 	private void setMyInfo()
 	{

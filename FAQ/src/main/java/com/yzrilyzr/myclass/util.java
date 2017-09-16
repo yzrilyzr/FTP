@@ -22,7 +22,7 @@ import android.view.ViewGroup;
 public class util
 {
     public static final String ERROR="ERROR;";
-
+	public static int VersionCode=2;
 	public static String mainDir=Environment.getExternalStorageDirectory().getAbsolutePath()+"/yzr的app/FAQ";
     public static void toast(final Context c,final String s)
     {

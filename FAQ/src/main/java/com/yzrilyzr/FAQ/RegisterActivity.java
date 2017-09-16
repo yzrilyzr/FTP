@@ -7,6 +7,7 @@ import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.RegisterActivity;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myAlertDialog;
+import com.yzrilyzr.FAQ.Data.User;
 
 public class RegisterActivity extends BaseActivity
 {
@@ -55,9 +56,11 @@ public class RegisterActivity extends BaseActivity
 		else if(d.equals(""))util.toast(this,"验证码不能为空");
 		else if(a.equals(b))
 		{
-			ClientService.sendMsg(C.PWR,a);
-			ClientService.sendMsg(C.VFR,d);
-			ClientService.sendMsg(C.EMR,c);
+			User us=new User();
+			us.pwd=a;
+			us.email=c;
+			us.nick=d;
+			ClientService.sendMsg(C.REG,us.o2s());
 		}
 	}
 	public void send(View v){

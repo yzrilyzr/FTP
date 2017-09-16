@@ -14,7 +14,7 @@ import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import android.util.Base64;
 
-public class ClientService
+public class ClientService extends RU
 {
 	public static Socket socket;
 	public static BufferedOutputStream Writer;
@@ -23,6 +23,7 @@ public class ClientService
 	public static boolean running=false;
 	public static boolean isLogin=false;
 	private static String myfaq,mypwd;
+	private static long HBTtime;
 	public interface Listener
 	{
 		public abstract void rev(byte cmd,String msg);
@@ -30,21 +31,23 @@ public class ClientService
 	private static CopyOnWriteArrayList<Listener> msginf=new CopyOnWriteArrayList<Listener>();
 	public static void connect() throws IOException
 	{
-		if(socket==null)
+		if(socket!=null)
 		{
-			socket=new Socket();
-			socket.setKeepAlive(true);
-			socket.setTcpNoDelay(true);
-			socket.setSendBufferSize(10240);
-			socket.setTrafficClass(0x04|0x10);
-			socket.setSoTimeout(40000);
-			socket.setReceiveBufferSize(10240);
-			socket.connect(new InetSocketAddress(hostIp,10000),40000);
-			running=true;
-			startService();
-			Writer=new BufferedOutputStream(socket.getOutputStream());
-			sendMsg(C.ENC);
+			socket.close();
+			socket=null;
 		}
+		socket=new Socket();
+		socket.setKeepAlive(true);
+		socket.setTcpNoDelay(true);
+		socket.setSendBufferSize(10240);
+		socket.setTrafficClass(0x04|0x10);
+		socket.setSoTimeout(10000);
+		socket.setReceiveBufferSize(10240);
+		socket.connect(new InetSocketAddress(hostIp,10000),40000);
+		running=true;
+		startService();
+		Writer=new BufferedOutputStream(socket.getOutputStream());
+		sendMsg(C.ENC);
 	}
 	public static void startService()
 	{
@@ -55,25 +58,30 @@ public class ClientService
 					// TODO: Implement this method
 					try
 					{
-						long HBTtime=System.currentTimeMillis();
+						HBTtime=System.currentTimeMillis();
 						BufferedInputStream buff=new BufferedInputStream(socket.getInputStream());
 						while(running)
 						{
-							if(System.currentTimeMillis()-HBTtime>40000l)running=false;
+							getHbt(HBTtime);
 							try
 							{
-								int msglen=0;
-								while(buff.available()<4&&running)
-								{}
-								msglen=Data.getInt(new byte[]{(byte)buff.read(),(byte)buff.read(),(byte)buff.read(),(byte)buff.read()});
-								while(buff.available()<1&&running)
-								{}
+								block(buff,1,new BO(){
+										@Override
+										public boolean g()
+										{
+											// TODO: Implement this method
+											return getHbt(HBTtime);
+										}
+									});
 								byte cmd=(byte)buff.read();
-								byte[] by=new byte[msglen];
-								while(buff.available()<msglen&&running)
-								{}
-								buff.read(by);
-								String str=new String(by);
+								String str=readStrFully(buff,new BO(){
+										@Override
+										public boolean g()
+										{
+											// TODO: Implement this method
+											return getHbt(HBTtime);
+										}
+									});
 								if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
 								//str=new String(Base64.decode(str,0));
 								if(cmd==C.HBT)
@@ -81,7 +89,7 @@ public class ClientService
 									HBTtime=System.currentTimeMillis();
 									sendMsg(C.HBT);
 								}
-								else if(cmd==C.ENC)deckey=str;
+								else if(cmd==C.ENC)deckey=Integer.toHexString(Integer.parseInt(str));
 								else
 								{
 									for(Listener o:msginf)
@@ -116,6 +124,11 @@ public class ClientService
 					{
 						sendMsg(C.LOG,getStackTrace(e));
 					}
+				}
+
+				private boolean getHbt(long HBTtim)
+				{
+					return running=System.currentTimeMillis()-HBTtim<40000l;
 				}
 			}).start();
 		new Thread(new Runnable(){
@@ -169,15 +182,14 @@ public class ClientService
 			if(s!=null)
 			{
 				byte[] a=s.getBytes();
-				//String aa=Base64.encodeToString(a,0);
 				if(deckey!=null)a=AES.encrypt(deckey,s).getBytes();
 				byte[] b=new byte[a.length+5];
 				byte[] c=Data.getIBytes(a.length);
-				b[4]=cmd;
-				b[0]=c[0];
-				b[1]=c[1];
-				b[2]=c[2];
-				b[3]=c[3];
+				b[0]=cmd;
+				b[1]=c[0];
+				b[2]=c[1];
+				b[3]=c[2];
+				b[4]=c[3];
 				int e=5;
 				for(byte d:a)b[e++]=d;
 				Writer.write(b);
@@ -186,11 +198,11 @@ public class ClientService
 			{
 				byte[] b=new byte[5];
 				byte[] c=Data.getIBytes(0);
-				b[4]=cmd;
-				b[0]=c[0];
-				b[1]=c[1];
-				b[2]=c[2];
-				b[3]=c[3];
+				b[0]=cmd;
+				b[1]=c[0];
+				b[2]=c[1];
+				b[3]=c[2];
+				b[4]=c[3];
 				Writer.write(b);
 			}
 			Writer.flush();
@@ -201,17 +213,15 @@ public class ClientService
 			return false;
 		}
 	}
-	public static void sendStream(InputStream is)
-	{
-
-	}
 	public static void login(String fa,String pwd)
 	{
 		//sendMsg("LGN");
 		try
 		{
-			sendMsg(C.USL,fa);
-			sendMsg(C.PWL,pwd);
+			User u=new User();
+			u.faq=Integer.parseInt(fa);
+			u.pwd=pwd;
+			sendMsg(C.LGN,u.o2s());
 			myfaq=fa;
 			mypwd=pwd;
 		}
@@ -219,5 +229,5 @@ public class ClientService
 		{
 		}
 	}
-	
+
 }

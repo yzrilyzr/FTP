@@ -92,8 +92,7 @@ public class LoginActivity extends BaseActivity
 				public void run()
 				{
 					// TODO: Implement this method
-					if(cmd==C.USE)util.toast(ctx,"用户名错误");
-					else if(cmd==C.PWE)util.toast(ctx,"密码错误");
+					if(cmd==C.LFL)util.toast(ctx,"用户名或密码错误");
 					else if(cmd==C.LSU)
 					{
 						startService(new Intent(ctx,MsgService.class));

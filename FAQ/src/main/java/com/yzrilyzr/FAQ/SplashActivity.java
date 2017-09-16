@@ -3,6 +3,7 @@ import com.yzrilyzr.ui.*;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -13,15 +14,17 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myIconDrawer.DrawType;
 import com.yzrilyzr.ui.uidata.icon;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import com.yzrilyzr.FAQ.Main.C;
-import com.yzrilyzr.FAQ.Main.T;
+import android.content.pm.PackageManager.NameNotFoundException;
+import com.yzrilyzr.FAQ.Main.RU;
 
 public class SplashActivity extends BaseActivity 
 {
@@ -37,6 +40,12 @@ public class SplashActivity extends BaseActivity
 		if(!isInit)
 		{
 			uidata.readData(this);
+			try
+			{
+				util.VersionCode = getPackageManager().getPackageInfo(getPackageName(),0).versionCode;
+			}
+			catch (PackageManager.NameNotFoundException e)
+			{}
 			if(uidata.mod)
 			{
 				StringBuilder sb=new StringBuilder();
@@ -79,17 +88,7 @@ public class SplashActivity extends BaseActivity
 								/*while(!uu)
 								{Thread.sleep(1);}*/
 								Thread.sleep(300);
-								runOnUiThread(new Runnable(){
-										@Override
-										public void run()
-										{
-											// TODO: Implement this metho
-											Intent in=new Intent(ctx,LoginActivity.class);
-											in.putExtra("al",true);
-											startActivity(in);
-											finish();
-										}
-									});
+								ClientService.sendMsg(C.UPD);
 							}
 							catch (Exception e)
 							{
@@ -106,6 +105,29 @@ public class SplashActivity extends BaseActivity
 				}).start();
 			setContentView(R.layout.splash);
 			//b();
+		}
+	}
+	@Override
+	public void rev(byte cmd, String msg)
+	{
+		// TODO: Implement this method
+		if(cmd==C.UPD){
+			String[] ms=msg.split("/");
+				final int i=Data.getInt(ms[1].getBytes());
+				runOnUiThread(new Runnable(){
+						@Override
+						public void run()
+						{
+							// TODO: Implement this method
+							if(util.VersionCode>=i){
+							Intent in=new Intent(ctx,LoginActivity.class);
+								in.putExtra("al",true);
+								startActivity(in);
+								finish();
+							}
+							else util.toast(ctx,"不支持该版本的FAQ");
+						}
+					});
 		}
 	}
 	private void b(){
