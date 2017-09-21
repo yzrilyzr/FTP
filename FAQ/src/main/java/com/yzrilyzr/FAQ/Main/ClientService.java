@@ -39,10 +39,10 @@ public class ClientService extends RU
 		socket=new Socket();
 		socket.setKeepAlive(true);
 		socket.setTcpNoDelay(true);
-		socket.setSendBufferSize(10240);
+		//socket.setSendBufferSize(10240);
 		socket.setTrafficClass(0x04|0x10);
 		socket.setSoTimeout(10000);
-		socket.setReceiveBufferSize(10240);
+		//socket.setReceiveBufferSize(10240);
 		socket.connect(new InetSocketAddress(hostIp,10000),40000);
 		running=true;
 		startService();
@@ -60,28 +60,35 @@ public class ClientService extends RU
 					{
 						HBTtime=System.currentTimeMillis();
 						BufferedInputStream buff=new BufferedInputStream(socket.getInputStream());
+						BO bo=new BO(){
+							@Override
+							public boolean g()
+							{
+								// TODO: Implement this method
+								return running=getHbt(HBTtime);
+							}
+						};
 						while(running)
 						{
-							getHbt(HBTtime);
+							running=getHbt(HBTtime);
 							try
 							{
-								block(buff,1,new BO(){
-										@Override
-										public boolean g()
-										{
-											// TODO: Implement this method
-											return getHbt(HBTtime);
-										}
-									});
+								block(buff,1,bo);
 								byte cmd=(byte)buff.read();
-								String str=readStrFully(buff,new BO(){
-										@Override
-										public boolean g()
-										{
-											// TODO: Implement this method
-											return getHbt(HBTtime);
-										}
-									});
+								int pwdlen=readIntFully(buff,bo);
+								String str=null;
+								ByteArrayOutputStream str2=new ByteArrayOutputStream();
+								int ind=0;
+								while(ind<pwdlen)
+								{
+									byte[] bb=new byte[pwdlen-ind];
+									int ii=buff.read(bb);
+									ind+=ii;
+									str2.write(bb,0,ii);
+								}
+								str2.close();
+								str=str2.toString();
+								str2=null;
 								if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
 								//str=new String(Base64.decode(str,0));
 								if(cmd==C.HBT)
@@ -90,6 +97,12 @@ public class ClientService extends RU
 									sendMsg(C.HBT);
 								}
 								else if(cmd==C.ENC)deckey=Integer.toHexString(Integer.parseInt(str));
+								else if(cmd==C.GHG||cmd==C.GHU)
+								{
+									if("-1".equals(str))return;
+									byte[] by=Base64.decode(str,0);
+									Data.saveHead(cmd==C.GHG,by);
+								}
 								else
 								{
 									for(Listener o:msginf)
@@ -181,29 +194,14 @@ public class ClientService extends RU
 		{
 			if(s!=null)
 			{
-				byte[] a=s.getBytes();
-				if(deckey!=null)a=AES.encrypt(deckey,s).getBytes();
-				byte[] b=new byte[a.length+5];
-				byte[] c=Data.getIBytes(a.length);
-				b[0]=cmd;
-				b[1]=c[0];
-				b[2]=c[1];
-				b[3]=c[2];
-				b[4]=c[3];
-				int e=5;
-				for(byte d:a)b[e++]=d;
-				Writer.write(b);
+				if(deckey!=null)s=AES.encrypt(deckey,s);
+				Writer.write(cmd);
+				writeStr(Writer,s);
 			}
 			else
 			{
-				byte[] b=new byte[5];
-				byte[] c=Data.getIBytes(0);
-				b[0]=cmd;
-				b[1]=c[0];
-				b[2]=c[1];
-				b[3]=c[2];
-				b[4]=c[3];
-				Writer.write(b);
+				Writer.write(cmd);
+				writeStr(Writer,"");
 			}
 			Writer.flush();
 			return true;
@@ -220,6 +218,8 @@ public class ClientService extends RU
 		{
 			User u=new User();
 			u.faq=Integer.parseInt(fa);
+			Data.myfaq=u.faq;
+			Data.resetMyself();
 			u.pwd=pwd;
 			sendMsg(C.LGN,u.o2s());
 			myfaq=fa;

@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import com.yzrilyzr.FAQ.MsgAdapter;
 
 public class Data
 {
@@ -60,6 +61,19 @@ public class Data
 				}
 			});
 	}
+	public static void sortEntByTime(List<MsgAdapter.Entry> msgu,final int l)
+	{
+		Collections.sort(msgu,new Comparator<MsgAdapter.Entry>(){
+				@Override
+				public int compare(MsgAdapter.Entry p1, MsgAdapter.Entry p2)
+				{
+					// TODO: Implement this method
+					if(p1.time>p2.time)return -1*l;
+					else return 1*l;
+				}
+			});
+	}
+	
 	public static myRoundDrawable getMyHeadDrawable()
 	{
 		return getHeadDrawable(myfaq,false);
@@ -103,6 +117,9 @@ public class Data
 		else if(u.faq==myfaq)me=u;
 		return u;
 	}
+	public static void resetMyself(){
+		me=null;
+	}
 	public static User getMyself()
 	{
 		if(me!=null)return me;
@@ -116,6 +133,8 @@ public class Data
 	{
 		try
 		{
+			File hd=new File(util.mainDir+"/head");
+			if(!hd.exists())hd.mkdirs();
 			String p=String.format("%s/head/%d%s.png",util.mainDir,faq,isg?".group":".user");
 			File f=new File(p);
 			if(!f.exists())

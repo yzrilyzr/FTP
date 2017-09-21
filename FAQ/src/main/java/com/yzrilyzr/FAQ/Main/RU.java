@@ -4,7 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 
-public class RU
+public class RU extends Thread
 {
 	public static void writeInt(BufferedOutputStream b,int i) throws IOException
 	{

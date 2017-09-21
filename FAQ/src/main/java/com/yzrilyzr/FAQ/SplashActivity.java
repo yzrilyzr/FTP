@@ -59,6 +59,7 @@ public class SplashActivity extends BaseActivity
 		}
 		isInit=true;
 		super.onCreate(savedInstanceState);
+		startService(new Intent(ctx,MsgService.class));
 		Data.DefaultHead=new myRoundDrawable(ctx,R.drawable.launcher);
 		if(ClientService.isLogin)
 		{

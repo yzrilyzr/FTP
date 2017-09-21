@@ -95,7 +95,6 @@ public class LoginActivity extends BaseActivity
 					if(cmd==C.LFL)util.toast(ctx,"用户名或密码错误");
 					else if(cmd==C.LSU)
 					{
-						startService(new Intent(ctx,MsgService.class));
 						util.toast(ctx,"登录成功");
 						ClientService.isLogin=true;
 						startActivity(new Intent(ctx,ListActivity.class));
@@ -117,7 +116,6 @@ public class LoginActivity extends BaseActivity
 				.putString("user",a)
 				.putString("pwd",AES.encrypt(a,b))
 				.commit();
-			Data.myfaq=Integer.parseInt(a);
 		}
 		catch (Exception e)
 		{}

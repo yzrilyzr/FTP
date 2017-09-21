@@ -15,17 +15,15 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView.OnItemClickListener;
 import com.yzrilyzr.FAQ.Data.MessageObj;
+import com.yzrilyzr.FAQ.Data.ToStrList;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
-import com.yzrilyzr.FAQ.Main.FileService;
 import com.yzrilyzr.FAQ.Main.T;
 import com.yzrilyzr.myclass.util;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -84,6 +82,15 @@ public class ListActivity extends BaseActivity
 				});
 		}
 		bbutton[0].getChildAt(0).setBackgroundColor(0xffaaaaaa);
+		page.setOnPageChangedListener(new myViewPager.OnPageChangeListener(){
+				@Override
+				public void onPageChanged(int last, int newone)
+				{
+					// TODO: Implement this method
+					bbutton[last].getChildAt(0).setBackground(null);
+					bbutton[newone].getChildAt(0).setBackgroundColor(0xffaaaaaa);
+				}
+			});
 		ListView lv=(ListView) findViewById(R.id.listmenuListView1);
 		final String[] s="设置,界面设置,帮助,关于,退出登录".split(",");
 		lv.setAdapter(new BaseAdapter(){
@@ -139,17 +146,16 @@ public class ListActivity extends BaseActivity
 					else if(p3==3)startActivity(new Intent(ctx,AboutActivity.class));
 					else if(p3==4)
 					{
-						stopService(new Intent(ctx,MsgService.class));
+						startActivity(new Intent(ctx,LoginActivity.class));
 						for(BaseActivity a:BaseActivity.activities)a.finish();
 						System.gc();
-						startActivity(new Intent(ctx,LoginActivity.class));
 						ClientService.isLogin=false;
 					}
 				}
 			});
 		ClientService.sendMsg(C.GUS,Data.myfaq+"");
 		listMsg();
-		//new StreamSender("/sdcard/音乐/自制/陈浩然的龙卷风(洛天依+30,言和+20).mp3",new MessageObj(1000,1000,T.FLE,false,"")).send();
+		//new FileService("/sdcard/音乐/自制/陈浩然的龙卷风(洛天依+30,言和+20).mp3",1).start();
 	}
 	private void setMyInfo()
 	{
@@ -246,50 +252,19 @@ public class ListActivity extends BaseActivity
 	}
 	private void listFri()
 	{
-		listFri.setAdapter(new BaseAdapter(){
-				@Override
-				public int getCount()
-				{
-					// TODO: Implement this method
-					return Data.getMyself().friends.size();
-				}
-
-				@Override
-				public Object getItem(int p1)
-				{
-					// TODO: Implement this method
-					return null;
-				}
-
-				@Override
-				public long getItemId(int p1)
-				{
-					// TODO: Implement this method
-					return 0;
-				}
-
-				@Override
-				public View getView(int p1, View p2, ViewGroup p3)
-				{
-					// TODO: Implement this method
-					ViewGroup vg=(ViewGroup)LayoutInflater.from(ListActivity.this).inflate(R.layout.list_entry,null);
-					ImageView hd=(ImageView) vg.findViewById(R.id.listentryImageView1);
-					TextView ni=(TextView) vg.findViewById(R.id.listentryTextView1);
-					TextView ms=(TextView) vg.findViewById(R.id.listentryTextView2);
-					TextView ts=(TextView) vg.findViewById(R.id.listentryTextView3);
-					ts.setVisibility(8);
-					int faq=Data.getMyself().friends.get(p1);
-					User u=Data.getUser(faq);
-					if(u!=null)
-					{
-						ni.setText(u.nick);
-						ms.setText(u.sign);
-					}
-					else ni.setText(faq+"");
-					hd.setImageDrawable(Data.getHeadDrawable(faq,false));
-					return vg;
-				}
-			});
+		final ArrayList<MsgAdapter.Entry> ent=new ArrayList<MsgAdapter.Entry>();
+		ToStrList<Integer> fr=Data.getMyself().friends;
+		for(int faq:fr)
+		{
+			MsgAdapter.Entry e=new MsgAdapter.Entry();
+			User u=Data.getUser(faq);
+			if(u!=null)
+			{e.txt=u.nick;e.stxt=u.sign;}
+			else e.txt=faq+"";
+			e.head=Data.getHeadDrawable(faq,false);
+			ent.add(e);
+		}
+		listFri.setAdapter(new MsgAdapter(ctx,ent));
 		listFri.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
@@ -306,67 +281,28 @@ public class ListActivity extends BaseActivity
 	private void listMsg()
 	{
 		final ArrayList<MessageObj> msgu=new ArrayList<MessageObj>();
+		final ArrayList<MsgAdapter.Entry> ent=new ArrayList<MsgAdapter.Entry>();
 		Iterator it=Data.msglist.entrySet().iterator();
 		while(it.hasNext())
 		{
-			MessageObj e=(MessageObj)((Map.Entry) it.next()).getValue();
-			msgu.add(e);
+			MessageObj m=(MessageObj)((Map.Entry) it.next()).getValue();
+			msgu.add(m);
+			MsgAdapter.Entry e=new MsgAdapter.Entry();
+			if(m.type==T.VMS)
+			{e.txt="系统消息";e.head=Data.DefaultHead;}
+			else
+			{
+				User u=Data.getUser(m.from);
+				if(u!=null)e.txt=u.nick;
+				e.head=Data.getHeadDrawable(m.from,m.isGroup);
+			}
+			e.stxt=m.msg;
+			e.time=m.time;
+			ent.add(e);
 		}
 		Data.sortMsgByTime(msgu,1);
-		listMsg.setAdapter(new BaseAdapter(){
-
-				@Override
-				public int getCount()
-				{
-					// TODO: Implement this method
-					return msgu.size();
-				}
-
-				@Override
-				public Object getItem(int p1)
-				{
-					// TODO: Implement this method
-					return null;
-				}
-
-				@Override
-				public long getItemId(int p1)
-				{
-					// TODO: Implement this method
-					return 0;
-				}
-
-				@Override
-				public View getView(int p1, View p2, ViewGroup p3)
-				{
-					// TODO: Implement this method
-					ViewGroup vg=(ViewGroup)LayoutInflater.from(ListActivity.this).inflate(R.layout.list_entry,null);
-					ImageView hd=(ImageView) vg.findViewById(R.id.listentryImageView1);
-					TextView ni=(TextView) vg.findViewById(R.id.listentryTextView1);
-					TextView ms=(TextView) vg.findViewById(R.id.listentryTextView2);
-					TextView ts=(TextView) vg.findViewById(R.id.listentryTextView3);
-					MessageObj o=msgu.get(p1);
-					ms.setText(o.msg);
-					ts.setText(new SimpleDateFormat("HH:mm").format(new Date(o.time)));
-					if(o.type==T.VMS)
-					{
-						hd.setImageDrawable(Data.DefaultHead);
-						ni.setText("系统消息");
-					}
-					else
-					{
-						User u=Data.getUser(o.from);
-						if(u!=null)ni.setText(u.nick);
-						else
-						{
-							ni.setText(o.from+"");
-							ClientService.sendMsg(C.GUS,o.from+"");
-						}
-						hd.setImageDrawable(Data.getHeadDrawable(o.from,o.isGroup));
-					}
-					return vg;
-				}
-			});
+		Data.sortEntByTime(ent,1);
+		listMsg.setAdapter(new MsgAdapter(ctx,ent));
 		listMsg.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)

@@ -107,29 +107,23 @@ public class MsgService extends Service implements ClientService.Listener
 		}
 		else if(cmd==C.FLO)
 		{
-			ClientService.isLogin=false;
 			runOnUiThread(new Runnable(){
 					@Override
 					public void run()
 					{
 						// TODO: Implement this method
+						ClientService.isLogin=false;
 						util.toast(MsgService.this,"您的帐号在其他客户端登录，您已被强制下线");
 						Intent in=new Intent(MsgService.this,LoginActivity.class);
 						in.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+						startActivity(in);
 						for(BaseActivity a:BaseActivity.activities)a.finish();
 						System.gc();
-						ClientService.isLogin=false;
-						startActivity(in);
 					}
 				});
 
 		}
-		else if(cmd==C.GHG||cmd==C.GHU)
-		{
-			if("-1".equals(msg))return;
-			byte[] by=Base64.decode(msg,0);
-			Data.saveHead(cmd==C.GHG,by);
-		}
+
 	}
 	private void runOnUiThread(Runnable r)
 	{
