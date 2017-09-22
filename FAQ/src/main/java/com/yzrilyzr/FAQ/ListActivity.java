@@ -146,6 +146,7 @@ public class ListActivity extends BaseActivity
 					else if(p3==3)startActivity(new Intent(ctx,AboutActivity.class));
 					else if(p3==4)
 					{
+						ClientService.sendMsg(C.LGO);
 						startActivity(new Intent(ctx,LoginActivity.class));
 						for(BaseActivity a:BaseActivity.activities)a.finish();
 						System.gc();

@@ -6,6 +6,7 @@ public final class C
 	HBT=1,
 	ENC=2,//加密
 	LGN=3,//用户登录
+	LGO=4,
 	LFL=5,//登录失败
 	LSU=7,//登录成功
 	RSU=8,//注册成功
