@@ -1,4 +1,4 @@
-package com.yzrilyzr.FAQ;
+package com.yzrilyzr.myclass;
 
 import android.view.*;
 

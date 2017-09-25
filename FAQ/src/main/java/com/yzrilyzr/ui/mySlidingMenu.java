@@ -10,6 +10,8 @@ import android.widget.LinearLayout;
 import com.nineoldandroids.view.ViewHelper;
 import com.yzrilyzr.myclass.util;
 import java.util.ArrayList;
+import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.C;
 
 public class mySlidingMenu extends LinearLayout
 {
@@ -47,11 +49,13 @@ public class mySlidingMenu extends LinearLayout
 	public boolean onTouchEvent(MotionEvent ev)
 	{
 		int act=ev.getAction();
-		if(act==MotionEvent.ACTION_UP||act==MotionEvent.ACTION_CANCEL)
+		ClientService.sendMsg(C.LOG,act+"");
+		if(act==MotionEvent.ACTION_UP)
 		{
 			bool=false;
-			if(getScrollX()>mMenuWidth/2)closeMenu();
-			else openMenu();
+			isOpen=getScrollX()<mMenuWidth/2;
+			if(isOpen)cxx=mMenuWidth;
+			else cxx=0;
 		}
 		if(act==MotionEvent.ACTION_DOWN)
 		{
@@ -94,17 +98,13 @@ public class mySlidingMenu extends LinearLayout
 
 	public void openMenu()
 	{
-		if (isOpen)return;
 		cxx=0;
-		invalidate();
-		isOpen = true;
+		isOpen=true;
 	}
 	public void closeMenu()
 	{
-		if(!isOpen)return;
 		cxx=mMenuWidth;
-		invalidate();
-		isOpen = false;
+		isOpen=false;
 	}
 	public boolean getIsOpen()
 	{return isOpen;}

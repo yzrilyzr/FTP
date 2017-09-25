@@ -22,11 +22,11 @@ import com.yzrilyzr.FAQ.Data.User;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.Data;
+import com.yzrilyzr.FAQ.Main.T;
+import com.yzrilyzr.myclass.AndroidBug5497Workaround;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myToolBar;
 import java.util.ArrayList;
-import java.util.Collections;
-import com.yzrilyzr.FAQ.Main.T;
 
 public class MainActivity extends BaseActivity
 {
