@@ -21,7 +21,8 @@ public class Shapes extends BGdraw
 		ww=util.getScreenWidth();
 		wh=util.getScreenHeight();
 		rad=util.dip2px(15);
-		vel=rad/4;
+		p.setTextSize(200);
+		vel=rad/16;
 	}
 
 	@Override
@@ -47,6 +48,15 @@ public class Shapes extends BGdraw
 			p.setStyle(Paint.Style.STROKE);
 			c.drawCircle(pp.x,pp.y,rad,p);
 		}
+		//c.drawText("FPS:"+(1000/dt),0,500,p);
+	}
+
+	@Override
+	public void onDestory()
+	{
+		// TODO: Implement this method
+		super.onDestory();
+		pos.clear();
 	}
 
 	@Override
@@ -55,7 +65,8 @@ public class Shapes extends BGdraw
 		// TODO: Implement this method
 		super.onCompute();
 		Random r=new Random();
-		for(PF pp:pos){
+		for(PF pp:pos)
+		{
 			pp.vx+=pp.ax;
 			pp.vy+=pp.ay;
 			pp.x+=pp.vx;
@@ -64,15 +75,19 @@ public class Shapes extends BGdraw
 			if(pp.y<-rad)pp.y=wh+rad;
 			if(pp.x>ww+rad)pp.x=-rad;
 			if(pp.y>wh+rad)pp.y=-rad;
-			if(pp.vx>vel||pp.vx<-vel)pp.vx=0;
-			if(pp.vy>vel||pp.vy<-vel)pp.vy=0;
-			pp.ax=r.nextBoolean()?0.5f:-0.5f;
-			pp.ay=r.nextBoolean()?0.5f:-0.5f;
+			if(pp.vx>vel)pp.vx=vel;
+			if(pp.vx<-vel)pp.vx=-vel;
+			if(pp.vy>vel)pp.vy=vel;
+			if(pp.vy<-vel)pp.vy=-vel;
+			pp.ax=r.nextBoolean()?0.2f:-0.2f;
+			pp.ay=r.nextBoolean()?0.2f:-0.2f;
 		}
 	}
-	class PF{
+	class PF
+	{
 		public float x,y,ax=0,ay=0,vx,vy;
-		public PF(float x,float y){
+		public PF(float x,float y)
+		{
 			this.x=x;
 			this.y=y;
 		}
