@@ -23,16 +23,10 @@ public class Shapes extends BGdraw
 		rad=util.dip2px(15);
 		p.setTextSize(200);
 		vel=rad/16;
-	}
-
-	@Override
-	public void onCreate(SurfaceHolder h)
-	{
-		// TODO: Implement this method
-		super.onCreate(h);
 		Random r=new Random();
 		for(int i=0;i<50;i++)pos.add(new PF(r.nextInt(ww),r.nextInt(wh)));
 	}
+
 	@Override
 	public void onDraw(Canvas c)
 	{

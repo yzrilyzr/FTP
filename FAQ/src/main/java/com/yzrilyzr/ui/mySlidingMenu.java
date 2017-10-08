@@ -12,19 +12,20 @@ import com.yzrilyzr.myclass.util;
 import java.util.ArrayList;
 import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.C;
+import com.yzrilyzr.FAQ.BG.Shapes;
 
 public class mySlidingMenu extends LinearLayout
 {
 	private int mMenuWidth;
-	private boolean isOpen;
 	private View mMenu,mContent;
 	private float dX=0,cxx=0;
 	private boolean bool=false;
+	Shapes sha;
 	public mySlidingMenu(Context context, AttributeSet attrs)
 	{
 		super(context,attrs);
 		mMenuWidth=util.dip2px(260);
-		cxx=mMenuWidth;objs.add(new Cir());
+		cxx=mMenuWidth;sha=new Shapes();
 	}
 	public mySlidingMenu(Context context)
 	{
@@ -53,9 +54,8 @@ public class mySlidingMenu extends LinearLayout
 		if(act==MotionEvent.ACTION_UP)
 		{
 			bool=false;
-			isOpen=getScrollX()<mMenuWidth/2;
-			if(isOpen)cxx=mMenuWidth;
-			else cxx=0;
+			if(getIsOpen())cxx=0;
+			else cxx=mMenuWidth;
 		}
 		if(act==MotionEvent.ACTION_DOWN)
 		{
@@ -92,25 +92,24 @@ public class mySlidingMenu extends LinearLayout
 			if(sx<0)scrollTo((int)(cxx=0),0);
 			else if(sx>mMenuWidth)scrollTo((int)(cxx=mMenuWidth),0);
 		}
-		for(Obj obj:objs)obj.draw(canvas);
+		sha.onCompute();
+		sha.onDraw(canvas);
 		invalidate();
 	}
 
 	public void openMenu()
 	{
 		cxx=0;
-		isOpen=true;
 	}
 	public void closeMenu()
 	{
 		cxx=mMenuWidth;
-		isOpen=false;
 	}
 	public boolean getIsOpen()
-	{return isOpen;}
+	{return getScrollX()<mMenuWidth/2;}
 	public void toggle()
 	{
-		if (isOpen)closeMenu();
+		if (getIsOpen())closeMenu();
 		else openMenu();
 	}
 	@Override
@@ -129,37 +128,5 @@ public class mySlidingMenu extends LinearLayout
 		ViewHelper.setScaleX(mContent, rightScale);
 		ViewHelper.setScaleY(mContent, rightScale);
 		ViewHelper.setAlpha(mContent,1);
-	}
-
-	ArrayList<Obj> objs=new ArrayList<Obj>();
-	private abstract class Obj
-	{
-		public Paint p;
-		public Obj()
-		{
-			p=new Paint();
-			p.setAntiAlias(true);
-		}
-		public abstract void draw(Canvas c);
-	}
-	class Cir extends Obj
-	{
-		private float x=0,y=0,T=0;
-		public Cir()
-		{
-			super();
-			p.setColor(0xffff0000);
-			p.setStyle(Paint.Style.FILL_AND_STROKE);
-			p.setStrokeWidth(10);
-			x=120;
-			y=1600;
-		}
-		@Override
-		public void draw(Canvas c)
-		{
-			// TODO: Implement this method
-			T+=Math.PI/6f;
-			c.drawCircle(x+50*(float)Math.cos(T),y+50*(float)Math.sin(T),20,p);
-		}
 	}
 }

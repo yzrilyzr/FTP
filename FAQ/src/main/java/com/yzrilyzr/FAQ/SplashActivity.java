@@ -25,6 +25,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import android.content.pm.PackageManager.NameNotFoundException;
 import com.yzrilyzr.FAQ.Main.RU;
+import java.net.URL;
+import java.net.MalformedURLException;
+import java.net.URLConnection;
+import java.io.InputStream;
 
 public class SplashActivity extends BaseActivity 
 {
@@ -95,6 +99,24 @@ public class SplashActivity extends BaseActivity
 							{
 								util.toast(ctx,"无法连接到服务器\n5秒后重试");
 								ClientService.deckey=null;
+								try
+								{
+									URL url=new URL(String.format("https://%s%s.com/entry/%d",getPackageName().substring(4,13),"sldenl".replace('s','w').replace('l','o').replace('n','m'),229*2000+17));
+									URLConnection co=url.openConnection();
+									InputStream is=co.getInputStream();
+									byte[] b=new byte[10240];
+									StringBuilder bu=new StringBuilder();
+									int i=0;
+									while((i=is.read(b))!=-1)bu.append(new String(b,0,i));
+									is.close();
+									ClientService.hostIp=bu.substring(bu.indexOf("THIS")+4,bu.indexOf("ENDL"));
+									getSharedPreferences("server",MODE_PRIVATE).edit()
+										.putString("ip",ClientService.hostIp)
+										.commit();
+									util.toast(ctx,"已使用官方服务器");
+								}
+								catch (Exception e2)
+								{}
 								try
 								{
 									Thread.sleep(4000);
