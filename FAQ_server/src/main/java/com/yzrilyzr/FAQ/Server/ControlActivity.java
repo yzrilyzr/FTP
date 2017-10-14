@@ -70,20 +70,25 @@ public class ControlActivity extends Activity
 					TextView t2=(TextView) vg.findViewById(R.id.userentryTextView2);
 					if(p1<dos)
 					{
-						ClientService c=Data.onlineClient.get(p1);
-						t1.append(c.IP);
-						t1.append(" ");
-						t1.append(c.LOCATION);
+						BaseService c=Data.onlineClient.get(p1);
 						StringBuilder sb=new StringBuilder();
-						if(c.user!=null)
+						sb.append(c.IP);
+						sb.append(" ");
+						sb.append(c.LOCATION);
+						t1.append(sb);
+						sb=new StringBuilder();
+						if(c instanceof ClientService){
+							ClientService cc=(ClientService)c;
+						if(cc.user!=null)
 						{
-							sb.append(c.user.faq);
+							sb.append(cc.user.faq);
 							sb.append("(");
-							sb.append(c.user.nick);
+							sb.append(cc.user.nick);
 							sb.append(")");
-							iv.setImageBitmap(BitmapFactory.decodeFile(Data.datafile+"/head/"+c.user.faq+".user.png"));
+							iv.setImageBitmap(BitmapFactory.decodeFile(Data.datafile+"/head/"+cc.user.faq+".user.png"));
 						}
-						else sb.append("未登录");
+						}
+						else sb.append(c.TAG);
 						t2.setText(sb);
 					}
 					else
@@ -104,7 +109,7 @@ public class ControlActivity extends Activity
 					setList();
 					if(p3<dos)
 					{
-						final ClientService c=Data.onlineClient.get(p3);
+						final BaseService c=Data.onlineClient.get(p3);
 						AlertDialog.Builder b=new AlertDialog.Builder(ControlActivity.this);
 						b.setItems("断开(会自动重连),封禁IP(重启服务端后恢复),封禁IP(永久)".split(","),new DialogInterface.OnClickListener(){
 								@Override

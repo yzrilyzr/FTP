@@ -7,46 +7,78 @@
 
 	<LinearLayout
 		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		android:orientation="horizontal">
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:text="开/关服"
-			android:onClick="open"/>
+			android:onClick="open"
+			android:layout_weight="1.0"/>
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:text="用户管理"
-			android:onClick="us"/>
+			android:onClick="us"
+			android:layout_weight="1.0"/>
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:text="连接控制"
-			android:onClick="control"/>
+			android:onClick="control"
+			android:layout_weight="1.0"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="程序状态"
+			android:onClick="stat"
+			android:layout_weight="1.0"/>
+
+	</LinearLayout>
+
+	<LinearLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
 			android:text="清除日志"
-			android:onClick="clear"/>
+			android:onClick="clear"
+			android:layout_weight="1.0"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="导出日志"
+			android:onClick="logout"
+			android:layout_weight="1.0"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="日志筛选"
+			android:onClick="loglist"
+			android:layout_weight="1.0"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="强制停止"
+			android:onClick="fstop"
+			android:layout_weight="1.0"/>
 
 	</LinearLayout>
 
-	<ScrollView
+	<com.yzrilyzr.FAQ.Server.LongTextView
 		android:layout_height="match_parent"
-		android:layout_width="match_parent">
-
-		<TextView
-			android:layout_height="wrap_content"
-			android:layout_width="match_parent"
-			android:id="@+id/mainTextView1"
-			android:textSize="12sp"/>
-
-	</ScrollView>
+		android:layout_width="match_parent"
+		android:id="@+id/mainTextView1"/>
 
 </LinearLayout>
 

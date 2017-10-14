@@ -5,17 +5,14 @@ public class C
 	public static byte
 	HBT=1,
 	ENC=2,
-	USL=3,
-	PWL=4,
-	PWE=5,
-	USE=6,
+	LGN=3,
+	LGO=4,
+	LFL=5,
 	LSU=7,
 	RSU=8,
 	VFE=9,
 	RFL=10,
-	PWR=11,
-	VFR=12,
-	EMR=13,
+	REG=11,
 	VFD=14,
 	VFC=15,
 	LOG=16,
@@ -26,5 +23,6 @@ public class C
 	AGR=21,
 	GHU=22,
 	GHG=23,
-	FLO=24;
+	FLO=24,
+	UPD=25;
 }
