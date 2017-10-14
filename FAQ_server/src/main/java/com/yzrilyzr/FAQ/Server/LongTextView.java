@@ -3,9 +3,7 @@ import android.view.inputmethod.*;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.InputType;
@@ -13,8 +11,8 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 public class LongTextView extends View implements InputConnection
 {
 
@@ -24,7 +22,7 @@ public class LongTextView extends View implements InputConnection
     public float th;
     private float cursorX=0;
     public int currentLine=-1,cursorStart=0,cursorEnd=0,cursorC=0;
-    private ArrayList<String> stringLines;
+    public CopyOnWriteArrayList<String> stringLines;
     private boolean isEdit=false,isTouch=false;
     public boolean ViewMode=false;
     //private StringBuffer sb;
@@ -242,7 +240,7 @@ public class LongTextView extends View implements InputConnection
 
 	private void init()
 	{
-		stringLines=new ArrayList<String>();
+		stringLines=new CopyOnWriteArrayList<String>();
         //sb=new StringBuffer();
         pa=new Paint(Paint.ANTI_ALIAS_FLAG);
         pa.setTextSize(30);
@@ -266,10 +264,16 @@ public class LongTextView extends View implements InputConnection
     }
     public String getText()
     {
-        String s="";
-        for(String a:stringLines)s+=a+"\n";
-        return s;
+        StringBuilder s=new StringBuilder();
+        for(String a:stringLines){
+			s.append(a);
+			s.append("\n");
+		}
+        return s.toString();
     }
+	public void clear(){
+		stringLines.clear();
+	}
     public void setText(String text)
     {
         try
@@ -282,19 +286,20 @@ public class LongTextView extends View implements InputConnection
         }
         catch(OutOfMemoryError e)
         {
-            Toast.makeText(getContext(),"内存不足",0).show();
+            //Toast.makeText(getContext(),"内存不足",0).show();
         }
     }
     public void addText(String text)
     {
         try
         {
-            stringLines.add(text);
+            String[] sd=text.split("\n");
+            for(String s:sd)stringLines.add(s);
             //invalidate();
         }
         catch(OutOfMemoryError e)
         {
-            Toast.makeText(getContext(),"内存不足",0).show();
+            //Toast.makeText(getContext(),"内存不足",0).show();
         }
     }
     @Override

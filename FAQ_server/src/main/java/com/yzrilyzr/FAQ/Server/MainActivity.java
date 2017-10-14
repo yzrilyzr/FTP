@@ -23,10 +23,10 @@ public class MainActivity extends Activity
 	static boolean started=false;
 	static LongTextView te;
 	static String TAG="Server";
-	static StringBuilder log=new StringBuilder();
 	static ServerSocket faqServer,fileServer,httpServer;
 	static int filterType=0;
 	static String filterKey="";
+	static String logBuff="";
 	static CopyOnWriteArrayList<ConsoleMsg> cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
  	static{
 		File f=new File(Data.datafile);
@@ -42,6 +42,14 @@ public class MainActivity extends Activity
 		Data.readBlackList();
 		toast(new ConsoleMsg(TAG,"主线程","数据载入成功","local"));
 	}
+
+	@Override
+	protected void onDestroy()
+	{
+		// TODO: Implement this method
+		logBuff=te.getText();
+		super.onDestroy();
+	}
 	@Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -51,7 +59,7 @@ public class MainActivity extends Activity
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.main);
 		te=(LongTextView) findViewById(R.id.mainTextView1);
-		te.setText(log.toString());
+		if(!"".equals(logBuff))te.setText(logBuff);
 		((ToggleButton)findViewById(R.id.mainToggleButton1)).setChecked(started);
 		toast(new ConsoleMsg(TAG,"主线程","界面初始化成功","local"));
     }
@@ -64,32 +72,29 @@ public class MainActivity extends Activity
 		(filterType==3&&filterKey.equals(m.at)))
 			toast(m.toString());
 	}
-	public static void toast(final String o)
+	public static void toast(String o)
 	{
 		try
 		{
-			ctx.runOnUiThread(new Runnable(){
-				@Override
-				public void run()
-				{
-					log.append(o);
-					log.append("\n");
-					postConsole();
-				}
-			});
+			te.addText(o);
+			scroll();
 		}
 		catch(Throwable e)
 		{}
 	}
-	private static void postConsole()
+
+	private static void scroll()
 	{
 		try
 		{
-			te.setText(log.toString());
-			String[] a=log.toString().split("\n");
-			te.currentLine=a.length-1;
-			te.cursorStart=a[a.length-1].length();
-			te.yOff=-te.th*a.length+ctx.getWindowManager().getDefaultDisplay().getHeight()*0.8f;
+			int a=te.stringLines.size();
+			if(a!=0)
+			{
+				te.currentLine=a-1;
+				te.cursorStart=te.stringLines.get(a-1).length();
+				te.yOff=-te.th*a+ctx.getWindowManager().getDefaultDisplay().getHeight()*0.8f;
+			}
+			else te.yOff=0;
 		}
 		catch(Throwable e)
 		{}
@@ -98,7 +103,7 @@ public class MainActivity extends Activity
 	{
 		try
 		{
-			BufferedOutputStream os= new BufferedOutputStream(new FileOutputStream(Data.datafile+"/日志导出"+System.currentTimeMillis()+".txt"));
+			BufferedOutputStream os=new BufferedOutputStream(new FileOutputStream(Data.datafile+"/日志导出"+System.currentTimeMillis()+".txt"));
 			for(ConsoleMsg c:cmsg)
 			{
 				os.write(c.toString().getBytes());
@@ -305,9 +310,8 @@ public class MainActivity extends Activity
 	}
 	public void clear(View v)
 	{
-		log=new StringBuilder();
 		cmsg.clear();
-		te.setText("");
+		te.clear();
 	}
 	public void stat(View v)
 	{
@@ -374,35 +378,25 @@ public class MainActivity extends Activity
 						public void onClick(DialogInterface p1, int pp2)
 						{
 							// TODO: Implement this method
-							log.delete(0,log.length());
 							filterType=p2;
 							filterKey=pe[pp2];
+							te.clear();
 							for(ConsoleMsg m:cmsg)
-							{
-								String k=null;
-								if(p2==1)k=m.ip;
-								else if(p2==2)k=m.tag;
-								else if(p2==3)k=m.at;
-								if(pe[pp2].equals(k))
-								{
-									log.append(m);
-									log.append("\n");
-								}
-							}
-							postConsole();
+								if((filterType==1&&filterKey.equals(m.ip))||
+								(filterType==2&&filterKey.equals(m.tag))||
+								(filterType==3&&filterKey.equals(m.at)))
+									te.addText(m.toString());
+							scroll();
 						}
 					}).show();
 				}
 				else
 				{
 					filterType=0;
-					log.delete(0,log.length());
-					for(ConsoleMsg m:cmsg)
-					{
-						log.append(m);
-						log.append("\n");
-					}
-					postConsole();
+					filterKey="";
+					te.clear();
+					for(ConsoleMsg m:cmsg)te.addText(m.toString());
+					scroll();
 				}
 			}
 		}).show();
