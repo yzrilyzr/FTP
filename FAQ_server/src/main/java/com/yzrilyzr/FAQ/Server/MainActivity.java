@@ -15,6 +15,7 @@ import android.os.StrictMode;
 import android.view.View;
 import android.view.Window;
 import java.util.concurrent.CopyOnWriteArrayList;
+import android.widget.ToggleButton;
 
 public class MainActivity extends Activity 
 {
@@ -27,16 +28,7 @@ public class MainActivity extends Activity
 	static int filterType=0;
 	static String filterKey="";
 	static CopyOnWriteArrayList<ConsoleMsg> cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
- 	@Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
-		Thread.currentThread().setName("FAQServer_MainActivity");
-		ctx=this;
-        super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.main);
-		te=(LongTextView) findViewById(R.id.mainTextView1);
-		te.setText(log.toString());
+ 	static{
 		File f=new File(Data.datafile);
 		if(!f.exists())f.mkdirs();
 		File u=new File(Data.datafile+"/users");
@@ -49,6 +41,19 @@ public class MainActivity extends Activity
 		Data.readUserData();
 		Data.readBlackList();
 		toast(new ConsoleMsg(TAG,"主线程","数据载入成功","local"));
+	}
+	@Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+		Thread.currentThread().setName("FAQServer_MainActivity");
+		ctx=this;
+        super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.main);
+		te=(LongTextView) findViewById(R.id.mainTextView1);
+		te.setText(log.toString());
+		((ToggleButton)findViewById(R.id.mainToggleButton1)).setChecked(started);
+		toast(new ConsoleMsg(TAG,"主线程","界面初始化成功","local"));
     }
 	public static void toast(ConsoleMsg m)
 	{
@@ -61,16 +66,20 @@ public class MainActivity extends Activity
 	}
 	public static void toast(final String o)
 	{
-		ctx.runOnUiThread(new Runnable(){
-			@Override
-			public void run()
-			{
-				log.append(o);
-				log.append("\n");
-				postConsole();
-			}
-		});
-
+		try
+		{
+			ctx.runOnUiThread(new Runnable(){
+				@Override
+				public void run()
+				{
+					log.append(o);
+					log.append("\n");
+					postConsole();
+				}
+			});
+		}
+		catch(Throwable e)
+		{}
 	}
 	private static void postConsole()
 	{
