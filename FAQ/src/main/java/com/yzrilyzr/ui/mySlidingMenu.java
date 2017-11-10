@@ -88,7 +88,7 @@ public class mySlidingMenu extends LinearLayout
 		if(!bool)
 		{
 			int sx=getScrollX();
-			if(sx!=cxx)scrollBy((int)((cxx-sx)*0.5),0);
+			if(sx!=cxx)scrollBy((int)Math.ceil((cxx-sx)*0.5),0);
 			if(sx<0)scrollTo((int)(cxx=0),0);
 			else if(sx>mMenuWidth)scrollTo((int)(cxx=mMenuWidth),0);
 		}
