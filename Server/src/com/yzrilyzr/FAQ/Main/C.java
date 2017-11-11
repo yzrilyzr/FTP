@@ -2,7 +2,7 @@ package com.yzrilyzr.FAQ.Main;
 
 public class C
 {
-	public static byte
+	public static final byte
 	HBT=1,//heart beat
 	ENC=2,//encode
 	LGN=3,//login

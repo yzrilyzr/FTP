@@ -365,8 +365,9 @@ public class LongTextView extends View implements InputConnection
 			 	canvas.drawText((ii+1)+"",xOff,l*th+yA,pa);
 				pa.setColor(0xffffffff);
                 canvas.drawText(s,lineNumWidth+xOff,l*th+yA,pa);
-				pa.setColor(0xffffff00);
+				if(s.indexOf("[")!=-1){
 				String gg=null;float ggw=0;
+				pa.setColor(0xffffff00);
 				canvas.drawText(gg=s.substring(s.indexOf("["),s.indexOf("]")+1),lineNumWidth+xOff,l*th+yA,pa);
 				pa.setColor(0xff00ffff);ggw+=pa.measureText(gg);
 				canvas.drawText(gg=s.substring(s.indexOf("<"),s.indexOf("(")),lineNumWidth+xOff+ggw,l*th+yA,pa);
@@ -376,6 +377,7 @@ public class LongTextView extends View implements InputConnection
 				canvas.drawText(gg=s.substring(s.indexOf("@"),s.indexOf(">")),lineNumWidth+xOff+ggw,l*th+yA,pa);
 				pa.setColor(0xff00ffff);ggw+=pa.measureText(gg);
 				canvas.drawText(s.substring(s.indexOf(">"),s.indexOf(">")+1),lineNumWidth+xOff+ggw,l*th+yA,pa);
+				}
             }
             if(!isTouch)
             {

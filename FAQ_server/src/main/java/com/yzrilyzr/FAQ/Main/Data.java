@@ -11,6 +11,7 @@ import java.net.Socket;
 public class Data extends RU
 {
 	public static String datafile=Environment.getExternalStorageDirectory().getAbsolutePath()+"/yzr的app/FAQ_server";
+	public static String rootFile=Environment.getExternalStorageDirectory().getAbsolutePath();
 	public static final ConcurrentHashMap<String,User> users=new ConcurrentHashMap<String,User>();
 	public static final ConcurrentHashMap<String,String> mailCd=new ConcurrentHashMap<String,String>();
 	public static final ConcurrentHashMap<String,ClientService> loginClient=new ConcurrentHashMap<String,ClientService>();

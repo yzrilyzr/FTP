@@ -16,6 +16,11 @@ import android.view.View;
 import android.view.Window;
 import java.util.concurrent.CopyOnWriteArrayList;
 import android.widget.ToggleButton;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import dalvik.system.DexClassLoader;
+import android.os.Handler;
 
 public class MainActivity extends Activity 
 {
@@ -28,7 +33,7 @@ public class MainActivity extends Activity
 	static String filterKey="";
 	static String logBuff="";
 	static CopyOnWriteArrayList<ConsoleMsg> cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
- 	static{
+	static{
 		File f=new File(Data.datafile);
 		if(!f.exists())f.mkdirs();
 		File u=new File(Data.datafile+"/users");
@@ -42,7 +47,6 @@ public class MainActivity extends Activity
 		Data.readBlackList();
 		toast(new ConsoleMsg(TAG,"主线程","数据载入成功","local"));
 	}
-
 	@Override
 	protected void onDestroy()
 	{
@@ -62,6 +66,7 @@ public class MainActivity extends Activity
 		if(!"".equals(logBuff))te.setText(logBuff);
 		((ToggleButton)findViewById(R.id.mainToggleButton1)).setChecked(started);
 		toast(new ConsoleMsg(TAG,"主线程","界面初始化成功","local"));
+		StartActivity.main=MainActivity.class;
     }
 	public static void toast(ConsoleMsg m)
 	{
@@ -76,14 +81,16 @@ public class MainActivity extends Activity
 	{
 		try
 		{
-			te.addText(o);
-			scroll();
+			ctx.mToast(o);
 		}
 		catch(Throwable e)
 		{}
 	}
-
-	private static void scroll()
+	private void mToast(String o){
+		te.addText(o);
+			scroll();
+	}
+	private void scroll()
 	{
 		try
 		{
@@ -237,6 +244,7 @@ public class MainActivity extends Activity
 						{
 							Socket s=fileServer.accept();
 							FileService c=new FileService(s,ctx);
+							Data.onlineClient.add(c);
 							c.start();
 						}
 						toast(new ConsoleMsg(TAG,"主线程","文件服务器已关闭","local"));
@@ -279,6 +287,62 @@ public class MainActivity extends Activity
 					}
 				}
 			},"FAQServer_HttpService_Server").start();
+			new Thread(Thread.currentThread().getThreadGroup(),new Runnable(){
+				@Override
+				public void run()
+				{
+					// TODO: Implement this method
+					try
+					{
+						httpServer=new ServerSocket(20000);
+						toast(new ConsoleMsg(TAG,"主线程","控制服务器已启动","local"));
+						while(started)
+						{
+							Socket s=httpServer.accept();
+							ControlService c=new ControlService(s,ctx);
+							Data.onlineClient.add(c);
+							c.start();
+						}
+						toast(new ConsoleMsg(TAG,"主线程","控制服务器已关闭","local"));
+					}
+					catch(SocketException e)
+					{
+						toast(new ConsoleMsg(TAG,"主线程","控制服务器已关闭","local"));
+					}
+					catch (IOException e)
+					{
+						toast(new ConsoleMsg("Error","主线程","无法启动控制服务器:"+e,"local"));
+					}
+				}
+			},"FAQServer_ControlService_Server").start();
+			new Thread(Thread.currentThread().getThreadGroup(),new Runnable(){
+				@Override
+				public void run()
+				{
+					// TODO: Implement this method
+					try
+					{
+						httpServer=new ServerSocket(20001);
+						toast(new ConsoleMsg(TAG,"主线程","控制 文件 服务器已启动","local"));
+						while(started)
+						{
+							Socket s=httpServer.accept();
+							ControlFileService c=new ControlFileService(s,ctx);
+							Data.onlineClient.add(c);
+							c.start();
+						}
+						toast(new ConsoleMsg(TAG,"主线程","控制 文件 服务器已关闭","local"));
+					}
+					catch(SocketException e)
+					{
+						toast(new ConsoleMsg(TAG,"主线程","控制 文件 服务器已关闭","local"));
+					}
+					catch (IOException e)
+					{
+						toast(new ConsoleMsg("Error","主线程","无法启动控制 文件 服务器:"+e,"local"));
+					}
+				}
+			},"FAQServer_ControlFileService_Server").start();
 		}
 	}
 	public void open(View v)
