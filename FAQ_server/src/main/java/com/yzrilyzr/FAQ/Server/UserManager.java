@@ -1,28 +1,22 @@
 package com.yzrilyzr.FAQ.Server;
 
+import android.widget.*;
+
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
-import com.yzrilyzr.FAQ.Data.User;
-import com.yzrilyzr.FAQ.Main.Data;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import android.content.DialogInterface;
-import android.widget.EditText;
-import android.graphics.BitmapFactory;
 
 public class UserManager extends Activity
-{
+{/*
 	ListView lv;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -127,7 +121,7 @@ public class UserManager extends Activity
 							EditText ed=new EditText(UserManager.this);
 							ed.setText(i+"");
 							v.addView(ed,-1,-2);
-						}*/
+						}*//*
 						b.setTitle("管理用户");
 					}
 					b.setView(v2)
@@ -175,5 +169,5 @@ public class UserManager extends Activity
 				b.show();
 			}
 	});
-	}
+	}*/
 }

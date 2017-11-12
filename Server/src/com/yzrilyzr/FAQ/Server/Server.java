@@ -16,150 +16,160 @@ public class Server
 	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer;
 	CopyOnWriteArrayList<ConsoleMsg> cmsg=null;
 	public Data Data;
+	public static final String info="FAQ Server v1.0 (2017 11 12) by yzrilyzr";
 	public static void main(String[] args)
 	{
-		Thread.currentThread().setName("FAQServer_Main");
-		Scanner s=new Scanner(System.in);
-		boolean run=true;
-		Server server=new Server();
-		server.Data.datafile="/sdcard/yzr的app/FAQ_server";
 		System.out.println("输入'astart'自动配置并启动服务器");
-		while(run)
-		{
-			try
+		final Server server=new Server();
+		server.Data.datafile="/sdcard/yzr的app/FAQ_server";
+		final CopyOnWriteArrayList<String> is=new CopyOnWriteArrayList<String>();
+		new Thread(new Runnable(){
+			@Override
+			public void run()
 			{
-				String tm=s.next();
-				System.out.println(">"+tm);
-				switch(tm)
-				{
-					case "help":
-					case "?":
-						String[] help=new String[]{
-						"start <服务器类型:int> 开服","stop <服务器类型:int> 关服",
-						"readdata <路径:String> 读取数据","setworkdir 设置工作目录",
-						"setrootdir <路径:String> 设置根目录","gc 清理内存",
-						"stat 查看运行状态","fstop 强制停止并退出",
-						"help 查看帮助","? 查看帮助","close 关闭服务器控制台",
-						"astart 自动配置并启动服务器","astop 自动配置并关闭服务器",
-						"sort <按照:int> <哪个:int> 筛选控制台消息",
-						"clear 清除控制台","getip 获取外网ip",
-						"disconnect <索引值:int> 断开客户端","loadoutlog 导出日志",
-						"ban <索引值:int> <方式:int> 封禁客户端",
-						"pardon <IP:String> 解封客户端"};
-						Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
-						for(String a:help)System.out.println(a);
-						break;
-					case "ban":
-						if(server.Data.onlineClient.size()==0)break;
-						int i=0;
-						for(BaseService ser:server.Data.onlineClient)
-							System.out.println((i++)+":"+ser.IP);
-						int o=s.nextInt();
-						System.out.println("0:断开连接,1:暂时封禁,2:永久封禁");
-						int p=s.nextInt();
-						server.ban(server.Data.onlineClient.get(o),p);
-						break;
-					case "pardon":
-						if(server.Data.blacklist.size()==0)break;
-						Iterator it=server.Data.blacklist.entrySet().iterator();
-						while(it.hasNext())
-						{
-							Map.Entry e=(Map.Entry)it.next();
-							String type="",v=(String)e.getValue();
-							if("1".equals(v))type="暂时封禁";
-							else if("2".equals(v))type="永久封禁";
-							System.out.println(e.getKey()+"("+type+")");
-						}
-						server.pardon(s.next());
-						break;
-					case "disconnect":
-						if(server.Data.onlineClient.size()==0)break;
-						int ii=0;
-						System.out.println("all:断开所有");
-						for(BaseService c:server.Data.onlineClient)
-							System.out.println((ii++)+":"+c.IP);
-						server.disconnect(s.next());
-						break;
-					case "sort":
-						System.out.println("0:默认,1:IP,2:标签,3:源码位置");
-						int iii=s.nextInt();int oo=0;
-						if(iii<0||iii>3)
-						{
-							System.out.println("参数错误");
-							break;
-						}
-						String[] k=server.sortMsg(iii,-1);
-						if(k==null)break;
-						for(String a:k)System.out.println((oo++)+":"+a);
-						oo=s.nextInt();
-						server.sortMsg(iii,oo);
-						break;
-					case "loadoutlog":
-						server.loadoutLog();
-						break;
-					case "astart":
-						System.gc();
-						server.readData();
-						server.startServer(0);
-						server.getIP();
-						break;
-					case "astop":
-						server.stopServer(0);
-						server.disconnect("all");
-						System.gc();
-						break;
-					case "start":
-						System.out.println("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
-						server.startServer(s.nextInt());
-						break;
-					case "stop":
-						System.out.println("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
-						server.startServer(s.nextInt());
-						break;
-					case "getip":
-						server.getIP();
-						break;
-					case "readdata":
-						server.readData();
-						break;
-					case "setworkdir":
-						server.Data.datafile=s.next();
-						break;
-					case "setrootdir":
-						server.Data.rootFile=s.next();
-						break;
-					case "gc":
-						System.gc();
-						break;
-					case "stat":
-						server.getStat();
-						break;
-					case "fstop":
-						System.exit(0);
-						break;
-					case "close":
-						run=false;
-						break;
-					case "clear":
-						server.clearLog();
-						break;
-					default:
-						System.out.println("未知指令，输入\"help\"或\"?\"查看帮助");
-				}
+				// TODO: Implement this method
+				while(true)
+					server.exec(is);
 			}
-			catch(Throwable e)
+		}).start();
+		Scanner s=new Scanner(System.in);
+		while(true)
+			is.add(s.next());
+	}
+	public void exec(CopyOnWriteArrayList<String> is)
+	{
+		Scan s=new Scan(is);
+		try
+		{
+			String tm=s.next();
+			System.out.println(">"+tm);
+			switch(tm)
 			{
-				System.out.println("指令执行错误");
-				e.printStackTrace();
+				case "help":
+				case "?":
+					String[] help=new String[]{
+					"start <服务器类型:int> 开服","stop <服务器类型:int> 关服",
+					"readdata <路径:String> 读取数据","setworkdir 设置工作目录",
+					"setrootdir <路径:String> 设置根目录","gc 清理内存",
+					"stat 查看运行状态","fstop 强制停止并退出",
+					"help 查看帮助","? 查看帮助",
+					"astart 自动配置并启动服务器","astop 自动配置并关闭服务器",
+					"sort <按照:int> <哪个:int> 筛选控制台消息",
+					"clear 清除控制台","getip 获取外网ip",
+					"disconnect <索引值:int> 断开客户端","loadoutlog 导出日志",
+					"ban <索引值:int> <方式:int> 封禁客户端",
+					"pardon <IP:String> 解封客户端"};
+					Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
+					for(String a:help)System.out.println(a);
+					break;
+				case "ban":
+					if(Data.onlineClient.size()==0)break;
+					int i=0;
+					for(BaseService ser:Data.onlineClient)
+						System.out.println((i++)+":"+ser.IP);
+					int o=s.nextInt();
+					System.out.println("0:断开连接,1:暂时封禁,2:永久封禁");
+					int p=s.nextInt();
+					ban(Data.onlineClient.get(o),p);
+					break;
+				case "pardon":
+					if(Data.blacklist.size()==0)break;
+					Iterator it=Data.blacklist.entrySet().iterator();
+					while(it.hasNext())
+					{
+						Map.Entry e=(Map.Entry)it.next();
+						String type="",v=(String)e.getValue();
+						if("1".equals(v))type="暂时封禁";
+						else if("2".equals(v))type="永久封禁";
+						System.out.println(e.getKey()+"("+type+")");
+					}
+					pardon(s.next());
+					break;
+				case "disconnect":
+					if(Data.onlineClient.size()==0)break;
+					int ii=0;
+					System.out.println("all:断开所有");
+					for(BaseService c:Data.onlineClient)
+						System.out.println((ii++)+":"+c.IP);
+					disconnect(s.next());
+					break;
+				case "sort":
+					System.out.println("0:默认,1:IP,2:标签,3:源码位置");
+					int iii=s.nextInt();int oo=0;
+					if(iii<0||iii>3)
+					{
+						System.out.println("参数错误");
+						break;
+					}
+					String[] k=sortMsg(iii,-1);
+					if(k==null)break;
+					for(String a:k)System.out.println((oo++)+":"+a);
+					oo=s.nextInt();
+					sortMsg(iii,oo);
+					break;
+				case "loadoutlog":
+					loadoutLog();
+					break;
+				case "astart":
+					System.gc();
+					readData();
+					startServer(0);
+					getIP();
+					break;
+				case "astop":
+					stopServer(0);
+					disconnect("all");
+					System.gc();
+					break;
+				case "start":
+					System.out.println("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
+					startServer(s.nextInt());
+					break;
+				case "stop":
+					System.out.println("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
+					stopServer(s.nextInt());
+					break;
+				case "getip":
+					getIP();
+					break;
+				case "readdata":
+					readData();
+					break;
+				case "setworkdir":
+					Data.datafile=s.next();
+					break;
+				case "setrootdir":
+					Data.rootFile=s.next();
+					break;
+				case "gc":
+					System.gc();
+					break;
+				case "stat":
+					getStat();
+					break;
+				case "fstop":
+					System.exit(0);
+					break;
+				case "clear":
+					clearLog();
+					break;
+				default:
+					System.out.println("未知指令，输入\"help\"或\"?\"查看帮助");
 			}
 		}
-		System.out.println("服务器已结束接受指令，请重启");
+		catch(Throwable e)
+		{
+			System.out.println("指令执行错误");
+			e.printStackTrace(System.out);
+		}
+		s.br();
 	}
 	public Server()
 	{
 		Data=new Data();
 		cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
-		faqServer=new ServerThread(Thread.currentThread().getThreadGroup(),"FAQServer_ClientService_Server"){
+		Thread.currentThread().setName("FAQServer_Main");
+		faqServer=new ServerThread("FAQServer_ClientService_Server"){
 			@Override
 			public void run()
 			{
@@ -186,7 +196,7 @@ public class Server
 				}
 			}
 		};
-		fileServer=new ServerThread(Thread.currentThread().getThreadGroup(),"FAQServer_FileService_Server"){
+		fileServer=new ServerThread("FAQServer_FileService_Server"){
 			@Override
 			public void run()
 			{
@@ -213,7 +223,7 @@ public class Server
 				}
 			}
 		};
-		httpServer=new ServerThread(Thread.currentThread().getThreadGroup(),"FAQServer_HttpService_Server"){
+		httpServer=new ServerThread("FAQServer_HttpService_Server"){
 			@Override
 			public void run()
 			{
@@ -240,7 +250,7 @@ public class Server
 				}
 			}
 		};
-		controlServer=new ServerThread(Thread.currentThread().getThreadGroup(),"FAQServer_ControlService_Server"){
+		controlServer=new ServerThread("FAQServer_ControlService_Server"){
 			@Override
 			public void run()
 			{
@@ -267,7 +277,7 @@ public class Server
 				}
 			}
 		};
-		controlFileServer=new ServerThread(Thread.currentThread().getThreadGroup(),"FAQServer_ControlFileService_Server"){
+		controlFileServer=new ServerThread("FAQServer_ControlFileService_Server"){
 			@Override
 			public void run()
 			{
@@ -294,7 +304,7 @@ public class Server
 				}
 			}
 		};
-		hbtServer=new ServerThread(Thread.currentThread().getThreadGroup(),"FAQServer_HBTSender_Server"){
+		hbtServer=new ServerThread("FAQServer_HBTSender_Server"){
 			@Override
 			public void run()
 			{
@@ -383,7 +393,6 @@ public class Server
 			{
 				filterType=p2;
 				filterKey=pe[pp2];
-				clearView();
 				for(ConsoleMsg m:cmsg)
 					if((filterType==1&&filterKey.equals(m.ip))||
 					(filterType==2&&filterKey.equals(m.tag))||
@@ -398,10 +407,6 @@ public class Server
 			for(ConsoleMsg m:cmsg)toast(m.toString());
 		}
 		return null;
-	}
-	public void clearView()
-	{
-
 	}
 	public void disconnect(String p)
 	{
@@ -485,7 +490,6 @@ public class Server
 	public void clearLog()
 	{
 		cmsg.clear();
-		clearView();
 	}
 	public void loadoutLog() throws IOException
 	{
@@ -555,13 +559,15 @@ public class Server
 				toast(new ConsoleMsg("Info","主线程","外网IP:"+strIP,"local"));
 			}},"FAQServer_getIP_Server").start();
 	}
-	class ServerThread extends Thread
+	abstract class ServerThread implements Runnable
 	{
 		protected boolean runn=false;
 		protected ServerSocket ser=null;
-		public ServerThread(ThreadGroup g,String n)
+		protected Thread th;
+		protected String n;
+		public ServerThread(String n)
 		{
-			super(g,n);
+			this.n=n;
 		}
 		public void stopServer() throws IOException
 		{
@@ -570,12 +576,41 @@ public class Server
 			if(ser!=null)ser.close();
 			ser=null;
 		}
-		@Override
 		public void start()
 		{
 			if(runn)return;
 			runn=true;
-			super.start();
+			th=new Thread(this,n);
+			th.start();
+		}
+		public abstract void run();
+	}
+	class Scan
+	{
+		CopyOnWriteArrayList<String> is;
+		int i=0;
+		boolean r=false;
+		public Scan(CopyOnWriteArrayList<String> is)
+		{
+			this.is=is;
+			r=true;
+		}
+		public int nextInt()
+		{
+			while(i>=is.size()&&r)
+			{}
+			return Integer.parseInt(is.get(i++));
+		}
+		public String next()
+		{
+			while(i>=is.size()&&r)
+			{}
+			return is.get(i++);
+		}
+		public void br()
+		{
+			r=false;
+			is.clear();
 		}
 	}
 }
