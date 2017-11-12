@@ -11,7 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.lang.reflect.InvocationTargetException;
 import java.io.FileNotFoundException;
 
-public class Loader extends OutputStream
+public class Loader
 {
 	private Object Server;
 	private MainActivity ctx;
@@ -19,13 +19,12 @@ public class Loader extends OutputStream
 	private Class<?> cls;
 	public Loader(MainActivity mm)
 	{
-		System.setOut(new PrintStream(this));
-		System.setErr(new PrintStream(this));
 		ctx=mm;
 		cmd=new CopyOnWriteArrayList<String>();
 		init();
 	}
-	public void setCtx(MainActivity mm){
+	public void setCtx(MainActivity mm)
+	{
 		ctx=mm;
 	}
 	private void init()
@@ -45,8 +44,8 @@ public class Loader extends OutputStream
 				{
 					DexClassLoader d=new DexClassLoader(u.getAbsolutePath(),ctx.getDir("dex",ctx.MODE_PRIVATE).getAbsolutePath(),null,ctx.getClassLoader());
 					cls=d.loadClass("com.yzrilyzr.FAQ.Server.Server");
-					Constructor con=cls.getConstructor(new Class<?>[]{});
-					Server=con.newInstance(new Object[]{});
+					Constructor con=cls.getConstructor(new Class<?>[]{Object.class});
+					Server=con.newInstance(new Object[]{this});
 					Object o=getField("Data");
 					o.getClass().getField("datafile").set(o,f.getAbsolutePath());
 					new Thread(){
@@ -60,20 +59,20 @@ public class Loader extends OutputStream
 								}
 								catch(Throwable e)
 								{
-									e.printStackTrace();
 								}
 						}
 					}.start();
-					System.out.println("内核已载入，信息:"+getField("info"));
+					onPrint("内核已载入，信息:"+getField("info"));
 				}
 			}
 		}
 		catch (Throwable e)
 		{
-			e.printStackTrace();
+			onPrint(e.toString());
 		}
 	}
-	public Object getField(String name){
+	public Object getField(String name)
+	{
 		try
 		{
 			return cls.getField(name).get(Server);
@@ -86,7 +85,8 @@ public class Loader extends OutputStream
 		{}
 		return null;
 	}
-	public Object setField(String name,Object v){
+	public Object setField(String name,Object v)
+	{
 		try
 		{
 			cls.getField(name).set(Server,v);
@@ -96,6 +96,22 @@ public class Loader extends OutputStream
 		catch (IllegalAccessException e)
 		{}
 		catch (IllegalArgumentException e)
+		{}
+		return null;
+	}
+	public Object invoke(String name,Class[] cl,Object... param)
+	{
+		try
+		{
+			return cls.getMethod(name,cl).invoke(Server,param);
+		}
+		catch (NoSuchMethodException e)
+		{}
+		catch (IllegalArgumentException e)
+		{}
+		catch (InvocationTargetException e)
+		{}
+		catch (IllegalAccessException e)
 		{}
 		return null;
 	}
@@ -127,23 +143,19 @@ public class Loader extends OutputStream
 	{
 		cmd.add(s);
 	}
-	@Override
-	public void write(int p1) throws IOException
+	public void onReload(int code)
 	{
-		// TODO: Implement this method
+		MainActivity.loader=null;
+		System.gc();
+		MainActivity.loader=new Loader(ctx);
+		MainActivity.loader.invoke("reloadServer",new Class[]{int.class},code);
 	}
-	@Override
-	public void write(byte[] buffer) throws IOException
+	public void onClearView()
 	{
-		// TODO: Implement this method
-		super.write(buffer);
-		ctx.toast(new String(buffer));
+		ctx.te.clear();
 	}
-	@Override
-	public void write(byte[] buffer, int offset, int count) throws IOException
+	public void onPrint(String s)
 	{
-		// TODO: Implement this method
-		super.write(buffer, offset, count);
-		ctx.toast(new String(buffer,offset,count));
+		ctx.toast(s);
 	}
 }

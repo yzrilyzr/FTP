@@ -11,7 +11,7 @@ import android.widget.EditText;
 public class MainActivity extends Activity 
 {
 	MainActivity ctx;
-	private LongTextView te;
+	LongTextView te;
 	static Loader loader;
 	static String logbuff=null;
 	@Override

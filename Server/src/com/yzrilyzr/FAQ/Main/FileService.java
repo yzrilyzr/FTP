@@ -39,9 +39,9 @@ public class FileService extends BaseService
 				long size=readIntFully(buff,bo);
 				String sha1=readStrFully(buff,bo);
 				String name=readStrFully(buff,bo);
-				File file=new File(Data.datafile+"/upload_files");
+				File file=new SafeFile(Data,false,Data.datafile+"/upload_files");
 				if(!file.exists())file.mkdirs();
-				RandomAccessFile ra=new RandomAccessFile(Data.datafile+"/upload_files/"+name,"rw");
+				RandomAccessFile ra=new RandomAccessFile(new SafeFile(Data,false,Data.datafile+"/upload_files/"+name),"rw");
 				ra.setLength(size);
 				writeStr(Writer,sha1);
 				Writer.flush();

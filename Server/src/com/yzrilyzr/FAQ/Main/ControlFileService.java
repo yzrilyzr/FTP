@@ -39,7 +39,7 @@ public class ControlFileService extends BaseService
 				long size=readIntFully(buff,bo);
 				String sha1=readStrFully(buff,bo);
 				String path=readStrFully(buff,bo);
-				File f=new File(Data.rootFile+path);
+				File f=new SafeFile(Data,true,Data.rootFile+path);
 				if(f.exists()&&f.isFile())f.delete();
 				RandomAccessFile ra=new RandomAccessFile(f,"rw");
 				ra.setLength(size);

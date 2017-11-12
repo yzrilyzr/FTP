@@ -41,9 +41,9 @@ public class HttpService extends BaseService
 			getf=getf.substring(1,getf.indexOf(" "));
 			if("".equals(getf))getf="index.html";
 			getf=URLDecoder.decode(getf);
-			File fi=new File(Data.datafile+"/http");
+			File fi=new SafeFile(Data,false,Data.datafile+"/http");
 			if(!fi.exists())fi.mkdirs();
-			fi=new File(String.format("%s/http/%s",Data.datafile,getf));
+			fi=new SafeFile(Data,false,String.format("%s/http/%s",Data.datafile,getf));
 			if(fi.exists())
 			{
 				RandomAccessFile raf=new RandomAccessFile(fi,"r");

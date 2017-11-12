@@ -49,7 +49,7 @@ public class Data extends RU
 	public void saveMsgBuffer() throws IOException
 	{
 		if(msgBuffer.size()==0)return;
-		RandomAccessFile r=new RandomAccessFile(datafile+"/msg","rw");
+		RandomAccessFile r=new RandomAccessFile(new SafeFile(this,false,datafile+"/msg"),"rw");
 		r.seek(r.length());
 		for(MessageObj m:msgBuffer)
 		{
@@ -62,7 +62,7 @@ public class Data extends RU
 	}
 	public void saveBlackList() throws IOException
 	{
-	BufferedOutputStream b=new BufferedOutputStream(new FileOutputStream(datafile+"/blacklist"));
+		BufferedOutputStream b=new BufferedOutputStream(new FileOutputStream(new SafeFile(this,false,datafile+"/blacklist")));
 			writeInt(b,blacklist.size());
 			Iterator iter=blacklist.entrySet().iterator();
 			while(iter.hasNext())
@@ -76,7 +76,7 @@ public class Data extends RU
 	}
 	public void readBlackList() throws IOException
 	{
-		BufferedInputStream b=new BufferedInputStream(new FileInputStream(datafile+"/blacklist"));
+		BufferedInputStream b=new BufferedInputStream(new FileInputStream(new SafeFile(this,false,datafile+"/blacklist")));
 		int f=readInt(b);
 		blacklist.clear();
 		for(int i=0;i<f;i++)blacklist.put(readStr(b),"2");
@@ -84,7 +84,7 @@ public class Data extends RU
 	}
 	public void saveUserData() throws IOException
 	{
-		BufferedOutputStream br=new BufferedOutputStream(new FileOutputStream(datafile+"/users"));
+		BufferedOutputStream br=new BufferedOutputStream(new FileOutputStream(new SafeFile(this,false,datafile+"/users")));
 		writeInt(br,users.size());
 		Iterator iter=users.entrySet().iterator();
 		while(iter.hasNext())
@@ -122,7 +122,7 @@ public class Data extends RU
 	public void readUserData() throws IOException
 	{
 		users.clear();
-		BufferedInputStream br=new BufferedInputStream(new FileInputStream(datafile+"/users"));
+		BufferedInputStream br=new BufferedInputStream(new FileInputStream(new SafeFile(this,false,datafile+"/users")));
 		int usercount=readInt(br);
 		for(int i=0;i<usercount;i++)
 		{

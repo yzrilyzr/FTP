@@ -58,6 +58,9 @@ public class ControlService extends BaseService
 				{
 					Toast("Thread","日志:"+str);
 				}
+				else if(cmd==C.REL){
+					ctx.onReload();
+				}
 				else Toast("Thread","指令:"+cmd+",接收:"+str);
 			}
 		}

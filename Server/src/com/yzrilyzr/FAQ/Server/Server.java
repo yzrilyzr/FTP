@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.*;
 
 import com.yzrilyzr.FAQ.Server.ConsoleMsg;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Server
@@ -16,11 +17,18 @@ public class Server
 	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer;
 	CopyOnWriteArrayList<ConsoleMsg> cmsg=null;
 	public Data Data;
-	public static final String info="FAQ Server v1.0 (2017 11 12) by yzrilyzr";
+	private Object interf;
+	public static final String info="FAQ Server v1.1_alpha (2017 11 12) by yzrilyzr";
 	public static void main(String[] args)
 	{
 		System.out.println("输入'astart'自动配置并启动服务器");
-		final Server server=new Server();
+		final Server server=new Server(new Object(){
+			public void onClearView(){System.out.println("clear");}
+			public void onReload(int code){
+				System.out.println(code);
+			}
+			public void onPrint(String s){System.out.println(s);}
+		});
 		server.Data.datafile="/sdcard/yzr的app/FAQ_server";
 		final CopyOnWriteArrayList<String> is=new CopyOnWriteArrayList<String>();
 		new Thread(new Runnable(){
@@ -42,7 +50,7 @@ public class Server
 		try
 		{
 			String tm=s.next();
-			System.out.println(">"+tm);
+			toast(">"+tm);
 			switch(tm)
 			{
 				case "help":
@@ -58,17 +66,18 @@ public class Server
 					"clear 清除控制台","getip 获取外网ip",
 					"disconnect <索引值:int> 断开客户端","loadoutlog 导出日志",
 					"ban <索引值:int> <方式:int> 封禁客户端",
-					"pardon <IP:String> 解封客户端"};
+					"pardon <IP:String> 解封客户端",
+					"reload 重载服务器"};
 					Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
-					for(String a:help)System.out.println(a);
+					for(String a:help)toast(a);
 					break;
 				case "ban":
 					if(Data.onlineClient.size()==0)break;
 					int i=0;
 					for(BaseService ser:Data.onlineClient)
-						System.out.println((i++)+":"+ser.IP);
+						toast((i++)+":"+ser.IP);
 					int o=s.nextInt();
-					System.out.println("0:断开连接,1:暂时封禁,2:永久封禁");
+					toast("0:断开连接,1:暂时封禁,2:永久封禁");
 					int p=s.nextInt();
 					ban(Data.onlineClient.get(o),p);
 					break;
@@ -81,29 +90,32 @@ public class Server
 						String type="",v=(String)e.getValue();
 						if("1".equals(v))type="暂时封禁";
 						else if("2".equals(v))type="永久封禁";
-						System.out.println(e.getKey()+"("+type+")");
+						toast(e.getKey()+"("+type+")");
 					}
 					pardon(s.next());
 					break;
 				case "disconnect":
 					if(Data.onlineClient.size()==0)break;
 					int ii=0;
-					System.out.println("all:断开所有");
+					toast("all:断开所有");
 					for(BaseService c:Data.onlineClient)
-						System.out.println((ii++)+":"+c.IP);
+						toast((ii++)+":"+c.IP);
 					disconnect(s.next());
 					break;
+				case "reload":
+					onReload();
+					break;
 				case "sort":
-					System.out.println("0:默认,1:IP,2:标签,3:源码位置");
+					toast("0:默认,1:IP,2:标签,3:源码位置");
 					int iii=s.nextInt();int oo=0;
 					if(iii<0||iii>3)
 					{
-						System.out.println("参数错误");
+						toast("参数错误");
 						break;
 					}
 					String[] k=sortMsg(iii,-1);
 					if(k==null)break;
-					for(String a:k)System.out.println((oo++)+":"+a);
+					for(String a:k)toast((oo++)+":"+a);
 					oo=s.nextInt();
 					sortMsg(iii,oo);
 					break;
@@ -122,11 +134,11 @@ public class Server
 					System.gc();
 					break;
 				case "start":
-					System.out.println("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
+					toast("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
 					startServer(s.nextInt());
 					break;
 				case "stop":
-					System.out.println("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
+					toast("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
 					stopServer(s.nextInt());
 					break;
 				case "getip":
@@ -154,18 +166,58 @@ public class Server
 					clearLog();
 					break;
 				default:
-					System.out.println("未知指令，输入\"help\"或\"?\"查看帮助");
+					toast("未知指令，输入\"help\"或\"?\"查看帮助");
 			}
 		}
 		catch(Throwable e)
 		{
-			System.out.println("指令执行错误");
-			e.printStackTrace(System.out);
+			toast("指令执行错误:"+Data.getStackTrace(e));
 		}
 		s.br();
 	}
-	public Server()
+	private Object invoke(String name,Object... param)
 	{
+		try
+		{
+			Class<?>[] cl=null;
+			if(param!=null)
+			{
+				cl=new Class<?>[param.length];
+				int i=0;
+				for(Object o:param)
+					if(o!=null)cl[i++]=o.getClass();
+			}
+			return interf.getClass().getMethod(name,cl).invoke(interf,param);
+		}
+		catch (NoSuchMethodException e)
+		{}
+		catch (IllegalArgumentException e)
+		{}
+		catch (InvocationTargetException e)
+		{}
+		catch (IllegalAccessException e)
+		{}
+		return null;
+	}
+	private Object invoke(String name,Class cl[],Object... param)
+	{
+		try
+		{
+			return interf.getClass().getMethod(name,cl).invoke(interf,param);
+		}
+		catch (NoSuchMethodException e)
+		{}
+		catch (IllegalArgumentException e)
+		{}
+		catch (InvocationTargetException e)
+		{}
+		catch (IllegalAccessException e)
+		{}
+		return null;
+	}
+	public Server(Object interfac)
+	{
+		interf=interfac;
 		Data=new Data();
 		cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
 		Thread.currentThread().setName("FAQServer_Main");
@@ -358,9 +410,9 @@ public class Server
 	}
 	public void readData() throws IOException
 	{
-		File f=new File(Data.datafile);
+		File f=new SafeFile(Data,false,Data.datafile);
 		if(!f.exists())f.mkdirs();
-		File u=new File(Data.datafile+"/users");
+		File u=new SafeFile(Data,false,Data.datafile+"/users");
 		if(!u.exists())u.createNewFile();
 		Data.readUserData();
 		Data.readBlackList();
@@ -393,6 +445,7 @@ public class Server
 			{
 				filterType=p2;
 				filterKey=pe[pp2];
+				onClearView();
 				for(ConsoleMsg m:cmsg)
 					if((filterType==1&&filterKey.equals(m.ip))||
 					(filterType==2&&filterKey.equals(m.tag))||
@@ -489,11 +542,12 @@ public class Server
 	}
 	public void clearLog()
 	{
+		onClearView();
 		cmsg.clear();
 	}
 	public void loadoutLog() throws IOException
 	{
-		BufferedOutputStream os=new BufferedOutputStream(new FileOutputStream(Data.datafile+"/日志导出"+System.currentTimeMillis()+".txt"));
+		BufferedOutputStream os=new BufferedOutputStream(new FileOutputStream(new SafeFile(Data,false,Data.datafile+"/日志导出"+System.currentTimeMillis()+".txt")));
 		for(ConsoleMsg c:cmsg)
 		{
 			os.write(c.toString().getBytes());
@@ -512,10 +566,6 @@ public class Server
 		(filterType==3&&filterKey.equals(m.at)))
 			toast(m.toString());
 	}
-	public void toast(String str)
-	{
-		System.out.println(str);
-	}
 	public void startServer(int w)
 	{
 		if(w==0||w==1)faqServer.start();
@@ -524,6 +574,14 @@ public class Server
 		if(w==0||w==4)httpServer.start();
 		if(w==0||w==5)controlServer.start();
 		if(w==0||w==6)controlFileServer.start();
+	}
+	public void reloadServer(int code){
+		if((code&1)==1)faqServer.start();
+		if((code&2)==2)httpServer.start();
+		if((code&4)==4)hbtServer.start();
+		if((code&8)==8)fileServer.start();
+		if((code&16)==16)controlFileServer.start();
+		if((code&32)==32)controlServer.start();
 	}
 	public void getIP()
 	{
@@ -612,5 +670,24 @@ public class Server
 			r=false;
 			is.clear();
 		}
+	}
+	public void onReload() throws IOException{
+		toast(new ConsoleMsg(TAG,"onReload","服务器正在重载","local"));
+		int code=0;
+		if(faqServer.runn)code|=1;
+		if(httpServer.runn)code|=2;
+		if(hbtServer.runn)code|=4;
+		if(fileServer.runn)code|=8;
+		if(controlFileServer.runn)code|=16;
+		if(controlServer.runn)code|=32;
+		stopServer(0);
+		System.gc();
+		invoke("onReload",new Class[]{int.class},code);
+	}
+	public void onClearView(){
+		invoke("onClearView");
+	}
+	public void toast(String s){
+		invoke("onPrint",s);
 	}
 }

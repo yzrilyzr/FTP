@@ -24,5 +24,6 @@ public class C
 	GHU=22,//get user head
 	GHG=23,//get group head
 	FLO=24,//login on other device
-	UPD=25;//check update
+	UPD=25,//check update
+	REL=26;//reload server
 }

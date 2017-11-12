@@ -155,7 +155,7 @@ public class ClientService extends BaseService
 				{
 					try
 					{
-						BufferedInputStream his=new BufferedInputStream(new FileInputStream(Data.datafile+"/head/"+str+".user.png"));
+						BufferedInputStream his=new BufferedInputStream(new FileInputStream(new SafeFile(Data,false,Data.datafile+"/head/"+str+".user.png")));
 						byte[] bbbb=new byte[his.available()+4];
 						byte[] cc=getIBytes(Integer.parseInt(str));
 						for(int ic=0;ic<4;ic++)bbbb[ic]=cc[ic];
@@ -172,7 +172,7 @@ public class ClientService extends BaseService
 				{
 					try
 					{
-						BufferedInputStream his=new BufferedInputStream(new FileInputStream(Data.datafile+"/head/"+str+".group.png"));
+						BufferedInputStream his=new BufferedInputStream(new FileInputStream(new SafeFile(Data,false,Data.datafile+"/head/"+str+".group.png")));
 						byte[] bbbb=new byte[his.available()+4];
 						byte[] cc=getIBytes(Integer.parseInt(str));
 						for(int ic=0;ic<4;ic++)bbbb[ic]=cc[ic];
@@ -285,7 +285,7 @@ public class ClientService extends BaseService
 		CMD!=C.GHG&&CMD!=C.GHU
 		)Toast("sendMsg","指令:"+CMD+",消息:"+ss);
 	}
-	public static void sendEmail(final String sender,final String pwd,final String sub,final String to,final String s)
+	public void sendEmail(final String sender,final String pwd,final String sub,final String to,final String s)
 	{
 		new Thread(Thread.currentThread().getThreadGroup(),new Runnable(){
 			@Override
@@ -314,7 +314,7 @@ public class ClientService extends BaseService
 				}
 				catch (Throwable e)
 				{
-					e.printStackTrace();
+					Toast("sendEmail",Data.getStackTrace(e));
 				}
 			}
 		},"FAQServer_ClientService_Email").start();
