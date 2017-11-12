@@ -4,7 +4,6 @@ import com.yzrilyzr.FAQ.Data.Group;
 import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
 import com.yzrilyzr.FAQ.Data.User;
-import com.yzrilyzr.FAQ.Main.Data;
 import com.yzrilyzr.FAQ.Server.Server;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,6 +12,11 @@ import java.net.Socket;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Random;
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import org.apache.commons.codec.binary.Base64;
 
 public class ClientService extends BaseService
@@ -114,7 +118,7 @@ public class ClientService extends BaseService
 					{
 						verifycode="123456";//(new Random().nextInt(899999)+100000)+"";
 						Toast("Thread","验证码"+verifycode);
-						sendEmail("faq_service@163.com","noti supporti","FAQ——为所欲为的开车(注册)",str.substring(3),"本次验证码:"+verifycode+"\n请尽快注册");
+						sendEmail("faq_service@16.com","noti supporti","FAQ——为所欲为的开车(注册)",str.substring(3),"本次验证码:"+verifycode+"\n请尽快注册");
 						Data.mailCd.put(IP,""+System.currentTimeMillis());
 					}
 					else
@@ -290,7 +294,7 @@ public class ClientService extends BaseService
 				// TODO Auto-generated method stub
 				try
 				{
-					/*Properties props = new Properties();
+					Properties props = new Properties();
 					props.put("mail.smtp.host", "smtp.163.com");
 					props.put("mail.smtp.auth", "true");
 					props.setProperty("mail.transport.protocol", "smtp");
@@ -306,11 +310,11 @@ public class ClientService extends BaseService
 					Transport transport = session.getTransport();
 					transport.connect(sender,pwd);
 					transport.sendMessage(message,message.getAllRecipients());
-					transport.close();*/
+					transport.close();
 				}
 				catch (Throwable e)
 				{
-					//Server.toast(Data.getStackTrace(e));
+					e.printStackTrace();
 				}
 			}
 		},"FAQServer_ClientService_Email").start();
