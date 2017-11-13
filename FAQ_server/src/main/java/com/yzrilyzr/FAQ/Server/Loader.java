@@ -47,12 +47,13 @@ public class Loader
 					Constructor con=cls.getConstructor(new Class<?>[]{Object.class});
 					Server=con.newInstance(new Object[]{this});
 					Object o=getField("Data");
+					o.getClass().getField("rootFile").set(o,Environment.getExternalStorageDirectory().getAbsolutePath());
 					o.getClass().getField("datafile").set(o,f.getAbsolutePath());
 					new Thread(){
 						@Override
 						public void run()
 						{
-							while(true)
+							while(Server!=null)
 								try
 								{
 									cls.getMethod("exec",new Class<?>[]{CopyOnWriteArrayList.class}).invoke(Server,new Object[]{cmd});
@@ -141,13 +142,19 @@ public class Loader
 	}
 	public void cmd(String s)
 	{
-		cmd.add(s);
+		String[] cm=s.split(" ");
+		for(String b:cm)cmd.add(b);
 	}
 	public void onReload(int code)
 	{
+		Server=null;
 		MainActivity.loader=null;
+		cmd("");
+		cls=null;
+		cmd=null;
 		System.gc();
 		MainActivity.loader=new Loader(ctx);
+		ctx=null;
 		MainActivity.loader.invoke("reloadServer",new Class[]{int.class},code);
 	}
 	public void onClearView()

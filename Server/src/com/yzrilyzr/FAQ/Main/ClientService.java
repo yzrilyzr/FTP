@@ -52,7 +52,8 @@ public class ClientService extends BaseService
 				int pwdlen=readIntFully(buff,bo);
 				ByteArrayOutputStream str2=new ByteArrayOutputStream();
 				int ind=0;
-				while(ind<pwdlen){
+				while(ind<pwdlen)
+				{
 					byte[] bb=new byte[pwdlen-ind];
 					int ii=buff.read(bb);
 					ind+=ii;
@@ -103,8 +104,10 @@ public class ClientService extends BaseService
 						else sendMsg(C.RFL);
 					}
 				}
-				else if(cmd==C.LGO){
+				else if(cmd==C.LGO)
+				{
 					Data.loginClient.remove(user.faq+"");
+					user=null;
 					Toast("Thread","用户登出");
 				}
 				else if(cmd==C.LOG)
@@ -125,31 +128,6 @@ public class ClientService extends BaseService
 					{
 						sendMsg(C.VFD,""+((300000l-System.currentTimeMillis()+cd)/1000l));
 					}
-				}
-				else if(cmd==C.MSG)
-				{
-					MessageObj m=(MessageObj) ToStrObj.s2o(str);
-
-					if(m.isGroup)
-					{
-						Group g=Data.groups.get(m.to+"");
-						for(int f:g.members)
-						{
-							ClientService c=Data.loginClient.get(f+"");
-							if(c!=null)c.sendMsg(C.MSG,str);
-						}
-					}
-					else
-					{
-						ClientService c=Data.loginClient.get(m.to+"");
-						if(c!=null)c.sendMsg(C.MSG,str);
-					}
-					if(m.type==T.MSG||m.type==T.VMS)
-					{
-						Toast("Thread",String.format("指令:%d,来自:%d,发给:%d,种类:%d,是否群组:%b,消息:%s",cmd,m.from,m.to,m.type,m.isGroup,m.msg));
-						Data.msgBuffer.add(m);
-					}
-					//ctx.toast("<Client>(Thread)["+IP+"]:Send to:"+m.to+" Success");
 				}
 				else if(cmd==C.GHU)
 				{
@@ -195,29 +173,6 @@ public class ClientService extends BaseService
 						sendMsg(C.GGR,u2.o2s());
 					}
 				}
-				else if(cmd==C.AFD)
-				{
-					User u1=Data.users.get(user.faq+"");
-					User u2=Data.users.get(str);
-					boolean bool=false;
-					for(int n:u1.friends)if(n==u2.faq)
-						{bool=true;break;}
-					Toast("Thread","指令:"+cmd+",添加好友:"+bo);
-					if(!bool)
-					{
-						u1.friends.add(u2.faq);
-						u2.friends.add(u1.faq);
-						Data.saveUserData();
-						sendMsg(C.GUS,u1.o2s());
-						sendMsg(C.MSG,new MessageObj(u2.faq,u1.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
-						ClientService ll=Data.loginClient.get(u2.faq+"");
-						if(ll!=null)
-						{
-							ll.sendMsg(C.GUS,u2.o2s());
-							ll.sendMsg(C.MSG,new MessageObj(u1.faq,u2.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
-						}
-					}
-				}
 				else if(cmd==C.GUS)
 				{
 					if(!"1000".equals(str))
@@ -238,6 +193,56 @@ public class ClientService extends BaseService
 				{
 					//最新，最低支持=
 					sendMsg(C.UPD,new String(getIBytes(2))+"/"+new String(getIBytes(2)));
+				}
+				else if(user!=null)
+				{
+					if(cmd==C.MSG)
+					{
+						MessageObj m=(MessageObj) ToStrObj.s2o(str);
+						if(m.isGroup)
+						{
+							Group g=Data.groups.get(m.to+"");
+							for(int f:g.members)
+							{
+								ClientService c=Data.loginClient.get(f+"");
+								if(c!=null)c.sendMsg(C.MSG,str);
+							}
+						}
+						else
+						{
+							ClientService c=Data.loginClient.get(m.to+"");
+							if(c!=null)c.sendMsg(C.MSG,str);
+						}
+						if(m.type==T.MSG||m.type==T.VMS)
+						{
+							Toast("Thread",String.format("指令:%d,来自:%d,发给:%d,种类:%d,是否群组:%b,消息:%s",cmd,m.from,m.to,m.type,m.isGroup,m.msg));
+							Data.msgBuffer.add(m);
+						}
+						//ctx.toast("<Client>(Thread)["+IP+"]:Send to:"+m.to+" Success");
+					}
+					else if(cmd==C.AFD)
+					{
+						User u1=Data.users.get(user.faq+"");
+						User u2=Data.users.get(str);
+						boolean bool=false;
+						for(int n:u1.friends)if(n==u2.faq)
+							{bool=true;break;}
+						Toast("Thread","指令:"+cmd+",添加好友:"+bo);
+						if(!bool)
+						{
+							u1.friends.add(u2.faq);
+							u2.friends.add(u1.faq);
+							Data.saveUserData();
+							sendMsg(C.GUS,u1.o2s());
+							sendMsg(C.MSG,new MessageObj(u2.faq,u1.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
+							ClientService ll=Data.loginClient.get(u2.faq+"");
+							if(ll!=null)
+							{
+								ll.sendMsg(C.GUS,u2.o2s());
+								ll.sendMsg(C.MSG,new MessageObj(u1.faq,u2.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
+							}
+						}
+					}
 				}
 				else Toast("Thread","指令:"+cmd+",接收:"+str);
 			}

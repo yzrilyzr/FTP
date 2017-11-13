@@ -36,6 +36,7 @@ public abstract class BaseService extends RU
 			//s.setReceiveBufferSize(10240);
 			isActive=true;
 			Writer=new BufferedOutputStream(s.getOutputStream());
+			IP=socket.getInetAddress().getHostAddress();
 		}
 		catch (Exception e)
 		{
@@ -50,7 +51,6 @@ public abstract class BaseService extends RU
 		super.run();
 		try
 		{
-			IP=socket.getInetAddress().getHostAddress();
 			if(Data.blacklist.get(IP)!=null)
 			{
 				Toast("Thread","此ip在黑名单");

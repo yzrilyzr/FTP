@@ -17,12 +17,14 @@ public class Data extends RU
 	public String datafile="/yzr的app/FAQ_server";
 	public String rootFile="";
 	public final ConcurrentHashMap<String,User> users=new ConcurrentHashMap<String,User>();
+	public final ConcurrentHashMap<String,Group> groups=new ConcurrentHashMap<String,Group>();
 	public final ConcurrentHashMap<String,String> mailCd=new ConcurrentHashMap<String,String>();
 	public final ConcurrentHashMap<String,ClientService> loginClient=new ConcurrentHashMap<String,ClientService>();
+	public final ConcurrentHashMap<String,ControlService> loginControl=new ConcurrentHashMap<String,ControlService>();
 	public final ConcurrentHashMap<String,String> blacklist=new ConcurrentHashMap<String,String>();
 	public final CopyOnWriteArrayList<BaseService> onlineClient=new CopyOnWriteArrayList<BaseService>();
 	public final CopyOnWriteArrayList<MessageObj> msgBuffer=new CopyOnWriteArrayList<MessageObj>();
-	public final ConcurrentHashMap<String,Group> groups=new ConcurrentHashMap<String,Group>();
+	
 	public User register(Socket soc,String pwd,String email) throws IOException
 	{
 		User u=new User();

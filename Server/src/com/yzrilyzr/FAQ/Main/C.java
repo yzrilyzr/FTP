@@ -25,5 +25,6 @@ public class C
 	GHG=23,//get group head
 	FLO=24,//login on other device
 	UPD=25,//check update
-	REL=26;//reload server
+	EXE=26,//execute console cm
+	CLV=27;//clear control console view
 }

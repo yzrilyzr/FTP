@@ -17,17 +17,21 @@ public class Server
 	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer;
 	CopyOnWriteArrayList<ConsoleMsg> cmsg=null;
 	public Data Data;
+	private boolean initedData=false;
 	private Object interf;
 	public static final String info="FAQ Server v1.1_alpha (2017 11 12) by yzrilyzr";
 	public static void main(String[] args)
 	{
 		System.out.println("输入'astart'自动配置并启动服务器");
 		final Server server=new Server(new Object(){
-			public void onClearView(){System.out.println("clear");}
-			public void onReload(int code){
+			public void onClearView()
+			{System.out.println("clear");}
+			public void onReload(int code)
+			{
 				System.out.println(code);
 			}
-			public void onPrint(String s){System.out.println(s);}
+			public void onPrint(String s)
+			{System.out.println(s);}
 		});
 		server.Data.datafile="/sdcard/yzr的app/FAQ_server";
 		final CopyOnWriteArrayList<String> is=new CopyOnWriteArrayList<String>();
@@ -260,7 +264,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						FileService c=new FileService(s,Server.this);
+						FileService c=new FileService(s,Server.this,false);
 						Data.onlineClient.add(c);
 						c.start();
 					}
@@ -341,7 +345,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						ControlFileService c=new ControlFileService(s,Server.this);
+						FileService c=new FileService(s,Server.this,true);
 						Data.onlineClient.add(c);
 						c.start();
 					}
@@ -417,6 +421,7 @@ public class Server
 		Data.readUserData();
 		Data.readBlackList();
 		toast(new ConsoleMsg(TAG,"主线程","数据载入成功","local"));
+		initedData=true;
 	}
 	public String[] sortMsg(int p2,int pp2)
 	{
@@ -575,14 +580,6 @@ public class Server
 		if(w==0||w==5)controlServer.start();
 		if(w==0||w==6)controlFileServer.start();
 	}
-	public void reloadServer(int code){
-		if((code&1)==1)faqServer.start();
-		if((code&2)==2)httpServer.start();
-		if((code&4)==4)hbtServer.start();
-		if((code&8)==8)fileServer.start();
-		if((code&16)==16)controlFileServer.start();
-		if((code&32)==32)controlServer.start();
-	}
 	public void getIP()
 	{
 		new Thread(Thread.currentThread().getThreadGroup(),new Runnable(){
@@ -671,7 +668,8 @@ public class Server
 			is.clear();
 		}
 	}
-	public void onReload() throws IOException{
+	public void onReload() throws IOException
+	{
 		toast(new ConsoleMsg(TAG,"onReload","服务器正在重载","local"));
 		int code=0;
 		if(faqServer.runn)code|=1;
@@ -680,14 +678,39 @@ public class Server
 		if(fileServer.runn)code|=8;
 		if(controlFileServer.runn)code|=16;
 		if(controlServer.runn)code|=32;
+		if(initedData)code|=64;
 		stopServer(0);
 		System.gc();
 		invoke("onReload",new Class[]{int.class},code);
 	}
-	public void onClearView(){
-		invoke("onClearView");
+	public void reloadServer(int code) throws IOException
+	{
+		if((code&1)==1)faqServer.start();
+		if((code&2)==2)httpServer.start();
+		if((code&4)==4)hbtServer.start();
+		if((code&8)==8)fileServer.start();
+		if((code&16)==16)controlFileServer.start();
+		if((code&32)==32)controlServer.start();
+		if((code&64)==64)readData();
 	}
-	public void toast(String s){
+	public void onClearView()
+	{
+		invoke("onClearView");
+		Iterator it=Data.loginControl.entrySet().iterator();
+		while(it.hasNext())
+		{
+			ControlService c=(ControlService)((Map.Entry)it.next()).getValue();
+			c.sendMsg(C.CLV);
+		}
+	}
+	public void toast(String s)
+	{
 		invoke("onPrint",s);
+		Iterator it=Data.loginControl.entrySet().iterator();
+		while(it.hasNext())
+		{
+			ControlService c=(ControlService)((Map.Entry)it.next()).getValue();
+			c.sendMsg(C.LOG,s);
+		}
 	}
 }

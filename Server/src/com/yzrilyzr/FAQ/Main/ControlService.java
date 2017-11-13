@@ -5,15 +5,27 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ControlService extends BaseService
 {
 	private String deckey;
+	private boolean isLogin=false;
+	private CopyOnWriteArrayList<String> mCmds=new CopyOnWriteArrayList<String>();
+	private Thread cmdexec;
 	public ControlService(Socket s,Server m)
 	{
 		super(s,m);
 		TAG="ControlClient";
 		setName("FAQServer_ControlService");
+		cmdexec=new Thread("FAQServer_ControlCmdExec("+IP+")"){
+			@Override public void run(){
+				while(running){
+					ctx.exec(mCmds);
+				}
+			}
+		};
+		cmdexec.start();
 	}
 	@Override
 	public void onRead(BufferedInputStream buff)
@@ -58,8 +70,17 @@ public class ControlService extends BaseService
 				{
 					Toast("Thread","日志:"+str);
 				}
-				else if(cmd==C.REL){
-					ctx.onReload();
+				else if(cmd==C.LGN)
+				{
+					Data.loginControl.put(IP,this);
+					isLogin=true;
+				}
+				else if(isLogin)
+				{
+					if(cmd==C.EXE){
+						String[] cmds=str.split(" ");
+						for(String g:cmds)mCmds.add(g);
+					}
 				}
 				else Toast("Thread","指令:"+cmd+",接收:"+str);
 			}
@@ -72,7 +93,8 @@ public class ControlService extends BaseService
 	@Override
 	public void onDestroy()
 	{
-		// TODO: Implement this method
+		mCmds.add("");
+		cmdexec.interrupt();
 	}
 	public void sendMsg(byte cmd)
 	{
@@ -98,10 +120,10 @@ public class ControlService extends BaseService
 		}
 		catch (Exception e)
 		{
-			Toast("Error","sendMsg",Data.getStackTrace(e));
+			//Toast("Error","sendMsg",Data.getStackTrace(e));
 		}
-		if(CMD!=C.HBT&&CMD!=C.MSG&&CMD!=C.GUS&&
+		/*if(CMD!=C.HBT&&CMD!=C.MSG&&CMD!=C.GUS&&
 		CMD!=C.GHG&&CMD!=C.GHU
-		)Toast("sendMsg","指令:"+CMD+",消息:"+ss);
+		)Toast("sendMsg","指令:"+CMD+",消息:"+ss);*/
 	}
 }

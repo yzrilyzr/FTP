@@ -7,16 +7,18 @@ import java.io.RandomAccessFile;
 import java.net.Socket;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.io.IOException;
 
 public class FileService extends BaseService
 {
-	public FileService(Socket s, Server c)
+	private boolean publicmode;
+	public FileService(Socket s,Server c,boolean publicmode)
 	{
 		super(s,c);
+		this.publicmode=publicmode;
 		TAG="FileClient";
 		setName("FAQServer_FileService");
 	}
-
 	@Override
 	public void onRead(BufferedInputStream buff)
 	{
@@ -39,12 +41,29 @@ public class FileService extends BaseService
 				long size=readIntFully(buff,bo);
 				String sha1=readStrFully(buff,bo);
 				String name=readStrFully(buff,bo);
-				File file=new SafeFile(Data,false,Data.datafile+"/upload_files");
-				if(!file.exists())file.mkdirs();
-				RandomAccessFile ra=new RandomAccessFile(new SafeFile(Data,false,Data.datafile+"/upload_files/"+name),"rw");
-				ra.setLength(size);
-				writeStr(Writer,sha1);
+				String path=null;
+				if(publicmode)path=Data.rootFile;
+				else path=Data.datafile+"/upload_files";
+				File dir=new SafeFile(Data,publicmode,path);
+				if(!dir.exists())dir.mkdirs();
+				File file=new SafeFile(Data,publicmode,path+"/"+name);
+				if(file.exists()){
+					byte[] sha1_local_b=getFileSha1(file.getAbsolutePath());
+					String sha1_local=byte2hex(sha1_local_b);
+					if(sha1_local.equals(sha1)){
+						Writer.write(1);//秒传
+						Writer.write(1);//接受完毕
+						Writer.flush();
+						running=false;
+						Toast("Thread","上传完毕:文件相同");
+						return;
+					}
+					else file.delete();
+				}
+				Writer.write(2);//允许
 				Writer.flush();
+				RandomAccessFile ra=new RandomAccessFile(file,"rw");
+				ra.setLength(size);
 				long index=0;int ii=0;
 				byte[] buffer=new byte[10240];
 				//ArrayList<long[]> list=new ArrayList<long[]>();
@@ -62,17 +81,25 @@ public class FileService extends BaseService
 					index+=ii;
 				}
 				ra.close();
+				Writer.write(1);//表示接受完毕
+				Writer.flush();
 				running=false;
 				Toast("Thread","上传完毕");
 			}
 			//else if(download==2)
-			{//false
+			{//下载
 
 			}
 			//else running=false;
 		}
 		catch (Exception e)
 		{
+			try
+			{
+				Writer.write(0);//拒绝
+			}
+			catch (IOException e2)
+			{}
 			Toast("Thread","上传失败:"+e.toString());
 		}
 	}
