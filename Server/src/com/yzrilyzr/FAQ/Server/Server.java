@@ -71,13 +71,36 @@ public class Server
 					"disconnect <索引值:int> 断开客户端","loadoutlog 导出日志",
 					"ban <索引值:int> <方式:int> 封禁客户端",
 					"pardon <IP:String> 解封客户端",
-					"reload 重载服务器"};
+					"reload 重载服务器","listfile <路径:String> 列表路径下的文件"};
 					Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
 					for(String a:help)toast(a);
 					break;
+				case "listfile":
+					File file=new SafeFile(Data,true,Data.rootFile+s.next());
+					File[] dir=file.listFiles();
+					if(!file.exists())
+					{
+						toast("文件不存在");
+						break;
+					}
+					toast("在'"+file.getAbsolutePath()+"'下的文件");
+					Arrays.sort(dir,new Comparator<File>(){
+						@Override
+						public int compare(File p1, File p2)
+						{
+							return p1.getName().compareToIgnoreCase(p2.getName());
+						}
+					});
+					File[] dir2=new File[dir.length];
+					int i=0;
+					for(File f:dir)if(f.isDirectory())dir2[i++]=f;
+					for(File f:dir)if(f.isFile())dir2[i++]=f;
+					i=0;
+					for(File f:dir2)toast((i++)+(f.isFile()?"(F)":"(D)")+":"+f.getName());
+					break;
 				case "ban":
 					if(Data.onlineClient.size()==0)break;
-					int i=0;
+					i=0;
 					for(BaseService ser:Data.onlineClient)
 						toast((i++)+":"+ser.IP);
 					int o=s.nextInt();
@@ -100,10 +123,10 @@ public class Server
 					break;
 				case "disconnect":
 					if(Data.onlineClient.size()==0)break;
-					int ii=0;
+					i=0;
 					toast("all:断开所有");
 					for(BaseService c:Data.onlineClient)
-						toast((ii++)+":"+c.IP);
+						toast((i++)+":"+c.IP);
 					disconnect(s.next());
 					break;
 				case "reload":
@@ -111,17 +134,17 @@ public class Server
 					break;
 				case "sort":
 					toast("0:默认,1:IP,2:标签,3:源码位置");
-					int iii=s.nextInt();int oo=0;
-					if(iii<0||iii>3)
+					i=s.nextInt();int oo=0;
+					if(i<0||i>3)
 					{
 						toast("参数错误");
 						break;
 					}
-					String[] k=sortMsg(iii,-1);
+					String[] k=sortMsg(i,-1);
 					if(k==null)break;
 					for(String a:k)toast((oo++)+":"+a);
 					oo=s.nextInt();
-					sortMsg(iii,oo);
+					sortMsg(i,oo);
 					break;
 				case "loadoutlog":
 					loadoutLog();
