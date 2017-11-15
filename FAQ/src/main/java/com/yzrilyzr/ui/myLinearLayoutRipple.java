@@ -1,10 +1,10 @@
 package com.yzrilyzr.ui;
 
-import android.view.*;
-
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
 import com.yzrilyzr.FAQ.R;
 import com.yzrilyzr.ui.uidata;
 
