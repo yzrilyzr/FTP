@@ -8,6 +8,8 @@ import java.net.Socket;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.io.IOException;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 
 public class FileService extends BaseService
 {
@@ -42,23 +44,33 @@ public class FileService extends BaseService
 				String sha1=readStrFully(buff,bo);
 				String name=readStrFully(buff,bo);
 				String path=null;
+				//存储目录
 				if(publicmode)path=Data.rootFile;
 				else path=Data.datafile+"/upload_files";
 				File dir=new SafeFile(Data,publicmode,path);
 				if(!dir.exists())dir.mkdirs();
+				//临时目录
+				dir=new SafeFile(Data,publicmode,Data.datafile+"/upload_files/tmp");
+				if(!dir.exists())dir.mkdirs();
+				//存放目标
 				File file=new SafeFile(Data,publicmode,path+"/"+name);
-				if(file.exists()){
+				if(file.exists())
+				{
 					byte[] sha1_local_b=getFileSha1(file.getAbsolutePath());
 					String sha1_local=byte2hex(sha1_local_b);
-					if(sha1_local.equals(sha1)){
+					if(sha1_local.equals(sha1))
+					{
 						Writer.write(1);//秒传
 						Writer.write(1);//接受完毕
 						Writer.flush();
 						running=false;
 						Toast("Thread","上传完毕:文件相同");
 						return;
+					}//临时目标
+					else
+					{
+						file=new SafeFile(Data,publicmode,Data.datafile+"/upload_files/tmp/"+name.substring(name.lastIndexOf("/")));
 					}
-					else file.delete();
 				}
 				Writer.write(2);//允许
 				Writer.flush();
@@ -75,12 +87,16 @@ public class FileService extends BaseService
 					/*if(buffsha1.equals(cbsha1))*/
 					ra.write(buffer,0,ii);
 					/*else{
-						Toast("上传失败","校验错误");
-						running=false;
-					}*/
+					 Toast("上传失败","校验错误");
+					 running=false;
+					 }*/
 					index+=ii;
 				}
 				ra.close();
+				FileChannel is=new FileInputStream(file).getChannel();
+				FileChannel os=new FileOutputStream(new SafeFile(Data,publicmode,path+"/"+name)).getChannel();
+				is.transferTo(0,is.size(),os);
+				file.delete();
 				Writer.write(1);//表示接受完毕
 				Writer.flush();
 				running=false;

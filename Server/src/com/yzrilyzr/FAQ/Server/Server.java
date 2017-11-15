@@ -19,7 +19,7 @@ public class Server
 	public Data Data;
 	private boolean initedData=false;
 	private Object interf;
-	public static final String info="FAQ Server v1.1_alpha (2017 11 12) by yzrilyzr";
+	public static final String info="FAQ Server v1.1_alpha (2017 11 15) by yzrilyzr";
 	public static void main(String[] args)
 	{
 		System.out.println("输入'astart'自动配置并启动服务器");
