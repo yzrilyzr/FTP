@@ -24,5 +24,8 @@ public final class C
 	GHU=22,
 	GHG=23,
 	FLO=24,
-	UPD=25;
+	UPD=25,
+	EXE=26,
+	CLV=27,
+	GFE=28;
 }

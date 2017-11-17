@@ -14,11 +14,82 @@
 		android:layout_width="match_parent"
 		android:orientation="vertical">
 
-		<Button
+		<LinearLayout
 			android:layout_height="wrap_content"
-			android:text="更新服务端"
-			android:layout_width="wrap_content"
-			android:onClick="updateServer"/>
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			android:layout_weight="1.0">
+
+			<com.yzrilyzr.ui.myLinearLayoutRipple
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:orientation="vertical"
+				android:onClick="fileExp"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:layout_margin="5dp">
+
+				<ImageView
+					android:layout_height="70dp"
+					android:layout_width="70dp"
+					android:src="@drawable/launcher"
+					android:layout_margin="5dp"/>
+
+				<com.yzrilyzr.ui.myTextView
+					android:layout_height="wrap_content"
+					android:text="文件管理器"
+					android:layout_width="wrap_content"
+					android:layout_margin="5dp"/>
+
+			</com.yzrilyzr.ui.myLinearLayoutRipple>
+
+			<com.yzrilyzr.ui.myLinearLayoutRipple
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:orientation="vertical"
+				android:onClick="updateServer"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:layout_margin="5dp">
+
+				<ImageView
+					android:layout_height="70dp"
+					android:layout_width="70dp"
+					android:src="@drawable/unfocusable"
+					android:layout_margin="5dp"/>
+
+				<com.yzrilyzr.ui.myTextView
+					android:layout_height="wrap_content"
+					android:text="更新服务器"
+					android:layout_width="wrap_content"
+					android:layout_margin="5dp"/>
+
+			</com.yzrilyzr.ui.myLinearLayoutRipple>
+
+			<com.yzrilyzr.ui.myLinearLayoutRipple
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:orientation="vertical"
+				android:onClick="console"
+				android:layout_weight="1.0"
+				android:gravity="center"
+				android:layout_margin="5dp">
+
+				<ImageView
+					android:layout_height="70dp"
+					android:layout_width="70dp"
+					android:src="@drawable/systeminfo"
+					android:layout_margin="5dp"/>
+
+				<com.yzrilyzr.ui.myTextView
+					android:layout_height="wrap_content"
+					android:text="控制台"
+					android:layout_width="wrap_content"
+					android:layout_margin="5dp"/>
+
+			</com.yzrilyzr.ui.myLinearLayoutRipple>
+
+		</LinearLayout>
 
 	</LinearLayout>
 

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:yzr="http://schemas.android.com/apk/res-auto"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:gravity="top|center"
+	android:focusable="true"
+	android:focusableInTouchMode="true">
+
+	<LinearLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:orientation="vertical">
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="vertical">
+
+			<com.yzrilyzr.ui.myTextViewBack
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/fileTextView1"/>
+
+			<com.yzrilyzr.ui.myTextViewBack
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/fileTextView2"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal"
+			android:layout_weight="1.0">
+
+			<com.yzrilyzr.ui.myListView
+				android:layout_height="match_parent"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"
+				android:id="@+id/filemyListView1"/>
+
+			<com.yzrilyzr.ui.myLinearLayout
+				android:layout_height="match_parent"
+				android:layout_width="1px"/>
+
+			<com.yzrilyzr.ui.myListView
+				android:layout_height="match_parent"
+				android:layout_width="wrap_content"
+				android:layout_weight="1.0"
+				android:id="@+id/filemyListView2"/>
+
+		</LinearLayout>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:orientation="horizontal">
+
+			<com.yzrilyzr.ui.myImageButton
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<com.yzrilyzr.ui.myToolBar
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		yzr:title="文件管理器"
+		yzr:tip0="返回"
+		yzr:src0="preset/prev"
+		yzr:onClick0="exit"
+		android:id="@+id/mainmyToolBar1"/>
+
+</FrameLayout>
+

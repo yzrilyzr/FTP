@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:yzr="http://schemas.android.com/apk/res-auto"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:gravity="top|center"
+	android:focusable="true"
+	android:focusableInTouchMode="true">
+
+	<LinearLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:orientation="vertical">
+
+		<ScrollView
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:layout_weight="1.0">
+
+			<com.yzrilyzr.FAQ.Controller.LongTextView
+				android:layout_height="match_parent"
+				android:layout_width="match_parent"
+				android:id="@+id/consoleLongTextView1"/>
+
+		</ScrollView>
+
+		<LinearLayout
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:orientation="horizontal">
+
+			<com.yzrilyzr.ui.myEditText
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:id="@+id/consoleEditText1"
+				android:layout_weight="1.0"
+				android:layout_gravity="bottom"
+				android:maxLines="5"/>
+
+			<com.yzrilyzr.ui.myButton
+				android:layout_height="wrap_content"
+				android:text="&gt;_"
+				android:layout_width="50dp"
+				android:onClick="send"
+				android:layout_gravity="bottom"/>
+
+		</LinearLayout>
+
+	</LinearLayout>
+
+	<com.yzrilyzr.ui.myToolBar
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		yzr:title="控制台"
+		yzr:tip0="返回"
+		yzr:src0="preset/prev"
+		yzr:onClick0="exit"
+		android:id="@+id/mainmyToolBar1"/>
+
+</FrameLayout>
+
