@@ -60,9 +60,11 @@ public class uploadToServer
 			BufferedOutputStream os=new BufferedOutputStream(so2.getOutputStream());
 			os.write(C.LGN);
 			os.write(new byte[4]);
+			os.flush();
 			os.write(C.EXE);
 			writeStr(os,"reload");
 			os.flush();
+			so2.close();
 			System.out.println("重载完毕");
 		}
 		catch(Exception e)

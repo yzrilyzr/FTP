@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.*;
 
 import com.yzrilyzr.FAQ.Server.ConsoleMsg;
+import com.yzrilyzr.JavaExp.Exp;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -19,6 +20,7 @@ public class Server
 	public Data Data;
 	private boolean initedData=false;
 	private Object interf;
+	private Exp exp;
 	public static final String info="FAQ Server v1.1_alpha (2017 11 15) by yzrilyzr";
 	public static void main(String[] args)
 	{
@@ -64,7 +66,7 @@ public class Server
 					"readdata <路径:String> 读取数据","setworkdir 设置工作目录",
 					"setrootdir <路径:String> 设置根目录","gc 清理内存",
 					"stat 查看运行状态","fstop 强制停止并退出",
-					"help 查看帮助","? 查看帮助",
+					"help 查看帮助","? 查看帮助","exec <JavaExp:String> 执行JavaExp",
 					"astart 自动配置并启动服务器","astop 自动配置并关闭服务器",
 					"sort <按照:int> <哪个:int> 筛选控制台消息",
 					"clear 清除控制台","getip 获取外网ip",
@@ -74,6 +76,16 @@ public class Server
 					"reload 重载服务器","listfile <路径:String> 列表路径下的文件"};
 					Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
 					for(String a:help)toast(a);
+					break;
+				case "exec":
+					toast("i:初始化,n <名称:String>:新分组,s <名称:String>:设置当前操作的组,g:获取当前操作的组");
+					String ch=s.next();
+					toast(">"+ch);
+					if("i".equals(ch))exp=new Exp();
+					else if("n".equals(ch))exp.newGroup(s.next());
+					else if("s".equals(ch))exp.setNowGroup(s.next());
+					else if("g".equals(ch))toast("当前组:"+exp.getNowGroup());
+					else exp.parse(ch);
 					break;
 				case "listfile":
 					File file=new SafeFile(Data,true,Data.rootFile+s.next());

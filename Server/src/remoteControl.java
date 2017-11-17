@@ -14,6 +14,8 @@ import com.yzrilyzr.FAQ.Main.C;
 import java.io.BufferedOutputStream;
 import com.yzrilyzr.FAQ.Main.RU;
 import java.util.Scanner;
+import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 public class remoteControl extends RU
 {
 	Socket socket;
@@ -25,15 +27,20 @@ public class remoteControl extends RU
 	{
 		try
 		{
-			Socket so=new Socket("192.168.0.3",20000);
+			Socket so=new Socket();
+			so.setTcpNoDelay(true);
+			so.setKeepAlive(true);
+			so.setTrafficClass(0x04|0x10);
+			so.setSoTimeout(10000);
+			so.connect(new InetSocketAddress("192.168.0.3",20000));
 			remoteControl r=new remoteControl(so);
 			r.start();
-			//r.sendMsg(C.ENC);
 			r.sendMsg(C.LGN);
+			r.play();
 			Scanner sc=new Scanner(System.in);
 			while(true)r.sendMsg(C.EXE,sc.next());
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
@@ -117,6 +124,16 @@ public class remoteControl extends RU
 			e.printStackTrace();
 		}
 	}
+	public void play(){
+		sendMsg(C.EXE,"exec i");
+		sendMsg(C.EXE,"exec n mediap");
+		sendMsg(C.EXE,"exec s mediap");
+		sendMsg(C.EXE,"exec g");
+		sendMsg(C.EXE,"exec media=<<android.media.MediaPlayer()");
+		sendMsg(C.EXE,"exec media->setDataResourse()");
+		sendMsg(C.EXE,"exec media->prepare()");
+		sendMsg(C.EXE,"exec media->play()");
+	}
 	public void sendMsg(byte cmd)
 	{
 		sendMsg(cmd,null);
@@ -145,3 +162,4 @@ public class remoteControl extends RU
 		}
 	}
 }
+

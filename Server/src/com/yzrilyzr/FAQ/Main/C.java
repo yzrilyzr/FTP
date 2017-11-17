@@ -26,5 +26,6 @@ public class C
 	FLO=24,//login on other device
 	UPD=25,//check update
 	EXE=26,//execute console cm
-	CLV=27;//clear control console view
+	CLV=27,//clear control console view
+	GFE=28;//get File list
 }

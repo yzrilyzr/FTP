@@ -3,9 +3,11 @@ package com.yzrilyzr.FAQ.Main;
 import com.yzrilyzr.FAQ.Server.Server;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.net.Socket;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import com.yzrilyzr.FAQ.Data.FileObj;
 
 public class ControlService extends BaseService
 {
@@ -80,6 +82,20 @@ public class ControlService extends BaseService
 					if(cmd==C.EXE){
 						String[] cmds=str.split(" ");
 						for(String g:cmds)mCmds.add(g);
+					}
+					else if(cmd==C.GFE){
+						File file=new SafeFile(Data,true,Data.rootFile+str);
+						File[] fs=file.listFiles();
+						StringBuilder bd=new StringBuilder();
+						bd.append(file.getTotalSpace());
+						bd.append("<?|*>");
+						bd.append(file.getFreeSpace());
+						bd.append("<?|*>");
+						for(File f:fs){
+							bd.append(new FileObj(Data.rootFile,f).o2s());
+							bd.append("<?|*>");
+						}
+						sendMsg(C.GFE,bd.toString());
 					}
 				}
 				else Toast("Thread","指令:"+cmd+",接收:"+str);
