@@ -31,15 +31,13 @@ public class FileService extends BaseService
 				public boolean g()
 				{
 					// TODO: Implement this method
-					return true;
+					return running;
 				}
 			};
 			block(buff,1,bo);
 			int download=buff.read();
 			if(download==1)
 			{//用户上传
-				//long len,string sha1,string name
-				Toast("上传","");
 				long size=readIntFully(buff,bo);
 				String sha1=readStrFully(buff,bo);
 				String name=readStrFully(buff,bo);
@@ -53,60 +51,78 @@ public class FileService extends BaseService
 				dir=new SafeFile(Data,publicmode,Data.datafile+"/upload_files/tmp");
 				if(!dir.exists())dir.mkdirs();
 				//存放目标
-				File file=new SafeFile(Data,publicmode,path+"/"+name);
-				if(file.exists())
+				File dstfile=new SafeFile(Data,publicmode,path+"/"+name);
+				File tmpfile=new SafeFile(Data,publicmode,Data.datafile+"/upload_files/tmp/"+name.substring(name.lastIndexOf("/")));
+				Toast("上传",dstfile.getPath());
+				if(dstfile.exists())
 				{
-					byte[] sha1_local_b=getFileSha1(file.getAbsolutePath());
+					byte[] sha1_local_b=getFileSha1(dstfile.getAbsolutePath());
 					String sha1_local=byte2hex(sha1_local_b);
 					if(sha1_local.equals(sha1))
 					{
 						Writer.write(1);//秒传
 						Writer.write(1);//接受完毕
 						Writer.flush();
-						running=false;
+						disconnect();
 						Toast("Thread","上传完毕:文件相同");
 						return;
-					}//临时目标
-					else
-					{
-						file=new SafeFile(Data,publicmode,Data.datafile+"/upload_files/tmp/"+name.substring(name.lastIndexOf("/")));
 					}
 				}
 				Writer.write(2);//允许
 				Writer.flush();
-				RandomAccessFile ra=new RandomAccessFile(file,"rw");
+				RandomAccessFile ra=new RandomAccessFile(tmpfile,"rw");
 				ra.setLength(size);
 				long index=0;int ii=0;
 				byte[] buffer=new byte[10240];
-				//ArrayList<long[]> list=new ArrayList<long[]>();
 				while(index<size)
 				{
-					//String buffsha1=readStrFully(buff,bo);
 					ii=buff.read(buffer);
-					//String cbsha1=byte2hex(getByteSha1(buffer));
-					/*if(buffsha1.equals(cbsha1))*/
 					ra.write(buffer,0,ii);
-					/*else{
-					 Toast("上传失败","校验错误");
-					 running=false;
-					 }*/
 					index+=ii;
 				}
 				ra.close();
-				FileChannel is=new FileInputStream(file).getChannel();
-				FileChannel os=new FileOutputStream(new SafeFile(Data,publicmode,path+"/"+name)).getChannel();
+				dstfile.delete();
+				FileChannel is=new FileInputStream(tmpfile).getChannel();
+				FileChannel os=new FileOutputStream(dstfile).getChannel();
 				is.transferTo(0,is.size(),os);
-				file.delete();
+				tmpfile.delete();
 				Writer.write(1);//表示接受完毕
 				Writer.flush();
-				running=false;
+				disconnect();
 				Toast("Thread","上传完毕");
 			}
-			//else if(download==2)
-			{//下载
+			else if(download==2)
+			{
+				//下载
 
 			}
-			//else running=false;
+			else if(download==3){
+				//创建文件夹
+				String name=readStrFully(buff,bo);
+				String path=null;
+				//存储目录
+				if(publicmode)path=Data.rootFile;
+				else path=Data.datafile+"/upload_files";
+				File dir=new SafeFile(Data,publicmode,path);
+				if(!dir.exists())dir.mkdirs();
+				//临时目录
+				dir=new SafeFile(Data,publicmode,Data.datafile+"/upload_files/tmp");
+				if(!dir.exists())dir.mkdirs();
+				//存放目标
+				File file=new SafeFile(Data,publicmode,path+"/"+name);
+				Toast("新建文件夹",file.getPath());
+				file.mkdirs();
+				Writer.write(1);
+				Writer.flush();
+				disconnect();
+			}
+			else if(download==4){
+				//删除文件
+			}
+			else if(download==5){
+				//重命名
+			}
+			else disconnect();
 		}
 		catch (Exception e)
 		{

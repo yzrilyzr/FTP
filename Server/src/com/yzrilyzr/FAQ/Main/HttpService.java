@@ -34,7 +34,7 @@ public class HttpService extends BaseService
 			String bu=new String(buffer);
 			int g=bu.indexOf("/");
 			if(g==-1){
-				running=false;
+				disconnect();
 				return;
 			}
 			String getf=bu.substring(g);
@@ -64,7 +64,7 @@ public class HttpService extends BaseService
 				}
 				catch(SocketException se)
 				{
-					running=false;
+					disconnect();
 				}
 				finally
 				{raf.close();}
@@ -76,7 +76,7 @@ public class HttpService extends BaseService
 			Toast("ERROR",Data.getStackTrace(e));
 		}
 		finally{
-			running=false;
+			disconnect();
 		}
 	}
 

@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
-public abstract class BaseService extends RU
+public abstract class BaseService extends RU implements Runnable
 {
 	protected Socket socket;
 	protected Server ctx;
@@ -30,33 +30,30 @@ public abstract class BaseService extends RU
 			socket=s;
 			s.setKeepAlive(true);
 			s.setTcpNoDelay(true);
-			//s.setSendBufferSize(1024);
 			s.setTrafficClass(0x04|0x10);
 			s.setSoTimeout(10000);
-			//s.setReceiveBufferSize(10240);
 			isActive=true;
 			Writer=new BufferedOutputStream(s.getOutputStream());
 			IP=socket.getInetAddress().getHostAddress();
+			Data.onlineClient.add(this);
 		}
 		catch (Exception e)
 		{
 			Toast("Error","Thread",Data.getStackTrace(e));
 		}
 	}
-
+	public void setName(String s){
+		Thread.currentThread().setName(s);
+	}
 	@Override
 	public void run()
 	{
-		// TODO: Implement this method
-		super.run();
 		try
 		{
 			if(Data.blacklist.get(IP)!=null)
 			{
 				Toast("Thread","此ip在黑名单");
-				running=false;
-				isActive=false;
-				socket.close();
+				disconnect();
 				return;
 			}
 			if(Data.mailCd.get(IP)==null)Data.mailCd.put(IP,"0");
@@ -66,9 +63,6 @@ public abstract class BaseService extends RU
 			{
 				onRead(buff);
 			}
-			Writer.close();
-			buff.close();
-			socket.close();
 		}
 		catch(Throwable e)
 		{
@@ -76,11 +70,24 @@ public abstract class BaseService extends RU
 		}
 		finally
 		{
+			Toast("Thread","断开连接");
+			disconnect();
+			onDestroy();
+		}
+	}
+	public void disconnect()
+	{
+		try
+		{
 			running=false;
 			isActive=false;
 			Data.onlineClient.remove(this);
-			onDestroy();
-			Toast("Thread","断开连接");
+			if(socket!=null&&!socket.isClosed())socket.close();
+			socket=null;
+		}
+		catch (IOException e)
+		{
+			
 		}
 	}
 	public abstract void onDestroy();

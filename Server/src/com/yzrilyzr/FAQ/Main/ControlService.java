@@ -13,8 +13,9 @@ public class ControlService extends BaseService
 {
 	private String deckey;
 	private boolean isLogin=false;
-	private CopyOnWriteArrayList<String> mCmds=new CopyOnWriteArrayList<String>();
+	private CopyOnWriteArrayList<String> mCmds;
 	private Thread cmdexec;
+	private Server.Scan scan;
 	public ControlService(Socket s,Server m)
 	{
 		super(s,m);
@@ -22,8 +23,10 @@ public class ControlService extends BaseService
 		setName("FAQServer_ControlService");
 		cmdexec=new Thread("FAQServer_ControlCmdExec("+IP+")"){
 			@Override public void run(){
+				mCmds=new CopyOnWriteArrayList<String>();
+				scan=new Server.Scan(mCmds);
 				while(running){
-					ctx.exec(mCmds);
+					ctx.exec(scan);
 				}
 			}
 		};
@@ -85,6 +88,7 @@ public class ControlService extends BaseService
 					}
 					else if(cmd==C.GFE){
 						File file=new SafeFile(Data,true,Data.rootFile+str);
+						if(!file.exists())sendMsg(C.GFE,"FNE");
 						File[] fs=file.listFiles();
 						StringBuilder bd=new StringBuilder();
 						bd.append(file.getTotalSpace());
@@ -92,7 +96,8 @@ public class ControlService extends BaseService
 						bd.append(file.getFreeSpace());
 						bd.append("<?|*>");
 						for(File f:fs){
-							bd.append(new FileObj(Data.rootFile,f).o2s());
+							FileObj o=new FileObj(Data.rootFile,f);
+							bd.append(o.o2s());
 							bd.append("<?|*>");
 						}
 						sendMsg(C.GFE,bd.toString());
@@ -109,7 +114,7 @@ public class ControlService extends BaseService
 	@Override
 	public void onDestroy()
 	{
-		mCmds.add("");
+		scan.stop();
 		cmdexec.interrupt();
 	}
 	public void sendMsg(byte cmd)

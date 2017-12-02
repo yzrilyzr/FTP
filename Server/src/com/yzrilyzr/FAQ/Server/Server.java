@@ -8,20 +8,29 @@ import java.util.*;
 import com.yzrilyzr.FAQ.Server.ConsoleMsg;
 import com.yzrilyzr.JavaExp.Exp;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
-public class Server
+public class Server implements Thread.UncaughtExceptionHandler
 {
 	int filterType=0;
 	String filterKey="";
-	final String TAG="Server";
+	public final String TAG="Server";
 	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer;
 	CopyOnWriteArrayList<ConsoleMsg> cmsg=null;
 	public Data Data;
 	private boolean initedData=false;
 	private Object interf;
 	private Exp exp;
-	public static final String info="FAQ Server v1.1_alpha (2017 11 15) by yzrilyzr";
+	private ExecutorService pool;
+	private Object player;
+	private File[] playlist;
+	private int playIndex=0;
+	public static final String info="FAQ Server v1.2.2.1_alpha (2017 11 26) by yzrilyzr";
 	public static void main(String[] args)
 	{
 		System.out.println("输入'astart'自动配置并启动服务器");
@@ -36,6 +45,7 @@ public class Server
 			{System.out.println(s);}
 		});
 		server.Data.datafile="/sdcard/yzr的app/FAQ_server";
+		server.Data.rootFile="/sdcard";
 		final CopyOnWriteArrayList<String> is=new CopyOnWriteArrayList<String>();
 		new Thread(new Runnable(){
 			@Override
@@ -43,16 +53,15 @@ public class Server
 			{
 				// TODO: Implement this method
 				while(true)
-					server.exec(is);
+					server.exec(new Scan(is));
 			}
 		}).start();
 		Scanner s=new Scanner(System.in);
 		while(true)
 			is.add(s.next());
 	}
-	public void exec(CopyOnWriteArrayList<String> is)
+	public void exec(Scan s)
 	{
-		Scan s=new Scan(is);
 		try
 		{
 			String tm=s.next();
@@ -73,13 +82,89 @@ public class Server
 					"disconnect <索引值:int> 断开客户端","loadoutlog 导出日志",
 					"ban <索引值:int> <方式:int> 封禁客户端",
 					"pardon <IP:String> 解封客户端",
+					"play <文件夹或文件路径:String> 播放音乐",
 					"reload 重载服务器","listfile <路径:String> 列表路径下的文件"};
 					Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
 					for(String a:help)toast(a);
 					break;
+				case "play":
+					toast("play:播放,stop:停止,pause:暂停,next:下一首,prev:上一首,select:选择");
+					if(player==null){
+						player=Class.forName("android.media.MediaPlayer").newInstance();
+					}
+					String ch=s.next();
+					final Class cls=player.getClass();
+					if("stop".equals(ch))cls.getMethod("stop").invoke(player);
+					else if("pause".equals(ch))cls.getMethod("pause").invoke(player);
+					else if("next".equals(ch)){
+						if(player!=null)cls.getMethod("reset").invoke(player);
+						if(++playIndex==playlist.length)playIndex=0;
+						cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
+						cls.getMethod("prepare").invoke(player);
+						cls.getMethod("start").invoke(player);
+					}
+					else if("select".equals(ch)){
+						int i=0;
+						for(File f:playlist)
+						toast((i++)+":"+f.getName());
+						playIndex=s.nextInt();
+						if(player!=null)cls.getMethod("reset").invoke(player);
+						if(playIndex<=-1)playIndex=playlist.length-1;
+						if(playIndex>=playlist.length)playIndex=0;
+						cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
+						cls.getMethod("prepare").invoke(player);
+						cls.getMethod("start").invoke(player);
+					}
+					else if("prev".equals(ch)){
+						if(player!=null)cls.getMethod("reset").invoke(player);
+						if(--playIndex==-1)playIndex=playlist.length-1;
+						cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
+						cls.getMethod("prepare").invoke(player);
+						cls.getMethod("start").invoke(player);
+					}
+					else if("pause".equals(ch))cls.getMethod("pause").invoke(player);
+					else if("play".equals(ch)){
+						if(player!=null)cls.getMethod("reset").invoke(player);
+						cls.getMethod("setDataSource",String.class).invoke(player,playlist[0].getAbsolutePath());
+						Class intf=Class.forName("android.media.MediaPlayer$OnCompletionListener");
+						InvocationHandler mHandler = new InvocationHandler(){
+							@Override
+							public Object invoke(Object p1, Method p2, Object[] p3) throws Throwable
+							{
+								if(player!=null)cls.getMethod("reset").invoke(player);
+								if(++playIndex==playlist.length)playIndex=0;
+								cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
+								cls.getMethod("prepare").invoke(player);
+								cls.getMethod("start").invoke(player);
+								return null;
+							}
+						};
+						Object mObj = java.lang.reflect.Proxy.newProxyInstance(Server.class.getClassLoader(),new Class[]{intf},mHandler);
+						cls.getMethod("setOnCompletionListener",intf).invoke(player,mObj);
+						cls.getMethod("prepare").invoke(player);
+						cls.getMethod("start").invoke(player);
+					}
+					else{
+						File f=new SafeFile(Data,true,Data.rootFile+ch);
+						toast("路径是:"+f.getAbsolutePath());
+						playlist=new File[1];
+						if(f.isFile())playlist[0]=f;
+						else if(f.isDirectory())
+							playlist=f.listFiles(new FilenameFilter(){
+								@Override
+								public boolean accept(File p1, String p2)
+								{
+									p2=p2.toLowerCase();
+									if(p2.endsWith("mp3"))return true;
+									return false;
+								}
+							});
+						
+					}
+					break;
 				case "exec":
 					toast("i:初始化,n <名称:String>:新分组,s <名称:String>:设置当前操作的组,g:获取当前操作的组");
-					String ch=s.next();
+					ch=s.next();
 					toast(">"+ch);
 					if("i".equals(ch))exp=new Exp();
 					else if("n".equals(ch))exp.newGroup(s.next());
@@ -212,7 +297,7 @@ public class Server
 		{
 			toast("指令执行错误:"+Data.getStackTrace(e));
 		}
-		s.br();
+		s.reset();
 	}
 	private Object invoke(String name,Object... param)
 	{
@@ -258,8 +343,10 @@ public class Server
 	{
 		interf=interfac;
 		Data=new Data();
+		pool=Executors.newCachedThreadPool();
 		cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
 		Thread.currentThread().setName("FAQServer_Main");
+		Thread.currentThread().setDefaultUncaughtExceptionHandler(this);
 		faqServer=new ServerThread("FAQServer_ClientService_Server"){
 			@Override
 			public void run()
@@ -272,9 +359,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						ClientService c=new ClientService(s,Server.this);
-						Data.onlineClient.add(c);
-						c.start();
+						pool.execute(new ClientService(s,Server.this));
 					}
 				}
 				catch(SocketException e)
@@ -299,9 +384,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						FileService c=new FileService(s,Server.this,false);
-						Data.onlineClient.add(c);
-						c.start();
+						pool.execute(new FileService(s,Server.this,false));
 					}
 				}
 				catch(SocketException e)
@@ -326,9 +409,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						HttpService c=new HttpService(s,Server.this);
-						Data.onlineClient.add(c);
-						c.start();
+						pool.execute(new HttpService(s,Server.this));
 					}
 				}
 				catch(SocketException e)
@@ -353,9 +434,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						ControlService c=new ControlService(s,Server.this);
-						Data.onlineClient.add(c);
-						c.start();
+						pool.execute(new ControlService(s,Server.this));
 					}
 				}
 				catch(SocketException e)
@@ -380,9 +459,7 @@ public class Server
 					while(runn)
 					{
 						Socket s=ser.accept();
-						FileService c=new FileService(s,Server.this,true);
-						Data.onlineClient.add(c);
-						c.start();
+						pool.execute(new FileService(s,Server.this,true));
 					}
 				}
 				catch(SocketException e)
@@ -410,11 +487,7 @@ public class Server
 							{
 								ClientService cs=(ClientService)css;
 								if(!cs.isActive)
-								{
-									cs.running=false;
-									Data.onlineClient.remove(cs);
-									if(cs.user!=null)Data.loginClient.remove(cs.user.faq+"");
-								}
+									cs.disconnect();
 								if(cs.running)
 								{
 									cs.isActive=false;
@@ -425,10 +498,7 @@ public class Server
 							{
 								ControlService cs=(ControlService)css;
 								if(!cs.isActive)
-								{
-									cs.running=false;
-									Data.onlineClient.remove(cs);
-								}
+									cs.disconnect();
 								if(cs.running)
 								{
 									cs.isActive=false;
@@ -505,16 +575,12 @@ public class Server
 	{
 		if(p.equals("all"))
 		{
-			for(BaseService c:Data.onlineClient)c.running=false;
-			Data.onlineClient.clear();
-			Data.loginClient.clear();
+			for(BaseService c:Data.onlineClient)c.disconnect();
 		}
 		else
 		{
 			BaseService s=Data.onlineClient.get(Integer.parseInt(p));
-			Data.onlineClient.remove(Integer.parseInt(p));
-			Data.loginClient.remove(s.IP);
-			s.running=false;
+			s.disconnect();
 		}
 		toast(new ConsoleMsg(TAG,"主线程","断开客户端成功","local"));
 	}
@@ -536,9 +602,7 @@ public class Server
 			Data.blacklist.put(c.IP,"2");
 			Data.saveBlackList();
 		}
-		Data.onlineClient.remove(c);
-		c.isActive=false;
-		c.running=false;
+		c.disconnect();
 		toast(new ConsoleMsg(TAG,"主线程","封禁成功","local"));
 	}
 	public void pardon(String ip) throws IOException
@@ -596,6 +660,25 @@ public class Server
 		os.flush();
 		os.close();
 		toast(new ConsoleMsg("Info","主线程","日志保存成功","local"));
+	}
+	@Override
+	public void uncaughtException(Thread p1, Throwable p2)
+	{
+		try
+		{
+			BufferedOutputStream os=new BufferedOutputStream(new FileOutputStream(Data.datafile+"/错误日志_"+System.currentTimeMillis()+".txt"));
+			PrintStream p=new PrintStream(os);
+			p.println("ThreadName:"+p1.getName());
+			p.println("StackTrace:");
+			p2.printStackTrace(p);
+			os.close();
+			p.close();
+		}
+		catch (Exception e)
+		{}
+		finally{
+			System.exit(0);
+		}
 	}
 	public void toast(ConsoleMsg m)
 	{
@@ -675,7 +758,7 @@ public class Server
 		}
 		public abstract void run();
 	}
-	class Scan
+	public static class Scan
 	{
 		CopyOnWriteArrayList<String> is;
 		int i=0;
@@ -685,22 +768,29 @@ public class Server
 			this.is=is;
 			r=true;
 		}
-		public int nextInt()
+		public int nextInt() throws InterruptedException
 		{
 			while(i>=is.size()&&r)
-			{}
+			{
+				Thread.sleep(1);
+			}
 			return Integer.parseInt(is.get(i++));
 		}
-		public String next()
+		public String next() throws InterruptedException
 		{
 			while(i>=is.size()&&r)
-			{}
+			{
+				Thread.sleep(1);
+			}
 			return is.get(i++);
 		}
-		public void br()
-		{
-			r=false;
+		public void reset(){
+			i=0;
 			is.clear();
+		}
+		public void stop(){
+			is.clear();
+			r=false;
 		}
 	}
 	public void onReload() throws IOException

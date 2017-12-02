@@ -254,6 +254,13 @@ public class ClientService extends BaseService
 	}
 
 	@Override
+	public void disconnect()
+	{
+		super.disconnect();
+		Data.loginClient.remove(IP);
+	}
+
+	@Override
 	public void onDestroy()
 	{
 		// TODO: Implement this method

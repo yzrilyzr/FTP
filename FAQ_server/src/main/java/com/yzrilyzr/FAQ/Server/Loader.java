@@ -16,6 +16,7 @@ public class Loader
 	private Object Server;
 	private MainActivity ctx;
 	private CopyOnWriteArrayList<String> cmd;
+	private Object Scan;
 	private Class<?> cls;
 	public Loader(MainActivity mm)
 	{
@@ -49,14 +50,21 @@ public class Loader
 					Object o=getField("Data");
 					o.getClass().getField("rootFile").set(o,Environment.getExternalStorageDirectory().getAbsolutePath());
 					o.getClass().getField("datafile").set(o,f.getAbsolutePath());
+					Class<?>[] cs=cls.getClasses();
+					for(Class<?> c:cs){
+						if(c.getName().contains("Scan")){
+							Scan=c.getConstructor(CopyOnWriteArrayList.class).newInstance(cmd);
+						}
+					}
 					new Thread(){
 						@Override
 						public void run()
 						{
+							
 							while(Server!=null)
 								try
 								{
-									cls.getMethod("exec",new Class<?>[]{CopyOnWriteArrayList.class}).invoke(Server,new Object[]{cmd});
+									cls.getMethod("exec",new Class<?>[]{Scan.getClass()}).invoke(Server,new Object[]{Scan});
 								}
 								catch(Throwable e)
 								{
