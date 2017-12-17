@@ -29,7 +29,7 @@ public abstract class BaseService extends RU implements Runnable
 			this.Data=ctx.Data;
 			socket=s;
 			s.setKeepAlive(true);
-			s.setTcpNoDelay(true);
+			//s.setTcpNoDelay(true);
 			s.setTrafficClass(0x04|0x10);
 			s.setSoTimeout(10000);
 			isActive=true;

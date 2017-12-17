@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import com.yzrilyzr.FAQ.Data.FileObj;
+import org.apache.commons.codec.binary.Base64;
 
 public class ControlService extends BaseService
 {

@@ -24,6 +24,14 @@ public class uploadToServer
 		}
 		try
 		{
+			Socket so2=new Socket(ip,20000);
+			BufferedOutputStream os=new BufferedOutputStream(so2.getOutputStream());
+			os.write(C.LGN);
+			os.write(new byte[4]);
+			os.flush();
+			os.write(C.EXE);
+			writeStr(os,"unlock");
+			os.flush();
 			Socket so=new Socket(ip,20001);
 			BufferedOutputStream b=new BufferedOutputStream(so.getOutputStream());
 			BufferedInputStream in=new BufferedInputStream(so.getInputStream());
@@ -56,11 +64,6 @@ public class uploadToServer
 				else throw new Exception("传输出错");
 			}
 			else throw new Exception("拒绝传输");
-			Socket so2=new Socket(ip,20000);
-			BufferedOutputStream os=new BufferedOutputStream(so2.getOutputStream());
-			os.write(C.LGN);
-			os.write(new byte[4]);
-			os.flush();
 			os.write(C.EXE);
 			writeStr(os,"reload");
 			os.flush();

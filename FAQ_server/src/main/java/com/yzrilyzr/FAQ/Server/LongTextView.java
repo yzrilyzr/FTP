@@ -13,9 +13,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
+import android.view.SurfaceView;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceHolder;
 public class LongTextView extends View implements InputConnection
 {
-
     private float lineNumWidth;
     public Paint pa;
     public float xOff=0,yOff=0,dxOff=0,dyOff=0,xVel=0,yVel=0;
@@ -327,8 +329,7 @@ public class LongTextView extends View implements InputConnection
         catch(Throwable e)
         {System.out.println(e);}
     }
-
-    @Override
+	@Override
     protected void onDraw(Canvas canvas)
     {
         // TODO: Implement this method
@@ -401,7 +402,7 @@ public class LongTextView extends View implements InputConnection
             cursorC=0;
             isEdit=false;
         }
-        invalidate();
+		invalidate();
     }
 
     @Override

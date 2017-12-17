@@ -20,16 +20,14 @@ public class Server implements Thread.UncaughtExceptionHandler
 	int filterType=0;
 	String filterKey="";
 	public final String TAG="Server";
-	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer;
+	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer,remoteControlServer;
 	CopyOnWriteArrayList<ConsoleMsg> cmsg=null;
 	public Data Data;
 	private boolean initedData=false;
 	private Object interf;
 	private Exp exp;
 	private ExecutorService pool;
-	private Object player;
-	private File[] playlist;
-	private int playIndex=0;
+	private MediaPlayer player;
 	public static final String info="FAQ Server v1.2.2.1_alpha (2017 11 26) by yzrilyzr";
 	public static void main(String[] args)
 	{
@@ -83,83 +81,54 @@ public class Server implements Thread.UncaughtExceptionHandler
 					"ban <索引值:int> <方式:int> 封禁客户端",
 					"pardon <IP:String> 解封客户端",
 					"play <文件夹或文件路径:String> 播放音乐",
-					"reload 重载服务器","listfile <路径:String> 列表路径下的文件"};
+					"reload 重载服务器","listfile <路径:String> 列表路径下的文件",
+					"lock 锁定服务器","setpassword <密码:String> 设置服务器密码",
+					"unlock 解锁服务器"};
 					Arrays.sort(help,String.CASE_INSENSITIVE_ORDER);
 					for(String a:help)toast(a);
 					break;
+				case "lock":
+					onDevice(1,"");
+					toast("已锁定");
+					break;
+				case "unlock":
+					onDevice(3,"");
+					toast("已解锁");
+					break;
+				case "setpassword":
+					toast("请输入密码");
+					onDevice(2,s.next());
+					toast("设置成功");
+					break;
 				case "play":
 					toast("play:播放,stop:停止,pause:暂停,next:下一首,prev:上一首,select:选择");
-					if(player==null){
-						player=Class.forName("android.media.MediaPlayer").newInstance();
-					}
+					if(player==null)player=new MediaPlayer();
 					String ch=s.next();
-					final Class cls=player.getClass();
-					if("stop".equals(ch))cls.getMethod("stop").invoke(player);
-					else if("pause".equals(ch))cls.getMethod("pause").invoke(player);
-					else if("next".equals(ch)){
-						if(player!=null)cls.getMethod("reset").invoke(player);
-						if(++playIndex==playlist.length)playIndex=0;
-						cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
-						cls.getMethod("prepare").invoke(player);
-						cls.getMethod("start").invoke(player);
-					}
+					if("stop".equals(ch))player.stop();
+					else if("next".equals(ch))player.next();
 					else if("select".equals(ch)){
 						int i=0;
-						for(File f:playlist)
+						for(File f:player.playlist)
 						toast((i++)+":"+f.getName());
-						playIndex=s.nextInt();
-						if(player!=null)cls.getMethod("reset").invoke(player);
-						if(playIndex<=-1)playIndex=playlist.length-1;
-						if(playIndex>=playlist.length)playIndex=0;
-						cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
-						cls.getMethod("prepare").invoke(player);
-						cls.getMethod("start").invoke(player);
+						player.select(s.nextInt());
 					}
-					else if("prev".equals(ch)){
-						if(player!=null)cls.getMethod("reset").invoke(player);
-						if(--playIndex==-1)playIndex=playlist.length-1;
-						cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
-						cls.getMethod("prepare").invoke(player);
-						cls.getMethod("start").invoke(player);
-					}
-					else if("pause".equals(ch))cls.getMethod("pause").invoke(player);
+					else if("prev".equals(ch))player.prev();
+					else if("pause".equals(ch))player.pause();
 					else if("play".equals(ch)){
-						if(player!=null)cls.getMethod("reset").invoke(player);
-						cls.getMethod("setDataSource",String.class).invoke(player,playlist[0].getAbsolutePath());
-						Class intf=Class.forName("android.media.MediaPlayer$OnCompletionListener");
-						InvocationHandler mHandler = new InvocationHandler(){
+						player.setOnCompletionListener(new MediaPlayer.OnCompletionListener(){
 							@Override
-							public Object invoke(Object p1, Method p2, Object[] p3) throws Throwable
+							public void onCompletion(MediaPlayer mp)
 							{
-								if(player!=null)cls.getMethod("reset").invoke(player);
-								if(++playIndex==playlist.length)playIndex=0;
-								cls.getMethod("setDataSource",String.class).invoke(player,playlist[playIndex].getAbsolutePath());
-								cls.getMethod("prepare").invoke(player);
-								cls.getMethod("start").invoke(player);
-								return null;
+								player.next();
 							}
-						};
-						Object mObj = java.lang.reflect.Proxy.newProxyInstance(Server.class.getClassLoader(),new Class[]{intf},mHandler);
-						cls.getMethod("setOnCompletionListener",intf).invoke(player,mObj);
-						cls.getMethod("prepare").invoke(player);
-						cls.getMethod("start").invoke(player);
+						});
+						if(!player.isPause())player.playNow();
+						else player.start();
 					}
 					else{
 						File f=new SafeFile(Data,true,Data.rootFile+ch);
 						toast("路径是:"+f.getAbsolutePath());
-						playlist=new File[1];
-						if(f.isFile())playlist[0]=f;
-						else if(f.isDirectory())
-							playlist=f.listFiles(new FilenameFilter(){
-								@Override
-								public boolean accept(File p1, String p2)
-								{
-									p2=p2.toLowerCase();
-									if(p2.endsWith("mp3"))return true;
-									return false;
-								}
-							});
-						
+						player.setDir(f);
 					}
 					break;
 				case "exec":
@@ -258,11 +227,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 					System.gc();
 					break;
 				case "start":
-					toast("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
+					toast("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器,7:远程控制服务器");
 					startServer(s.nextInt());
 					break;
 				case "stop":
-					toast("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器");
+					toast("0:所有,1:FAQ服务器,2:心跳包发送器,3:文件服务器,4:HTTP服务器,5:控制服务器,6:控制 文件 服务器,7:远程控制服务器");
 					stopServer(s.nextInt());
 					break;
 				case "getip":
@@ -472,6 +441,31 @@ public class Server implements Thread.UncaughtExceptionHandler
 				}
 			}
 		};
+		remoteControlServer=new ServerThread("FAQServer_RemoteControlService_Server"){
+			@Override
+			public void run()
+			{
+				// TODO: Implement this method
+				try
+				{
+					ser=new ServerSocket(20002);
+					toast(new ConsoleMsg(TAG,"主线程","远程控制服务器已启动","local"));
+					while(runn)
+					{
+						Socket s=ser.accept();
+						pool.execute(new RemoteControlService(s,Server.this));
+					}
+				}
+				catch(SocketException e)
+				{
+					toast(new ConsoleMsg(TAG,"主线程","远程控制服务器已关闭","local"));
+				}
+				catch (IOException e)
+				{
+					toast(new ConsoleMsg("Error","主线程","无法启动远程控制服务器:"+e,"local"));
+				}
+			}
+		};
 		hbtServer=new ServerThread("FAQServer_HBTSender_Server"){
 			@Override
 			public void run()
@@ -593,6 +587,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 		if(w==0||w==4)httpServer.stopServer();
 		if(w==0||w==5)controlServer.stopServer();
 		if(w==0||w==6)controlFileServer.stopServer();
+		if(w==0||w==7)remoteControlServer.stopServer();
 	}
 	public void ban(BaseService c,int p2) throws IOException
 	{
@@ -697,6 +692,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 		if(w==0||w==4)httpServer.start();
 		if(w==0||w==5)controlServer.start();
 		if(w==0||w==6)controlFileServer.start();
+		if(w==0||w==7)remoteControlServer.start();
 	}
 	public void getIP()
 	{
@@ -804,6 +800,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 		if(controlFileServer.runn)code|=16;
 		if(controlServer.runn)code|=32;
 		if(initedData)code|=64;
+		if(remoteControlServer.runn)code|=128;
 		stopServer(0);
 		System.gc();
 		invoke("onReload",new Class[]{int.class},code);
@@ -817,6 +814,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 		if((code&16)==16)controlFileServer.start();
 		if((code&32)==32)controlServer.start();
 		if((code&64)==64)readData();
+		if((code&128)==128)remoteControlServer.start();
 	}
 	public void onClearView()
 	{
@@ -837,5 +835,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 			ControlService c=(ControlService)((Map.Entry)it.next()).getValue();
 			c.sendMsg(C.LOG,s);
 		}
+	}
+	public byte[] onGetScreen(){
+		return (byte[])invoke("onGetScreen");
+	}
+	public void onDevice(int c,String p){
+		invoke("onDevice",new Class[]{int.class,String.class},c,p);
 	}
 }
