@@ -15,13 +15,21 @@ public class Data extends RU
 {
 	public String datafile="/yzr的app/FAQ_server";
 	public String rootFile="";
+	//k:faq,v:user
 	public final ConcurrentHashMap<String,User> users=new ConcurrentHashMap<String,User>();
+	//k:faq,v:group
 	public final ConcurrentHashMap<String,Group> groups=new ConcurrentHashMap<String,Group>();
+	//k:ip,v:long
 	public final ConcurrentHashMap<String,String> mailCd=new ConcurrentHashMap<String,String>();
+	//k:ip,v:LoginClient
 	public final ConcurrentHashMap<String,LoginClient> loginClient=new ConcurrentHashMap<String,LoginClient>();//ip
+	//socketaddress
 	public final CopyOnWriteArrayList<SocketAddress> loginControl=new CopyOnWriteArrayList<SocketAddress>();//ADDRESS
+	//k:ip,v:type
 	public final ConcurrentHashMap<String,String> blacklist=new ConcurrentHashMap<String,String>();
+	//ip
 	public final CopyOnWriteArrayList<String> connectedClient=new CopyOnWriteArrayList<String>();
+	//messageobj
 	public final CopyOnWriteArrayList<MessageObj> msgBuffer=new CopyOnWriteArrayList<MessageObj>();
 	
 	public User register(String ip,String pwd,String email) throws IOException
