@@ -2,8 +2,13 @@ import java.io.*;
 
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.FileService;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.Socket;
 import java.nio.channels.FileChannel;
+import java.net.SocketAddress;
+import java.net.InetAddress;
 
 public class uploadToServer
 {
@@ -24,14 +29,7 @@ public class uploadToServer
 		}
 		try
 		{
-			Socket so2=new Socket(ip,20000);
-			BufferedOutputStream os=new BufferedOutputStream(so2.getOutputStream());
-			os.write(C.LGN);
-			os.write(new byte[4]);
-			os.flush();
-			os.write(C.EXE);
-			writeStr(os,"unlock");
-			os.flush();
+			DatagramSocket so2=new DatagramSocket();
 			Socket so=new Socket(ip,20001);
 			BufferedOutputStream b=new BufferedOutputStream(so.getOutputStream());
 			BufferedInputStream in=new BufferedInputStream(so.getInputStream());
@@ -48,7 +46,7 @@ public class uploadToServer
 			{
 				System.out.println("秒传");
 			}
-			if(res==2)
+			else if(res==2)
 			{
 				System.out.println("准备传输");
 				byte[] by=new byte[10240];
@@ -64,11 +62,24 @@ public class uploadToServer
 				else throw new Exception("传输出错");
 			}
 			else throw new Exception("拒绝传输");
-			os.write(C.EXE);
-			writeStr(os,"reload");
+			
+			ByteArrayOutputStream os=new ByteArrayOutputStream();
+			os.write(C.LGN);
 			os.flush();
-			so2.close();
+			os.close();
+			byte[] bb=os.toByteArray();
+			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
+			System.out.println("登录成功");
+			os=new ByteArrayOutputStream();
+			os.write(C.EXE);
+			os.write("reload".getBytes());
+			os.flush();
+			os.close();
+			bb=os.toByteArray();
+			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("重载完毕");
+			Thread.sleep(1000);
+			System.exit(0);
 		}
 		catch(Exception e)
 		{

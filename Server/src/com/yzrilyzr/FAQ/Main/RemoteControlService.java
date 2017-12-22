@@ -1,49 +1,31 @@
 package com.yzrilyzr.FAQ.Main;
 import com.yzrilyzr.FAQ.Server.Server;
-import java.io.BufferedInputStream;
-import java.net.Socket;
-import java.io.IOException;
-import java.io.ByteArrayInputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 
-public class RemoteControlService extends BaseService
+public class RemoteControlService extends UdpService
 {
-	public RemoteControlService(Socket s,Server m)
+	public RemoteControlService(DatagramPacket s,Server m)
 	{
 		super(s,m);
 		TAG="RemoteControlClient";
 		setName("FAQServer_RemoteControlService");
 	}
 	@Override
-	public void onDestroy()
+	public void rev(DatagramPacket p)throws Throwable
 	{
-		// TODO: Implement this method
-	}
-	@Override
-	public void onRead(BufferedInputStream buff)
-	{
-		try
+		byte[] byt=p.getData();
+		int r=byt[0];
+		if(r==1)
 		{
-			int r=buff.read();
-			if(r==1){
-				byte[] bb=ctx.onGetScreen();
-				if(bb==null){
-					writeInt(Writer,0);
-					Writer.flush();
-				}
-				else{
-					writeInt(Writer,bb.length);
-					ByteArrayInputStream is=new ByteArrayInputStream(bb);
-					byte[] bu=new byte[2048];int k=0;
-					while((k=is.read(bu))!=-1)Writer.write(bu,0,k);
-					Writer.flush();
-				}
+			byte[] bb=ctx.onGetScreen();
+			if(bb!=null)
+			{
+				DatagramSocket s=new DatagramSocket();
+				s.send(new DatagramPacket(bb,bb.length,address));
+				s.close();
 			}
 		}
-		catch (IOException e)
-		{
-			Toast("Error","远程控制请求读取失败");
-			running=false;
-		}
 	}
-	
+
 }

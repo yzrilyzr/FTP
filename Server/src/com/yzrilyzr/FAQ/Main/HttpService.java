@@ -9,7 +9,7 @@ import java.net.SocketException;
 import java.net.URLDecoder;
 import java.io.IOException;
 
-public class HttpService extends BaseService
+public class HttpService extends TcpService
 {
 	public HttpService(Socket s,Server m)
 	{

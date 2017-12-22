@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 
-public class FileService extends BaseService
+public class FileService extends TcpService
 {
 	private boolean publicmode;
 	public FileService(Socket s,Server c,boolean publicmode)

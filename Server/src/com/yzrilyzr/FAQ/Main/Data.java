@@ -5,8 +5,7 @@ import com.yzrilyzr.FAQ.Data.Group;
 import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrList;
 import com.yzrilyzr.FAQ.Data.User;
-import com.yzrilyzr.FAQ.Server.Server;
-import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,16 +18,16 @@ public class Data extends RU
 	public final ConcurrentHashMap<String,User> users=new ConcurrentHashMap<String,User>();
 	public final ConcurrentHashMap<String,Group> groups=new ConcurrentHashMap<String,Group>();
 	public final ConcurrentHashMap<String,String> mailCd=new ConcurrentHashMap<String,String>();
-	public final ConcurrentHashMap<String,ClientService> loginClient=new ConcurrentHashMap<String,ClientService>();
-	public final ConcurrentHashMap<String,ControlService> loginControl=new ConcurrentHashMap<String,ControlService>();
+	public final ConcurrentHashMap<String,LoginClient> loginClient=new ConcurrentHashMap<String,LoginClient>();//ip
+	public final CopyOnWriteArrayList<SocketAddress> loginControl=new CopyOnWriteArrayList<SocketAddress>();//ADDRESS
 	public final ConcurrentHashMap<String,String> blacklist=new ConcurrentHashMap<String,String>();
-	public final CopyOnWriteArrayList<BaseService> onlineClient=new CopyOnWriteArrayList<BaseService>();
+	public final CopyOnWriteArrayList<String> connectedClient=new CopyOnWriteArrayList<String>();
 	public final CopyOnWriteArrayList<MessageObj> msgBuffer=new CopyOnWriteArrayList<MessageObj>();
 	
-	public User register(Socket soc,String pwd,String email) throws IOException
+	public User register(String ip,String pwd,String email) throws IOException
 	{
 		User u=new User();
-		u.ip=soc.getInetAddress().getHostAddress();
+		u.ip=ip;
 		Iterator iter=users.entrySet().iterator();
 		while(iter.hasNext())
 		{
@@ -145,6 +144,4 @@ public class Data extends RU
 		}
 		br.close();
 	}
-
-
 }

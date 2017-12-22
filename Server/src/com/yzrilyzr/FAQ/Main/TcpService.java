@@ -10,19 +10,18 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
-public abstract class BaseService extends RU implements Runnable
+public abstract class TcpService extends RU implements Runnable
 {
 	protected Socket socket;
 	protected Server ctx;
 	protected BufferedOutputStream Writer;
 	public String IP,LOCATION;
 	public String TAG="BaseClient";
-	public boolean isActive=true;
 	public boolean running=true;
 	protected Data Data;
-	public BaseService(Socket s, Server c)
+	public TcpService(Socket s, Server c)
 	{
-		setName("FAQServer_BaseService");
+		setName("FAQServer_TcpService");
 		try
 		{
 			this.ctx=c;
@@ -30,12 +29,11 @@ public abstract class BaseService extends RU implements Runnable
 			socket=s;
 			s.setKeepAlive(true);
 			//s.setTcpNoDelay(true);
-			s.setTrafficClass(0x04|0x10);
-			s.setSoTimeout(10000);
-			isActive=true;
+			//s.setTrafficClass(0x04|0x10);
+			s.setSoTimeout(60000);
 			Writer=new BufferedOutputStream(s.getOutputStream());
 			IP=socket.getInetAddress().getHostAddress();
-			Data.onlineClient.add(this);
+			if(!Data.connectedClient.contains(IP))Data.connectedClient.add(IP);
 		}
 		catch (Exception e)
 		{
@@ -80,8 +78,6 @@ public abstract class BaseService extends RU implements Runnable
 		try
 		{
 			running=false;
-			isActive=false;
-			Data.onlineClient.remove(this);
 			if(socket!=null&&!socket.isClosed())socket.close();
 			socket=null;
 		}

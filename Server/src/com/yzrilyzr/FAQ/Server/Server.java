@@ -20,7 +20,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 	int filterType=0;
 	String filterKey="";
 	public final String TAG="Server";
-	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,hbtServer,remoteControlServer;
+	ServerThread faqServer,fileServer,httpServer,controlServer,controlFileServer,remoteControlServer;
 	CopyOnWriteArrayList<ConsoleMsg> cmsg=null;
 	public Data Data;
 	private boolean initedData=false;
@@ -29,6 +29,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 	private ExecutorService pool;
 	private MediaPlayer player;
 	public static final String info="FAQ Server v1.2.2.1_alpha (2017 11 26) by yzrilyzr";
+	public final CopyOnWriteArrayList<String> mCmds=new CopyOnWriteArrayList<String>();
 	public static void main(String[] args)
 	{
 		System.out.println("输入'astart'自动配置并启动服务器");
@@ -44,19 +45,19 @@ public class Server implements Thread.UncaughtExceptionHandler
 		});
 		server.Data.datafile="/sdcard/yzr的app/FAQ_server";
 		server.Data.rootFile="/sdcard";
-		final CopyOnWriteArrayList<String> is=new CopyOnWriteArrayList<String>();
+		final CopyOnWriteArrayList<String> mCmds=new CopyOnWriteArrayList<String>();
 		new Thread(new Runnable(){
 			@Override
 			public void run()
 			{
 				// TODO: Implement this method
 				while(true)
-					server.exec(new Scan(is));
+					server.exec(new Scan(mCmds));
 			}
 		}).start();
 		Scanner s=new Scanner(System.in);
 		while(true)
-			is.add(s.next());
+			mCmds.add(s.next());
 	}
 	public void exec(Scan s)
 	{
@@ -77,8 +78,8 @@ public class Server implements Thread.UncaughtExceptionHandler
 					"astart 自动配置并启动服务器","astop 自动配置并关闭服务器",
 					"sort <按照:int> <哪个:int> 筛选控制台消息",
 					"clear 清除控制台","getip 获取外网ip",
-					"disconnect <索引值:int> 断开客户端","loadoutlog 导出日志",
-					"ban <索引值:int> <方式:int> 封禁客户端",
+					"loadoutlog 导出日志",
+					"ban <索引值:int> 封禁客户端",
 					"pardon <IP:String> 解封客户端",
 					"play <文件夹或文件路径:String> 播放音乐",
 					"reload 重载服务器","listfile <路径:String> 列表路径下的文件",
@@ -106,15 +107,17 @@ public class Server implements Thread.UncaughtExceptionHandler
 					String ch=s.next();
 					if("stop".equals(ch))player.stop();
 					else if("next".equals(ch))player.next();
-					else if("select".equals(ch)){
+					else if("select".equals(ch))
+					{
 						int i=0;
 						for(File f:player.playlist)
-						toast((i++)+":"+f.getName());
+							toast((i++)+":"+f.getName());
 						player.select(s.nextInt());
 					}
 					else if("prev".equals(ch))player.prev();
 					else if("pause".equals(ch))player.pause();
-					else if("play".equals(ch)){
+					else if("play".equals(ch))
+					{
 						player.setOnCompletionListener(new MediaPlayer.OnCompletionListener(){
 							@Override
 							public void onCompletion(MediaPlayer mp)
@@ -125,7 +128,8 @@ public class Server implements Thread.UncaughtExceptionHandler
 						if(!player.isPause())player.playNow();
 						else player.start();
 					}
-					else{
+					else
+					{
 						File f=new SafeFile(Data,true,Data.rootFile+ch);
 						toast("路径是:"+f.getAbsolutePath());
 						player.setDir(f);
@@ -165,14 +169,14 @@ public class Server implements Thread.UncaughtExceptionHandler
 					for(File f:dir2)toast((i++)+(f.isFile()?"(F)":"(D)")+":"+f.getName());
 					break;
 				case "ban":
-					if(Data.onlineClient.size()==0)break;
+					if(Data.connectedClient.size()==0)break;
 					i=0;
-					for(BaseService ser:Data.onlineClient)
-						toast((i++)+":"+ser.IP);
+					for(String ser:Data.connectedClient)
+						toast((i++)+":"+ser);
 					int o=s.nextInt();
 					toast("0:断开连接,1:暂时封禁,2:永久封禁");
 					int p=s.nextInt();
-					ban(Data.onlineClient.get(o),p);
+					ban(Data.connectedClient.get(o),p);
 					break;
 				case "pardon":
 					if(Data.blacklist.size()==0)break;
@@ -186,14 +190,6 @@ public class Server implements Thread.UncaughtExceptionHandler
 						toast(e.getKey()+"("+type+")");
 					}
 					pardon(s.next());
-					break;
-				case "disconnect":
-					if(Data.onlineClient.size()==0)break;
-					i=0;
-					toast("all:断开所有");
-					for(BaseService c:Data.onlineClient)
-						toast((i++)+":"+c.IP);
-					disconnect(s.next());
 					break;
 				case "reload":
 					onReload();
@@ -223,7 +219,6 @@ public class Server implements Thread.UncaughtExceptionHandler
 					break;
 				case "astop":
 					stopServer(0);
-					disconnect("all");
 					System.gc();
 					break;
 				case "start":
@@ -316,19 +311,30 @@ public class Server implements Thread.UncaughtExceptionHandler
 		cmsg=new CopyOnWriteArrayList<ConsoleMsg>();
 		Thread.currentThread().setName("FAQServer_Main");
 		Thread.currentThread().setDefaultUncaughtExceptionHandler(this);
-		faqServer=new ServerThread("FAQServer_ClientService_Server"){
+		new Thread(new Runnable(){
+			@Override
+			public void run()
+			{
+				// TODO: Implement this method
+				while(true)
+					exec(new Scan(mCmds));
+			}
+		}).start();
+		faqServer=new UDPServerThread("FAQServer_ClientService_Server"){
 			@Override
 			public void run()
 			{
 				// TODO: Implement this method
 				try
 				{
-					ser=new ServerSocket(10000);
+					server=new DatagramSocket(10000);
 					toast(new ConsoleMsg(TAG,"主线程","服务器已启动","local"));
 					while(runn)
 					{
-						Socket s=ser.accept();
-						pool.execute(new ClientService(s,Server.this));
+						byte[] bb=new byte[1024];
+						DatagramPacket pa=new DatagramPacket(bb,bb.length);
+						((DatagramSocket)server).receive(pa);
+						pool.execute(new ClientService(pa,Server.this));
 					}
 				}
 				catch(SocketException e)
@@ -341,18 +347,18 @@ public class Server implements Thread.UncaughtExceptionHandler
 				}
 			}
 		};
-		fileServer=new ServerThread("FAQServer_FileService_Server"){
+		fileServer=new TCPServerThread("FAQServer_FileService_Server"){
 			@Override
 			public void run()
 			{
 				// TODO: Implement this method
 				try
 				{
-					ser=new ServerSocket(10001);
+					server=new ServerSocket(10001);
 					toast(new ConsoleMsg(TAG,"主线程","文件服务器已启动","local"));
 					while(runn)
 					{
-						Socket s=ser.accept();
+						Socket s=((ServerSocket)server).accept();
 						pool.execute(new FileService(s,Server.this,false));
 					}
 				}
@@ -373,11 +379,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 				// TODO: Implement this method
 				try
 				{
-					ser=new ServerSocket(10002);
+					server=new ServerSocket(10002);
 					toast(new ConsoleMsg(TAG,"主线程","HTTP服务器已启动","local"));
 					while(runn)
 					{
-						Socket s=ser.accept();
+						Socket s=((ServerSocket)server).accept();
 						pool.execute(new HttpService(s,Server.this));
 					}
 				}
@@ -398,12 +404,14 @@ public class Server implements Thread.UncaughtExceptionHandler
 				// TODO: Implement this method
 				try
 				{
-					ser=new ServerSocket(20000);
+					server=new DatagramSocket(20000);
 					toast(new ConsoleMsg(TAG,"主线程","控制服务器已启动","local"));
 					while(runn)
 					{
-						Socket s=ser.accept();
-						pool.execute(new ControlService(s,Server.this));
+						byte[] bb=new byte[1024];
+						DatagramPacket pa=new DatagramPacket(bb,bb.length);
+						((DatagramSocket)server).receive(pa);
+						pool.execute(new ControlService(pa,Server.this));
 					}
 				}
 				catch(SocketException e)
@@ -423,11 +431,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 				// TODO: Implement this method
 				try
 				{
-					ser=new ServerSocket(20001);
+					server=new ServerSocket(20001);
 					toast(new ConsoleMsg(TAG,"主线程","控制 文件 服务器已启动","local"));
 					while(runn)
 					{
-						Socket s=ser.accept();
+						Socket s=((ServerSocket)server).accept();
 						pool.execute(new FileService(s,Server.this,true));
 					}
 				}
@@ -448,12 +456,14 @@ public class Server implements Thread.UncaughtExceptionHandler
 				// TODO: Implement this method
 				try
 				{
-					ser=new ServerSocket(20002);
+					server=new DatagramSocket(20002);
 					toast(new ConsoleMsg(TAG,"主线程","远程控制服务器已启动","local"));
 					while(runn)
 					{
-						Socket s=ser.accept();
-						pool.execute(new RemoteControlService(s,Server.this));
+						byte[] bb=new byte[1024];
+						DatagramPacket pa=new DatagramPacket(bb,bb.length);
+						((DatagramSocket)server).receive(pa);
+						pool.execute(new RemoteControlService(pa,Server.this));
 					}
 				}
 				catch(SocketException e)
@@ -463,50 +473,6 @@ public class Server implements Thread.UncaughtExceptionHandler
 				catch (IOException e)
 				{
 					toast(new ConsoleMsg("Error","主线程","无法启动远程控制服务器:"+e,"local"));
-				}
-			}
-		};
-		hbtServer=new ServerThread("FAQServer_HBTSender_Server"){
-			@Override
-			public void run()
-			{
-				toast(new ConsoleMsg(TAG,"主线程","心跳包服务器已启动","local"));
-				while(runn)
-				{
-					try
-					{
-						for(BaseService css:Data.onlineClient)
-						{
-							if(css instanceof ClientService)
-							{
-								ClientService cs=(ClientService)css;
-								if(!cs.isActive)
-									cs.disconnect();
-								if(cs.running)
-								{
-									cs.isActive=false;
-									cs.sendMsg(C.HBT);
-								}
-							}
-							else if(css instanceof ControlService)
-							{
-								ControlService cs=(ControlService)css;
-								if(!cs.isActive)
-									cs.disconnect();
-								if(cs.running)
-								{
-									cs.isActive=false;
-									cs.sendMsg(C.HBT);
-								}
-							}
-						}
-						Data.saveMsgBuffer();
-						Thread.sleep(30000);
-					}
-					catch(Throwable e)
-					{
-						toast(new ConsoleMsg("Error","主线程","心跳包发送器错误:"+e,"local"));
-					}
 				}
 			}
 		};
@@ -565,39 +531,23 @@ public class Server implements Thread.UncaughtExceptionHandler
 		}
 		return null;
 	}
-	public void disconnect(String p)
-	{
-		if(p.equals("all"))
-		{
-			for(BaseService c:Data.onlineClient)c.disconnect();
-		}
-		else
-		{
-			BaseService s=Data.onlineClient.get(Integer.parseInt(p));
-			s.disconnect();
-		}
-		toast(new ConsoleMsg(TAG,"主线程","断开客户端成功","local"));
-	}
-
 	public void stopServer(int w) throws IOException
 	{
 		if(w==0||w==1)faqServer.stopServer();
-		if(w==0||w==2)hbtServer.stopServer();
-		if(w==0||w==3)fileServer.stopServer();
-		if(w==0||w==4)httpServer.stopServer();
-		if(w==0||w==5)controlServer.stopServer();
-		if(w==0||w==6)controlFileServer.stopServer();
-		if(w==0||w==7)remoteControlServer.stopServer();
+		if(w==0||w==2)fileServer.stopServer();
+		if(w==0||w==3)httpServer.stopServer();
+		if(w==0||w==4)controlServer.stopServer();
+		if(w==0||w==5)controlFileServer.stopServer();
+		if(w==0||w==6)remoteControlServer.stopServer();
 	}
-	public void ban(BaseService c,int p2) throws IOException
+	public void ban(String c,int p2) throws IOException
 	{
-		if(p2==1)Data.blacklist.put(c.IP,"1");
+		if(p2==1)Data.blacklist.put(c,"1");
 		if(p2==2)
 		{
-			Data.blacklist.put(c.IP,"2");
+			Data.blacklist.put(c,"2");
 			Data.saveBlackList();
 		}
-		c.disconnect();
 		toast(new ConsoleMsg(TAG,"主线程","封禁成功","local"));
 	}
 	public void pardon(String ip) throws IOException
@@ -671,7 +621,8 @@ public class Server implements Thread.UncaughtExceptionHandler
 		}
 		catch (Exception e)
 		{}
-		finally{
+		finally
+		{
 			System.exit(0);
 		}
 	}
@@ -687,12 +638,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 	public void startServer(int w)
 	{
 		if(w==0||w==1)faqServer.start();
-		if(w==0||w==2)hbtServer.start();
-		if(w==0||w==3)fileServer.start();
-		if(w==0||w==4)httpServer.start();
-		if(w==0||w==5)controlServer.start();
-		if(w==0||w==6)controlFileServer.start();
-		if(w==0||w==7)remoteControlServer.start();
+		if(w==0||w==2)fileServer.start();
+		if(w==0||w==3)httpServer.start();
+		if(w==0||w==4)controlServer.start();
+		if(w==0||w==5)controlFileServer.start();
+		if(w==0||w==6)remoteControlServer.start();
 	}
 	public void getIP()
 	{
@@ -731,7 +681,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 	abstract class ServerThread implements Runnable
 	{
 		protected boolean runn=false;
-		protected ServerSocket ser=null;
+		protected Closeable server=null;
 		protected Thread th;
 		protected String n;
 		public ServerThread(String n)
@@ -742,8 +692,8 @@ public class Server implements Thread.UncaughtExceptionHandler
 		{
 			if(!runn)return;
 			runn=false;
-			if(ser!=null)ser.close();
-			ser=null;
+			if(server!=null)server.close();
+			server=null;
 		}
 		public void start()
 		{
@@ -751,6 +701,22 @@ public class Server implements Thread.UncaughtExceptionHandler
 			runn=true;
 			th=new Thread(this,n);
 			th.start();
+		}
+		public abstract void run();
+	}
+	abstract class UDPServerThread extends ServerThread
+	{
+		public UDPServerThread(String n)
+		{
+			super(n);
+		}
+		public abstract void run();
+	}
+	abstract class TCPServerThread extends ServerThread
+	{
+		public TCPServerThread(String n)
+		{
+			super(n);
 		}
 		public abstract void run();
 	}
@@ -780,11 +746,13 @@ public class Server implements Thread.UncaughtExceptionHandler
 			}
 			return is.get(i++);
 		}
-		public void reset(){
+		public void reset()
+		{
 			i=0;
 			is.clear();
 		}
-		public void stop(){
+		public void stop()
+		{
 			is.clear();
 			r=false;
 		}
@@ -795,12 +763,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 		int code=0;
 		if(faqServer.runn)code|=1;
 		if(httpServer.runn)code|=2;
-		if(hbtServer.runn)code|=4;
-		if(fileServer.runn)code|=8;
-		if(controlFileServer.runn)code|=16;
-		if(controlServer.runn)code|=32;
-		if(initedData)code|=64;
-		if(remoteControlServer.runn)code|=128;
+		if(fileServer.runn)code|=4;
+		if(controlFileServer.runn)code|=8;
+		if(controlServer.runn)code|=16;
+		if(initedData)code|=32;
+		if(remoteControlServer.runn)code|=64;
 		stopServer(0);
 		System.gc();
 		invoke("onReload",new Class[]{int.class},code);
@@ -809,37 +776,44 @@ public class Server implements Thread.UncaughtExceptionHandler
 	{
 		if((code&1)==1)faqServer.start();
 		if((code&2)==2)httpServer.start();
-		if((code&4)==4)hbtServer.start();
-		if((code&8)==8)fileServer.start();
-		if((code&16)==16)controlFileServer.start();
-		if((code&32)==32)controlServer.start();
-		if((code&64)==64)readData();
-		if((code&128)==128)remoteControlServer.start();
+		if((code&4)==4)fileServer.start();
+		if((code&8)==8)controlFileServer.start();
+		if((code&16)==16)controlServer.start();
+		if((code&32)==32)readData();
+		if((code&64)==64)remoteControlServer.start();
 	}
 	public void onClearView()
 	{
 		invoke("onClearView");
-		Iterator it=Data.loginControl.entrySet().iterator();
-		while(it.hasNext())
+		for(SocketAddress add:Data.loginControl)
 		{
-			ControlService c=(ControlService)((Map.Entry)it.next()).getValue();
-			c.sendMsg(C.CLV);
+			try
+			{
+				UdpService.sendMsg(C.CLV,null,add,null);
+			}
+			catch (Exception e)
+			{}
 		}
 	}
 	public void toast(String s)
 	{
 		invoke("onPrint",s);
-		Iterator it=Data.loginControl.entrySet().iterator();
-		while(it.hasNext())
+		for(SocketAddress add:Data.loginControl)
 		{
-			ControlService c=(ControlService)((Map.Entry)it.next()).getValue();
-			c.sendMsg(C.LOG,s);
+			try
+			{
+				UdpService.sendMsg(C.LOG,null,add,s);
+			}
+			catch (Exception e)
+			{}
 		}
 	}
-	public byte[] onGetScreen(){
+	public byte[] onGetScreen()
+	{
 		return (byte[])invoke("onGetScreen");
 	}
-	public void onDevice(int c,String p){
+	public void onDevice(int c,String p)
+	{
 		invoke("onDevice",new Class[]{int.class,String.class},c,p);
 	}
 }
