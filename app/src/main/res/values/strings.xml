@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">FAQ</string>
+    <string name="app_name">FAQ服务器控制端</string>
     <string name="修改狗死妈">修改狗死妈</string>
 
 </resources>

@@ -17,14 +17,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import com.yzrilyzr.FAQ.Data.FileObj;
 import com.yzrilyzr.FAQ.Data.ToStrObj;
+import com.yzrilyzr.FAQ.Main.BO;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
+import com.yzrilyzr.FAQ.Main.FileService;
 import com.yzrilyzr.myclass.myActivity;
 import com.yzrilyzr.myclass.util;
+import com.yzrilyzr.ui.myAlertDialog;
+import com.yzrilyzr.ui.myDialogInterface;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.CopyOnWriteArrayList;
+import com.yzrilyzr.ui.myProgressBar;
 
 public class FileActivity extends BaseActivity
 {
@@ -35,6 +42,9 @@ public class FileActivity extends BaseActivity
 	File localFile;
 	String remoteFile;
 	String remoteInfo1,remoteInfo2;
+	String localInfo1,localInfo2;
+	myProgressBar prog;
+	UploadThread upload;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -45,6 +55,7 @@ public class FileActivity extends BaseActivity
 		remote=(ListView) findViewById(R.id.filemyListView2);
 		pathview=(TextView) findViewById(R.id.fileTextView1);
 		infoview=(TextView) findViewById(R.id.fileTextView2);
+		prog=(myProgressBar) findViewById(R.id.filemyProgressBar1);
 		SharedPreferences s=getSharedPreferences("fileManager",MODE_PRIVATE);
 		localFile=new File(s.getString("local",Environment.getExternalStorageDirectory().getAbsolutePath()));
 		remoteFile=s.getString("remote","");
@@ -102,16 +113,32 @@ public class FileActivity extends BaseActivity
 					}
 					else
 					{
-						remoteFile=f.parent;
+						remoteFile=remoteFile.substring(0,remoteFile.lastIndexOf("/"));
 						ClientService.sendMsg(C.GFE,remoteFile);
 					}
 				}
 			});
 		local.setOnItemLongClickListener(new OnItemLongClickListener(){
 				@Override
-				public boolean onItemLongClick(AdapterView<?> p1, View p2, int p3, long p4)
+				public boolean onItemLongClick(AdapterView<?> p1, View p2, final int p3, long p4)
 				{
-
+					if(p3!=0)
+						new myAlertDialog(ctx)
+							.setTitle("操作")
+							.setItems("上传".split(","),new myDialogInterface(){
+								@Override public void click(View p1,int p2)
+								{
+									if(p2==0){
+										if(upload==null){
+											upload=new UploadThread(localFiles[p3],remoteFile);
+											upload.start();
+										}
+										else upload.getFile(localFiles[p3]);
+									}
+								}
+							})
+							.setNegativeButton("取消",null)
+							.show();
 					return true;
 				}
 			});
@@ -123,9 +150,10 @@ public class FileActivity extends BaseActivity
 					return true;
 				}
 			});
-		setInfo(0);
 		local.setAdapter(new LocalAdapter());
 		ClientService.sendMsg(C.GFE,remoteFile);
+		pathview.setTextSize(util.dip2px(3));
+		infoview.setTextSize(util.dip2px(3));
 	}
 	@Override
 	protected void onDestroy()
@@ -141,12 +169,12 @@ public class FileActivity extends BaseActivity
 		if(w==0)
 		{
 			pathview.setText(localFile.getAbsolutePath());
-			infoview.setText("总共:"+getUnit(localFile.getTotalSpace())+" 剩余:"+getUnit(localFile.getFreeSpace()));
+			infoview.setText("总共:"+localInfo1+" 剩余:"+localInfo2);
 		}
 		else
 		{
 			pathview.setText(remoteFile);
-			infoview.setText("总共:"+getUnit(Long.parseLong(remoteInfo1))+" 剩余:"+getUnit(Long.parseLong(remoteInfo2)));
+			infoview.setText("总共:"+remoteInfo1+" 剩余:"+remoteInfo2);
 		}
 	}
 	@Override
@@ -154,10 +182,18 @@ public class FileActivity extends BaseActivity
 	{
 		if(cmd==C.GFE)
 		{
+			if("FNE".equals(msg))
+			{
+				util.toast(ctx,"远程文件不存在");
+				ClientService.sendMsg(C.GFE,"");
+				return;
+			}
 			String[] s=msg.split("<\\?\\|\\*>");
-			remoteInfo1=s[0];
-			remoteInfo2=s[1];
-			FileObj[] fs=new FileObj[s.length-3];
+			remoteInfo1=getUnit(Long.parseLong(s[0]));
+			remoteInfo2=getUnit(Long.parseLong(s[1]));
+			int len=s.length-2;
+			if(len<0)len=0;
+			FileObj[] fs=new FileObj[len];
 			for(int i=0;i<fs.length;i++)
 			{
 				fs[i]=(FileObj)ToStrObj.s2o(s[i+2]);
@@ -192,6 +228,8 @@ public class FileActivity extends BaseActivity
 	{
 		public LocalAdapter()
 		{
+			localInfo1=getUnit(localFile.getTotalSpace());
+			localInfo2=getUnit(localFile.getFreeSpace());
 			File[] src=localFile.listFiles();
 			File[] dst=new File[src.length+1];
 			Arrays.sort(src,new Comparator<File>(){
@@ -296,17 +334,113 @@ public class FileActivity extends BaseActivity
 		}
 		public void setText(String s)
 		{
-			((TextView)v.findViewById(R.id.fileentryTextView1)).setText(s);
+			TextView tv=(TextView)v.findViewById(R.id.fileentryTextView1);
+			tv.setText(s);
+			tv.setTextSize(util.dip2px(4));
 		}
 		public void setSubText(String s)
 		{
 			TextView tv=(TextView)v.findViewById(R.id.fileentryTextView2);
 			tv.setText(s);
-			tv.setTextSize(util.dip2px(3));
+			tv.setTextSize(util.dip2px(2));
 		}
 		public void setImage(Bitmap s)
 		{
 			((ImageView)v.findViewById(R.id.fileentryImageView1)).setImageBitmap(s);
+		}
+	}
+	class UploadThread extends Thread implements FileService.CallBack
+	{
+		String local,remote;
+		ArrayList<File> list;
+		File file;
+		int thind=0;
+		uiRunnable runn;
+		CopyOnWriteArrayList<FileService> threads;
+		public UploadThread(File fie,String remote)
+		{
+			file=fie;
+			local=file.getParentFile().getAbsolutePath();
+			this.remote=remote;
+			list=new ArrayList<File>();
+			threads=new CopyOnWriteArrayList<FileService>();
+			runn=new uiRunnable();
+		}
+		private void getFile(File f)
+		{
+			if(f.isFile())list.add(f);
+			else if(f.isDirectory())
+			{
+				list.add(f);
+				File[] fs=f.listFiles();
+				for(File ff:fs)getFile(ff);
+			}
+		}
+		@Override
+		public void run()
+		{
+			getFile(file);
+			for(File f:list)
+			{
+				try
+				{
+					BO bo=new BO(){
+						@Override
+						public boolean g()
+						{
+							return threads.size()>4;
+						}
+					};
+					while(bo.g())Thread.sleep(1);
+					int cmd=-1;
+					if(f.isFile())cmd=1;
+					if(f.isDirectory())cmd=3;
+					FileService ser=new FileService(f,remote+f.getAbsolutePath().substring(local.length()),cmd);
+					ser.setCallBack(this);
+					ser.start();
+					threads.add(ser);
+				}
+				catch (Throwable e)
+				{}
+			}
+			upload=null;
+		}
+		@Override
+		public void onProgress(FileService s,long p, long m)
+		{
+			int first=(int)(100l*p/m);
+			int second=100*thind/list.size();
+			runn.setProg(second,first,100);
+		}
+		@Override
+		public void onFinish(FileService fs,boolean success)
+		{
+			threads.remove(fs);
+			thind++;
+			onProgress(fs,0,1);
+			if(thind==list.size())util.toast(ctx,success?"上传成功":"上传失败");
+		}
+	}
+	class uiRunnable implements Runnable
+	{
+		int m,f,s;
+		long time=0;
+		@Override
+		public void run()
+		{
+			prog.setMax(m);
+			prog.setProgress(f);
+			prog.setSecondaryProgress(s);
+		}
+		public void setProg(int f,int s,int m){
+			this.f=f;
+			this.s=s;
+			this.m=m;
+			if(System.currentTimeMillis()>time+200)
+			{
+				runOnUiThread(this);
+				time=System.currentTimeMillis();
+			}
 		}
 	}
 }

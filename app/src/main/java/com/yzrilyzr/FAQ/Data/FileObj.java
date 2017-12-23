@@ -11,6 +11,7 @@ public class FileObj extends ToStrObj
 	{
 		name=file.getName();
 		path=file.getAbsolutePath().substring(localpath.length());
+		parent=file.getParentFile().getAbsolutePath().substring(localpath.length());
 		length=file.length();
 		lastMod=file.lastModified();
 		execute=file.canExecute();
@@ -18,7 +19,6 @@ public class FileObj extends ToStrObj
 		write=file.canWrite();
 		isFile=file.isFile();
 		separator=file.separator;
-		parent=file.getParent();
 		isDir=file.isDirectory();
 	}
 	public FileObj(){}

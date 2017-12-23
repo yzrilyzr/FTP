@@ -11,15 +11,10 @@ import com.yzrilyzr.ui.myAlertDialog;
 import com.yzrilyzr.ui.myDialogInterface;
 import com.yzrilyzr.ui.myEditText;
 import com.yzrilyzr.ui.uidata;
-import java.io.InputStream;
-import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.URLConnection;
 
-public class SplashActivity extends myActivity
+public class SplashActivity extends BaseActivity
 {
 	static boolean inited=false;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -28,59 +23,31 @@ public class SplashActivity extends myActivity
 		{
 			uidata.readData(this);
 			uidata.initIcon(this);
+			setContentView(R.layout.splash);
 			inited=true;
 			SharedPreferences sp=getSharedPreferences("server",MODE_PRIVATE);
 			ClientService.hostIp=sp.getString("ip","127.0.0.1");
-			new Thread(new Runnable(){
-					@Override
-					public void run()
-					{
-						// TODO: Implement this method
-						boolean isc=true;
-						while(isc)
-							try
-							{
-								ClientService.connect();
-								while(ClientService.deckey==null)
-								{Thread.sleep(1);}
-								isc=false;
-								Thread.sleep(300);
-							}
-							catch(SocketTimeoutException ste)
-							{
-								util.toast(ctx,"连接超时\n5秒后重试");
-								ClientService.deckey=null;
-								try
-								{
-									Thread.sleep(4000);
-								}
-								catch (InterruptedException ey)
-								{}
-							}
-							catch (Exception e)
-							{
-								util.toast(ctx,"无法连接到服务器\n5秒后重试");
-								ClientService.deckey=null;
-								try
-								{
-									Thread.sleep(4000);
-								}
-								catch (InterruptedException ey)
-								{}
-							}
-						util.toast(ctx,"连接成功");
-						startActivity(new Intent(ctx,MainActivity.class));
-						finish();
-						ClientService.sendMsg(C.LGN);
-					}
-				}).start();
-			setContentView(R.layout.splash);
+			ClientService.startService();
+			ClientService.sendMsg(C.LGN);
 		}
 		else
 		{
 			startActivity(new Intent(ctx,MainActivity.class));
 			finish();
 		}
+	}
+	@Override
+	public void rev(byte cmd, String msg)
+	{
+		if(cmd==C.LGN)runOnUiThread(new Runnable(){
+					@Override
+					public void run()
+					{
+						util.toast(ctx,"连接成功");
+						startActivity(new Intent(ctx,MainActivity.class));
+						finish();
+					}
+				});
 	}
 	public void set(View v)
 	{

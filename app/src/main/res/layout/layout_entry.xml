@@ -1,32 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
 	android:layout_height="wrap_content"
 	android:orientation="horizontal"
-	android:padding="5dp">
+	android:padding="3dp">
 
 	<ImageView
 		android:layout_height="40dp"
 		android:layout_width="40dp"
 		android:id="@+id/fileentryImageView1"/>
 
-	<com.yzrilyzr.ui.myTextViewBack
+	<LinearLayout
+		android:orientation="vertical"
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
-		android:id="@+id/fileentryTextView1"
-		android:ellipsize="middle"
-		android:maxLines="1"
-		android:layout_marginLeft="45dp"/>
+		android:layout_marginLeft="3dp">
 
-	<com.yzrilyzr.ui.myTextViewBack
-		android:layout_height="wrap_content"
-		android:layout_width="match_parent"
-		android:id="@+id/fileentryTextView2"
-		android:gravity="left|center"
-		android:ellipsize="end"
-		android:layout_marginTop="20dp"
-		android:layout_marginLeft="45dp"/>
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:id="@+id/fileentryTextView1"
+			android:ellipsize="middle"
+			android:maxLines="2"/>
 
-</FrameLayout>
+		<com.yzrilyzr.ui.myTextViewBack
+			android:layout_height="wrap_content"
+			android:layout_width="match_parent"
+			android:id="@+id/fileentryTextView2"
+			android:gravity="left|center"
+			android:ellipsize="end"/>
+
+	</LinearLayout>
+
+</LinearLayout>
 

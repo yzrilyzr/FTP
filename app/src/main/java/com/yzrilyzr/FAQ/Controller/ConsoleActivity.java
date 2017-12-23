@@ -6,6 +6,7 @@ import com.yzrilyzr.FAQ.Main.ClientService;
 import com.yzrilyzr.FAQ.Main.C;
 import android.widget.EditText;
 import com.yzrilyzr.myclass.AndroidBug5497Workaround;
+import com.yzrilyzr.myclass.util;
 
 public class ConsoleActivity extends BaseActivity
 {

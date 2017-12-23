@@ -21,6 +21,7 @@
             </intent-filter>
         </activity>
 		<activity android:name=".ConsoleActivity"/>
+		<activity android:name=".ControlActivity"/>
 		<activity android:name=".FileActivity"/>
 		<activity android:name=".MainActivity"/>
     </application>

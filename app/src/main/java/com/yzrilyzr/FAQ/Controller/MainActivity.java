@@ -19,8 +19,8 @@ public class MainActivity extends myActivity
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
     }
-	public void updateServer(View v){
-		
+	public void control(View v){
+		startActivity(new Intent(this,ControlActivity.class));
 	}
 	public void console(View v){
 		startActivity(new Intent(this,ConsoleActivity.class));

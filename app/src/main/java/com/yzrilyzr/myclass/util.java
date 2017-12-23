@@ -48,6 +48,7 @@ public class util
 					// TODO: Implement this method
 					Toast t=new Toast(c);
 					ViewGroup v=(ViewGroup) LayoutInflater.from(c).inflate(R.layout.layout_toast,null);
+					v.setClickable(false);
 					t.setView(v);
 					((TextView)v.getChildAt(0)).setText(s);
 					t.show();

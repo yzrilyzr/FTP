@@ -47,7 +47,7 @@
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:orientation="vertical"
-				android:onClick="updateServer"
+				android:onClick="control"
 				android:layout_weight="1.0"
 				android:gravity="center"
 				android:layout_margin="5dp">
@@ -60,7 +60,7 @@
 
 				<com.yzrilyzr.ui.myTextView
 					android:layout_height="wrap_content"
-					android:text="更新服务器"
+					android:text="远程控制"
 					android:layout_width="wrap_content"
 					android:layout_margin="5dp"/>
 
@@ -78,7 +78,7 @@
 				<ImageView
 					android:layout_height="70dp"
 					android:layout_width="70dp"
-					android:src="@drawable/systeminfo"
+					android:src="@drawable/cmd"
 					android:layout_margin="5dp"/>
 
 				<com.yzrilyzr.ui.myTextView
