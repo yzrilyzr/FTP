@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketAddress;
 import java.net.SocketException;
+import java.io.ByteArrayOutputStream;
 
 public abstract class UdpService extends RU implements Runnable
 {
@@ -14,7 +15,7 @@ public abstract class UdpService extends RU implements Runnable
 	protected Data Data;
 	public String IP,LOCATION,deckey;
 	public SocketAddress address;
-	public UdpService(DatagramPacket packet, Server ctx)
+	public UdpService(DatagramPacket packet,Server ctx)
 	{
 		this.packet = packet;
 		this.ctx = ctx;
@@ -32,6 +33,7 @@ public abstract class UdpService extends RU implements Runnable
 	{
 		try
 		{
+			//Toast("Thread","已连接:"+address);
 			if(Data.blacklist.get(IP)!=null)
 			{
 				Toast("Thread","此ip在黑名单");
@@ -62,24 +64,7 @@ public abstract class UdpService extends RU implements Runnable
 	{
 		try
 		{
-			DatagramPacket p=null;
-			if(ss!=null)
-			{
-				if(deckey!=null)ss=AES.encrypt(deckey,ss);
-				byte[] b=ss.getBytes();
-				byte[] b2=new byte[b.length+1];
-				b2[0]=CMD;
-				System.arraycopy(b,0,b2,0,b.length);
-				b=null;
-				p=new DatagramPacket(b2,b2.length,address);
-			}
-			else
-			{
-				p=new DatagramPacket(new byte[]{CMD},1,address);
-			}
-			DatagramSocket so=new DatagramSocket();
-			so.send(p);
-			so.close();
+			sendMsg(CMD,deckey,address,ss);
 		}
 		catch (Exception e)
 		{
@@ -95,20 +80,21 @@ public abstract class UdpService extends RU implements Runnable
 		if(ss!=null)
 		{
 			if(deckey!=null)ss=AES.encrypt(deckey,ss);
-			byte[] b=ss.getBytes();
-			byte[] b2=new byte[b.length+1];
-			b2[0]=CMD;
-			System.arraycopy(b,0,b2,0,b.length);
-			b=null;
+			ByteArrayOutputStream os=new ByteArrayOutputStream();
+			os.write(CMD);
+			os.write(ss.getBytes());
+			os.flush();
+			os.close();
+			byte[] b2=os.toByteArray();
 			p=new DatagramPacket(b2,b2.length,address);
 		}
 		else
 		{
 			p=new DatagramPacket(new byte[]{CMD},1,address);
 		}
-		DatagramSocket so=new DatagramSocket();
-		so.send(p);
-		so.close();
+		DatagramSocket soo=new DatagramSocket();
+		soo.send(p);
+		soo.close();
 	}
 	public abstract void rev(DatagramPacket p)throws Throwable;
 }

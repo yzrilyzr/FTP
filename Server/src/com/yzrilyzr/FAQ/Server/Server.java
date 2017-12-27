@@ -785,11 +785,11 @@ public class Server implements Thread.UncaughtExceptionHandler
 	public void onClearView()
 	{
 		invoke("onClearView");
-		for(SocketAddress add:Data.loginControl)
+		for(LoginClient add:Data.loginControl.values())
 		{
 			try
 			{
-				UdpService.sendMsg(C.CLV,null,add,null);
+				UdpService.sendMsg(C.CLV,null,add.address,null);
 			}
 			catch (Exception e)
 			{}
@@ -798,19 +798,19 @@ public class Server implements Thread.UncaughtExceptionHandler
 	public void toast(String s)
 	{
 		invoke("onPrint",s);
-		for(SocketAddress add:Data.loginControl)
+		for(LoginClient add:Data.loginControl.values())
 		{
 			try
 			{
-				UdpService.sendMsg(C.LOG,null,add,s);
+				UdpService.sendMsg(C.LOG,null,add.address,s);
 			}
 			catch (Exception e)
 			{}
 		}
 	}
-	public byte[] onGetScreen()
+	public void onGetScreen(ByteArrayOutputStream os)
 	{
-		return (byte[])invoke("onGetScreen");
+		invoke("onGetScreen",os);
 	}
 	public void onDevice(int c,String p)
 	{

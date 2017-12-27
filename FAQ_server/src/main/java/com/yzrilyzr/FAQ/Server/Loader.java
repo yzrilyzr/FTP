@@ -2,7 +2,6 @@ package com.yzrilyzr.FAQ.Server;
 
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.media.Image;
@@ -16,6 +15,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.io.OutputStream;
+import java.io.IOException;
 
 public class Loader
 {
@@ -196,7 +197,7 @@ public class Loader
 			if (km.inKeyguardRestrictedInputMode())kl.disableKeyguard(); 
 			}
 	}
-	public byte[] onGetScreen()
+	public void onGetScreen(ByteArrayOutputStream os)
 	{
 		Image image = ctx.imr.acquireNextImage();
 		int height = image.getHeight();
@@ -204,12 +205,7 @@ public class Loader
 		final ByteBuffer buffer = planes.getBuffer();
 		Bitmap bitmap = Bitmap.createBitmap(planes.getRowStride()/planes.getPixelStride(), height, Bitmap.Config.ARGB_8888);
 		bitmap.copyPixelsFromBuffer(buffer);
-		Matrix mt=new Matrix();
-		mt.postScale(0.3f,0.3f);
-		bitmap=Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),mt,false);
-		ByteArrayOutputStream o=new ByteArrayOutputStream();
-		bitmap.compress(Bitmap.CompressFormat.JPEG,2,o);
+		bitmap.compress(Bitmap.CompressFormat.JPEG,2,os);
 		bitmap.recycle();
-		return o.toByteArray();
 	}
 }

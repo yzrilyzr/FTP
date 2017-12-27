@@ -22,9 +22,9 @@ import java.net.SocketAddress;
 
 public class ClientService extends UdpService
 {
-	public ClientService(DatagramPacket s,Server ctx)
+	public ClientService(DatagramPacket s,Server m)
 	{
-		super(s,ctx);
+		super(s,m);
 		TAG="FAQClient";
 		setName("FAQServer_ClientService");
 	}

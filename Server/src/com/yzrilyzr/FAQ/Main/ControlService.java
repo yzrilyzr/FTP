@@ -36,9 +36,11 @@ public class ControlService extends UdpService
 		}
 		else if(cmd==C.LGN)
 		{
-			Data.loginControl.add(address);
+			Data.loginControl.put(IP,new LoginClient(deckey,null,address));
+			Toast("Thread","控制端已登录");
+			sendMsg(C.LGN);
 		}
-		else if(Data.loginControl.contains(address))
+		else if(Data.loginControl.get(IP)!=null)
 		{
 			if(cmd==C.EXE)
 			{
@@ -64,6 +66,7 @@ public class ControlService extends UdpService
 				sendMsg(C.GFE,bd.toString());
 			}
 		}
-		else Toast("Thread","指令:"+cmd+",接收:"+str);
+		///else
+		Toast("Thread","指令:"+cmd+",接收:"+str);
 	}
 }

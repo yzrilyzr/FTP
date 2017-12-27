@@ -22,9 +22,9 @@ public class Data extends RU
 	//k:ip,v:long
 	public final ConcurrentHashMap<String,String> mailCd=new ConcurrentHashMap<String,String>();
 	//k:ip,v:LoginClient
-	public final ConcurrentHashMap<String,LoginClient> loginClient=new ConcurrentHashMap<String,LoginClient>();//ip
-	//socketaddress
-	public final CopyOnWriteArrayList<SocketAddress> loginControl=new CopyOnWriteArrayList<SocketAddress>();//ADDRESS
+	public final ConcurrentHashMap<String,LoginClient> loginClient=new ConcurrentHashMap<String,LoginClient>();
+	//k:ip,v:LoginClient
+	public final ConcurrentHashMap<String,LoginClient> loginControl=new ConcurrentHashMap<String,LoginClient>();
 	//k:ip,v:type
 	public final ConcurrentHashMap<String,String> blacklist=new ConcurrentHashMap<String,String>();
 	//ip
