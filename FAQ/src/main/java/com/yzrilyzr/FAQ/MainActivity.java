@@ -130,7 +130,7 @@ public class MainActivity extends BaseActivity
 		obj2.from=obj.to;
 		obj2.to=obj.from;
 		Data.msglist.put(obj.to+"",obj2);
-		if(!ClientService.sendMsg(C.MSG,obj.o2s()))util.toast(this,"发送失败");
+		ClientService.sendMsg(C.MSG,obj.o2s());
 	}
 
 	@Override

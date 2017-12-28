@@ -1,56 +1,35 @@
 package com.yzrilyzr.FAQ.Main;
-import java.io.*;
-
-import android.app.Activity;
-import android.widget.Toast;
 import com.yzrilyzr.FAQ.Data.User;
-import com.yzrilyzr.myclass.util;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.net.SocketAddress;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
-import com.yzrilyzr.FAQ.Data.MessageObj;
-import com.yzrilyzr.FAQ.Data.ToStrObj;
-import android.util.Base64;
+import java.net.SocketException;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientService extends RU
 {
-	public static Socket socket;
-	public static BufferedOutputStream Writer;
-	public static String hostIp="112.194.46.115";
+	public static String hostIp="192.168.0.3";
 	public static String deckey=null;
-	public static boolean running=false;
 	public static boolean isLogin=false;
 	private static String myfaq,mypwd;
-	private static long HBTtime;
+	private static DatagramSocket so;
 	public interface Listener
 	{
 		public abstract void rev(byte cmd,String msg);
 	}
 	private static CopyOnWriteArrayList<Listener> msginf=new CopyOnWriteArrayList<Listener>();
-	public static void connect() throws IOException
-	{
-		if(socket!=null)
-		{
-			socket.close();
-			socket=null;
-		}
-		socket=new Socket();
-		socket.setKeepAlive(true);
-		socket.setTcpNoDelay(true);
-		//socket.setSendBufferSize(10240);
-		socket.setTrafficClass(0x04|0x10);
-		socket.setSoTimeout(10000);
-		//socket.setReceiveBufferSize(10240);
-		socket.connect(new InetSocketAddress(hostIp,10000),40000);
-		running=true;
-		startService();
-		Writer=new BufferedOutputStream(socket.getOutputStream());
-		sendMsg(C.ENC);
-	}
+	private static CopyOnWriteArrayList<Runnable> sendmsg=new CopyOnWriteArrayList<Runnable>();
 	public static void startService()
 	{
+		try
+		{
+			so=new DatagramSocket();
+		}
+		catch (SocketException e)
+		{}
 		new Thread(new Runnable(){
 				@Override
 				public void run()
@@ -58,51 +37,23 @@ public class ClientService extends RU
 					// TODO: Implement this method
 					try
 					{
-						HBTtime=System.currentTimeMillis();
-						BufferedInputStream buff=new BufferedInputStream(socket.getInputStream());
-						BO bo=new BO(){
-							@Override
-							public boolean g()
-							{
-								// TODO: Implement this method
-								return running=getHbt(HBTtime);
-							}
-						};
-						while(running)
+						while(true)
 						{
-							running=getHbt(HBTtime);
+							byte[] bb=new byte[1024];
+							DatagramPacket pa=new DatagramPacket(bb,bb.length);
+							so.receive(pa);
 							try
 							{
-								block(buff,1,bo);
-								byte cmd=(byte)buff.read();
-								int pwdlen=readIntFully(buff,bo);
-								String str=null;
-								ByteArrayOutputStream str2=new ByteArrayOutputStream();
-								int ind=0;
-								while(ind<pwdlen)
-								{
-									byte[] bb=new byte[pwdlen-ind];
-									int ii=buff.read(bb);
-									ind+=ii;
-									str2.write(bb,0,ii);
-								}
-								str2.close();
-								str=str2.toString();
-								str2=null;
+								byte[] byt=pa.getData();
+								byte cmd=byt[0];
+								String str=new String(byt,pa.getOffset()+1,pa.getLength()-1);
 								if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
 								//str=new String(Base64.decode(str,0));
 								if(cmd==C.HBT)
 								{
-									HBTtime=System.currentTimeMillis();
 									sendMsg(C.HBT);
 								}
 								else if(cmd==C.ENC)deckey=Integer.toHexString(Integer.parseInt(str));
-								else if(cmd==C.GHG||cmd==C.GHU)
-								{
-									if("-1".equals(str))return;
-									byte[] by=Base64.decode(str,0);
-									Data.saveHead(cmd==C.GHG,by);
-								}
 								else
 								{
 									for(Listener o:msginf)
@@ -115,52 +66,19 @@ public class ClientService extends RU
 							}
 
 						}
-						running=false;
-						socket.close();
-						socket=null;
-						boolean isc=true;
-						while(isc)
-							try
-							{
-								deckey=null;
-								connect();
-								while(ClientService.deckey==null)
-								{Thread.sleep(1);}
-								login(myfaq,mypwd);
-								isc=false;
-							}
-							catch (Exception e)
-							{
-							}
 					}
 					catch(Throwable e)
 					{
 						sendMsg(C.LOG,getStackTrace(e));
 					}
 				}
-
-				private boolean getHbt(long HBTtim)
-				{
-					return running=System.currentTimeMillis()-HBTtim<40000l;
-				}
 			}).start();
-		new Thread(new Runnable(){
-				@Override
-				public void run()
-				{
-					// TODO: Implement this method
-					try
-					{
-						while(running)
-						{
-							Data.saveMsgBuffer();
-							Thread.sleep(5000);
-						}
-					}
-					catch(Throwable e)
-					{}
-				}
-			}).start();
+		new Thread(){
+			@Override public void run(){
+				while(true)
+					if(sendmsg.size()>0)sendmsg.remove(0).run();
+			}
+		}.start();
 	}
 	public static void addListener(Listener o)
 	{
@@ -184,32 +102,42 @@ public class ClientService extends RU
             pw.close();
         }
     }
-	public static boolean sendMsg(byte cmd)
+	public static void sendMsg(byte cmd)
 	{
-		return sendMsg(cmd,null);
+		sendMsg(cmd,null);
 	}
-	public static boolean sendMsg(byte cmd,String s)
+	public static void sendMsg(final byte cmd,final String ss)
 	{
-		try
-		{
-			if(s!=null)
-			{
-				if(deckey!=null)s=AES.encrypt(deckey,s);
-				Writer.write(cmd);
-				writeStr(Writer,s);
-			}
-			else
-			{
-				Writer.write(cmd);
-				writeStr(Writer,"");
-			}
-			Writer.flush();
-			return true;
-		}
-		catch (Throwable e)
-		{
-			return false;
-		}
+		sendmsg.add(new Runnable(){
+				@Override
+				public void run()
+				{
+					try
+					{
+						DatagramPacket p=null;
+						String s=ss;
+						if(s!=null)
+						{
+							if(deckey!=null)s=AES.encrypt(deckey,s);
+							ByteArrayOutputStream os=new ByteArrayOutputStream();
+							os.write(cmd);
+							os.write(s.getBytes());
+							os.flush();
+							os.close();
+							byte[] b2=os.toByteArray();
+							p=new DatagramPacket(b2,b2.length,new InetSocketAddress(hostIp,10000));
+						}
+						else
+						{
+							p=new DatagramPacket(new byte[]{cmd},1,new InetSocketAddress(hostIp,10000));
+						}
+						so.send(p);
+					}
+					catch (Throwable e)
+					{
+					}
+				}
+			});
 	}
 	public static void login(String fa,String pwd)
 	{

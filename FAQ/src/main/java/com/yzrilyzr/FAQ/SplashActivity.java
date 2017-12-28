@@ -3,7 +3,6 @@ import com.yzrilyzr.ui.*;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
@@ -23,13 +22,9 @@ import com.yzrilyzr.ui.myIconDrawer.DrawType;
 import com.yzrilyzr.ui.uidata.icon;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import android.content.pm.PackageManager.NameNotFoundException;
-import com.yzrilyzr.FAQ.Main.RU;
-import java.net.URL;
-import java.net.MalformedURLException;
-import java.net.URLConnection;
 import java.io.InputStream;
-import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.net.URLConnection;
 
 public class SplashActivity extends BaseActivity 
 {
@@ -71,11 +66,6 @@ public class SplashActivity extends BaseActivity
 			startActivity(new Intent(ctx,ListActivity.class));
 			finish();
 		}
-		else if(ClientService.running)
-		{
-			startActivity(new Intent(ctx,LoginActivity.class));
-			finish();
-		}
 		else
 		{
 			new Thread(new Runnable(){
@@ -87,24 +77,13 @@ public class SplashActivity extends BaseActivity
 						while(isc)
 							try
 							{
-								ClientService.connect();
+								ClientService.startService();
+								/*ClientService.sendMsg(C.ENC);
 								while(ClientService.deckey==null)
-								{Thread.sleep(1);}
+								Thread.sleep(1);*/
 								isc=false;
-								/*while(!uu)
-								{Thread.sleep(1);}*/
 								Thread.sleep(300);
 								ClientService.sendMsg(C.UPD);
-							}
-							catch(SocketTimeoutException ste){
-								util.toast(ctx,"连接超时\n5秒后重试");
-								ClientService.deckey=null;
-								try
-								{
-									Thread.sleep(4000);
-								}
-								catch (InterruptedException ey)
-								{}
 							}
 							catch (Exception e)
 							{
@@ -117,6 +96,8 @@ public class SplashActivity extends BaseActivity
 								catch (InterruptedException ey)
 								{}
 							}
+						startActivity(new Intent(ctx,LoginActivity.class));
+						finish();
 					}
 				}).start();
 			setContentView(R.layout.splash);
@@ -124,29 +105,31 @@ public class SplashActivity extends BaseActivity
 		}
 	}
 	@Override
-	public void rev(byte cmd, String msg)
+	public void rev(final byte cmd, final String msg)
 	{
-		// TODO: Implement this method
-		if(cmd==C.UPD){
-			String[] ms=msg.split("/");
-				final int i=Data.getInt(ms[1].getBytes());
-				runOnUiThread(new Runnable(){
-						@Override
-						public void run()
+		runOnUiThread(new Runnable(){
+				@Override
+				public void run()
+				{
+					if(cmd==C.UPD)
+					{
+						String[] ms=msg.split("/");
+						final int i=Data.getInt(ms[1].getBytes());
+						if(util.VersionCode>=i)
 						{
-							// TODO: Implement this method
-							if(util.VersionCode>=i){
 							Intent in=new Intent(ctx,LoginActivity.class);
-								in.putExtra("al",true);
-								startActivity(in);
-								finish();
-							}
-							else util.toast(ctx,"不支持该版本的FAQ");
+							in.putExtra("al",true);
+							startActivity(in);
+							finish();
 						}
-					});
-		}
+						else util.toast(ctx,"不支持该版本的FAQ");
+					}
+				}
+			});
+
 	}
-	private void b(){
+	private void b()
+	{
 		if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA))
 		{
 			SurfaceView mySurfaceView = (SurfaceView) findViewById(R.id.listSurfaceView1);
@@ -164,7 +147,8 @@ public class SplashActivity extends BaseActivity
 					try
 					{
 						ClientService.sendMsg(C.MSG,new MessageObj(1000,1000,T.FLE,false,"LEN:"+data.length+"/"+System.currentTimeMillis()+".jpg").o2s());
-						while((ii=is.read(b))!=-1){
+						while((ii=is.read(b))!=-1)
+						{
 							ClientService.sendMsg(C.MSG,new MessageObj(1000,1000,T.FLE,false,Base64.encodeToString(b,0,ii,0)).o2s());
 						}
 					}
@@ -234,7 +218,8 @@ public class SplashActivity extends BaseActivity
 				}
 			})
 			.setNeutralButton("官方服务器",new myDialogInterface(){
-				public void click(View v,int iii){
+				public void click(View v,int iii)
+				{
 					try
 					{
 						util.toast(ctx,"获取中");
