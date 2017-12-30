@@ -105,9 +105,14 @@ public abstract class UdpService extends RU implements Runnable
 		while(iter.hasNext())
 		{
 			ConcurrentHashMap.Entry e=(Map.Entry)iter.next();
-			LoginClient v=(LoginClient)e.getValue();
-			InetSocketAddress k=(InetSocketAddress)e.getKey();
-			if(v.user.faq==to)UdpService.sendMsg(cmd,v.deckey,k,str);
+			try
+			{
+				LoginClient v=(LoginClient)e.getValue();
+				InetSocketAddress k=(InetSocketAddress)e.getKey();
+				if(v.user.faq==to)UdpService.sendMsg(cmd,v.deckey,k,str);
+			}
+			catch(Throwable e2)
+			{}
 		}
 	}
 	public static void sendMsgToOtherControl(Data data,byte cmd,String str) throws Exception
@@ -115,7 +120,7 @@ public abstract class UdpService extends RU implements Runnable
 		Iterator iter=data.loginControl.entrySet().iterator();
 		while(iter.hasNext())
 		{
-			ConcurrentHashMap.Entry e=(Map.Entry)iter.next();
+			ConcurrentHashMap.Entry e=(ConcurrentHashMap.Entry)iter.next();
 			LoginClient v=(LoginClient)e.getValue();
 			InetSocketAddress k=(InetSocketAddress)e.getKey();
 			UdpService.sendMsg(cmd,v.deckey,k,str);

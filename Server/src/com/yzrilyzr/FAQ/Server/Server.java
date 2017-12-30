@@ -774,17 +774,21 @@ public class Server implements Thread.UncaughtExceptionHandler
 			UdpService.sendMsgToOtherControl(Data,C.CLV,null);
 		}
 		catch (Exception e)
-		{}
+		{
+			toast(new ConsoleMsg(TAG,"onClearView","群发消息失败","local"));
+		}
 	}
 	public void toast(String s)
 	{
 		invoke("onPrint",s);
 		try
 		{
-			UdpService.sendMsgToOtherControl(Data,C.LOG,null);
+			UdpService.sendMsgToOtherControl(Data,C.LOG,s);
 		}
 		catch (Exception e)
-		{}
+		{
+			toast(new ConsoleMsg(TAG,"onPrint","群发消息失败","local"));
+		}
 	}
 	public void onGetScreen(ByteArrayOutputStream os)
 	{

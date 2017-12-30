@@ -23,7 +23,7 @@ public class ControlService extends UdpService
 		byte[] byt=p.getData();
 		byte cmd=byt[0];
 		String str=new String(byt,p.getOffset()+1,p.getLength()-1);
-		LoginClient cli=Data.loginClient.get(address);
+		LoginClient cli=Data.loginControl.get(address);
 		if(cli!=null)deckey=cli.deckey;
 		if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
 		if(cmd==C.ENC)
@@ -38,7 +38,7 @@ public class ControlService extends UdpService
 			Toast("Thread","日志:"+str);
 		}
 		else if(cmd==C.CON){
-			Data.loginClient.put(address,new LoginClient());
+			Data.loginControl.put(address,new LoginClient());
 			sendMsg(C.CON);
 		}
 		else if(cmd==C.LGN)

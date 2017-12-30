@@ -64,12 +64,21 @@ public class uploadToServer
 			else throw new Exception("拒绝传输");
 			
 			ByteArrayOutputStream os=new ByteArrayOutputStream();
-			os.write(C.LGN);
+			os=new ByteArrayOutputStream();
+			os.write(C.CON);
 			os.flush();
 			os.close();
 			byte[] bb=os.toByteArray();
 			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
+			System.out.println("连接成功");
+			
+			os.write(C.LGN);
+			os.flush();
+			os.close();
+			bb=os.toByteArray();
+			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("登录成功");
+			
 			os=new ByteArrayOutputStream();
 			os.write(C.EXE);
 			os.write("reload".getBytes());
@@ -78,6 +87,7 @@ public class uploadToServer
 			bb=os.toByteArray();
 			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("重载完毕");
+			
 			Thread.sleep(1000);
 			System.exit(0);
 		}
