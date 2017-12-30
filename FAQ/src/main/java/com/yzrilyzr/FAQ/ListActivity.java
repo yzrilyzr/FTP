@@ -167,7 +167,7 @@ public class ListActivity extends BaseActivity
 		t.setImageDrawable(Data.getMyHeadDrawable());
 		((TextView)findViewById(R.id.listmenumyTextViewTitle1)).setText(me.nick);
 		((TextView)findViewById(R.id.listmenumyTextView1)).setText(me.sign);
-		toolbar.removeViewAt(2);
+		toolbar.getChildAt(2).setVisibility(8);
 	}
 	public void add(View v)
 	{

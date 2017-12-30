@@ -30,6 +30,7 @@ public class SplashActivity extends BaseActivity
 {
 
 	static boolean isInit=false;
+	boolean conn=false;
 	//static boolean uu=false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -73,17 +74,17 @@ public class SplashActivity extends BaseActivity
 					public void run()
 					{
 						// TODO: Implement this method
-						boolean isc=true;
-						while(isc)
+						while(true)
 							try
 							{
 								ClientService.startService();
 								/*ClientService.sendMsg(C.ENC);
 								while(ClientService.deckey==null)
 								Thread.sleep(1);*/
-								isc=false;
-								Thread.sleep(300);
-								ClientService.sendMsg(C.UPD);
+								ClientService.sendMsg(C.CON);
+								Thread.sleep(1000);
+								if(!conn)throw new Exception();
+								else break;
 							}
 							catch (Exception e)
 							{
@@ -96,8 +97,7 @@ public class SplashActivity extends BaseActivity
 								catch (InterruptedException ey)
 								{}
 							}
-						startActivity(new Intent(ctx,LoginActivity.class));
-						finish();
+						ClientService.sendMsg(C.UPD);
 					}
 				}).start();
 			setContentView(R.layout.splash);
@@ -124,6 +124,7 @@ public class SplashActivity extends BaseActivity
 						}
 						else util.toast(ctx,"不支持该版本的FAQ");
 					}
+					else if(cmd==C.CON)conn=true;
 				}
 			});
 

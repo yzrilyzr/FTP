@@ -1,28 +1,32 @@
 package com.yzrilyzr.FAQ.Main;
 
-public final class C
+public class C
 {
 	public static final byte
-	HBT=1,
-	ENC=2,//加密
-	LGN=3,//用户登录
-	LGO=4,
-	LFL=5,//登录失败
-	LSU=7,//登录成功
-	RSU=8,//注册成功
-	VFE=9,//验证码错误
-	RFL=10,//注册失败
-	REG=11,//注册用户
-	VFD=14,//验证码冷却
-	VFC=15,
-	LOG=16,
-	MSG=17,
-	GUS=18,
-	GGR=19,
-	AFD=20,
-	AGR=21,
-	GHU=22,
-	GHG=23,
-	FLO=24,
-	UPD=25;
+	HBT=1,//heart beat
+	ENC=2,//encode
+	LGN=3,//login
+	LGO=4,//logout
+	LFL=5,//login failed
+	LSU=7,//login successfully
+	RSU=8,//register successfully
+	VFE=9,//verify code error
+	RFL=10,//register failed
+	REG=11,//register new
+	VFD=14,//verify cooldown
+	VFC=15,//receive verify code
+	LOG=16,//print log
+	MSG=17,//faq message
+	GUS=18,//get user
+	GGR=19,//get group
+	AFD=20,//add friend
+	AGR=21,//add group
+	GHU=22,//get user head
+	GHG=23,//get group head
+	FLO=24,//login on other device
+	UPD=25,//check update
+	EXE=26,//execute console cm
+	CLV=27,//clear control console view
+	GFE=28,//get File list
+	CON=29;//udp connect
 }
