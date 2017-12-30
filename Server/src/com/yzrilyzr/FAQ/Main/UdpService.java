@@ -1,26 +1,29 @@
 package com.yzrilyzr.FAQ.Main;
 import com.yzrilyzr.FAQ.Server.ConsoleMsg;
 import com.yzrilyzr.FAQ.Server.Server;
+import java.io.ByteArrayOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.net.SocketException;
-import java.io.ByteArrayOutputStream;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class UdpService extends RU implements Runnable
 {
 	private DatagramPacket packet;
-	Server ctx;
+	public Server ctx;
 	public String TAG="BaseClient";
-	protected Data Data;
+	public Data Data;
 	public String IP,LOCATION,deckey;
-	public SocketAddress address;
+	public InetSocketAddress address;
 	public UdpService(DatagramPacket packet,Server ctx)
 	{
 		this.packet = packet;
 		this.ctx = ctx;
 		this.Data=ctx.Data;
-		address=packet.getSocketAddress();
+		address=(InetSocketAddress) packet.getSocketAddress();
 		IP=packet.getAddress().getHostAddress();
 		if(!Data.connectedClient.contains(IP))Data.connectedClient.add(IP);
 	}
@@ -95,6 +98,28 @@ public abstract class UdpService extends RU implements Runnable
 		DatagramSocket soo=new DatagramSocket();
 		soo.send(p);
 		soo.close();
+	}
+	public static void sendMsgToOther(Data data,byte cmd,int to,String str) throws Exception
+	{
+		Iterator iter=data.loginClient.entrySet().iterator();
+		while(iter.hasNext())
+		{
+			ConcurrentHashMap.Entry e=(Map.Entry)iter.next();
+			LoginClient v=(LoginClient)e.getValue();
+			InetSocketAddress k=(InetSocketAddress)e.getKey();
+			if(v.user.faq==to)UdpService.sendMsg(cmd,v.deckey,k,str);
+		}
+	}
+	public static void sendMsgToOtherControl(Data data,byte cmd,String str) throws Exception
+	{
+		Iterator iter=data.loginControl.entrySet().iterator();
+		while(iter.hasNext())
+		{
+			ConcurrentHashMap.Entry e=(Map.Entry)iter.next();
+			LoginClient v=(LoginClient)e.getValue();
+			InetSocketAddress k=(InetSocketAddress)e.getKey();
+			UdpService.sendMsg(cmd,v.deckey,k,str);
+		}
 	}
 	public abstract void rev(DatagramPacket p)throws Throwable;
 }

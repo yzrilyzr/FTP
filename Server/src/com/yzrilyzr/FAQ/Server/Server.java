@@ -320,7 +320,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 					exec(new Scan(mCmds));
 			}
 		}).start();
-		faqServer=new UDPServerThread("FAQServer_ClientService_Server"){
+		faqServer=new ServerThread("FAQServer_ClientService_Server"){
 			@Override
 			public void run()
 			{
@@ -347,7 +347,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 				}
 			}
 		};
-		fileServer=new TCPServerThread("FAQServer_FileService_Server"){
+		fileServer=new ServerThread("FAQServer_FileService_Server"){
 			@Override
 			public void run()
 			{
@@ -704,22 +704,6 @@ public class Server implements Thread.UncaughtExceptionHandler
 		}
 		public abstract void run();
 	}
-	abstract class UDPServerThread extends ServerThread
-	{
-		public UDPServerThread(String n)
-		{
-			super(n);
-		}
-		public abstract void run();
-	}
-	abstract class TCPServerThread extends ServerThread
-	{
-		public TCPServerThread(String n)
-		{
-			super(n);
-		}
-		public abstract void run();
-	}
 	public static class Scan
 	{
 		CopyOnWriteArrayList<String> is;
@@ -785,28 +769,22 @@ public class Server implements Thread.UncaughtExceptionHandler
 	public void onClearView()
 	{
 		invoke("onClearView");
-		for(LoginClient add:Data.loginControl.values())
+		try
 		{
-			try
-			{
-				UdpService.sendMsg(C.CLV,null,add.address,null);
-			}
-			catch (Exception e)
-			{}
+			UdpService.sendMsgToOtherControl(Data,C.CLV,null);
 		}
+		catch (Exception e)
+		{}
 	}
 	public void toast(String s)
 	{
 		invoke("onPrint",s);
-		for(LoginClient add:Data.loginControl.values())
+		try
 		{
-			try
-			{
-				UdpService.sendMsg(C.LOG,null,add.address,s);
-			}
-			catch (Exception e)
-			{}
+			UdpService.sendMsgToOtherControl(Data,C.LOG,null);
 		}
+		catch (Exception e)
+		{}
 	}
 	public void onGetScreen(ByteArrayOutputStream os)
 	{

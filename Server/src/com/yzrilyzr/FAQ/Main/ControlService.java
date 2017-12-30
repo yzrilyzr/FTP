@@ -18,29 +18,36 @@ public class ControlService extends UdpService
 		setName("FAQServer_ControlService");
 	}
 	@Override
-	public void rev(DatagramPacket p)
+	public void rev(DatagramPacket p)throws Throwable
 	{
 		byte[] byt=p.getData();
 		byte cmd=byt[0];
 		String str=new String(byt,p.getOffset()+1,p.getLength()-1);
+		LoginClient cli=Data.loginClient.get(address);
+		if(cli!=null)deckey=cli.deckey;
+		if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
 		if(cmd==C.ENC)
 		{
 			int r=new Random().nextInt(866511684)+100000;
 			String enc=Integer.toHexString(r);
 			sendMsg(C.ENC,r+"");
-			deckey=enc;
+			cli.deckey=enc;
 		}
 		else if(cmd==C.LOG)
 		{
 			Toast("Thread","日志:"+str);
 		}
+		else if(cmd==C.CON){
+			Data.loginClient.put(address,new LoginClient());
+			sendMsg(C.CON);
+		}
 		else if(cmd==C.LGN)
 		{
-			Data.loginControl.put(IP,new LoginClient(deckey,null,address));
+			cli.isLogin=true;
 			Toast("Thread","控制端已登录");
 			sendMsg(C.LGN);
 		}
-		else if(Data.loginControl.get(IP)!=null)
+		else if(cli.isLogin)
 		{
 			if(cmd==C.EXE)
 			{

@@ -5,11 +5,13 @@ import com.yzrilyzr.FAQ.Data.Group;
 import com.yzrilyzr.FAQ.Data.MessageObj;
 import com.yzrilyzr.FAQ.Data.ToStrList;
 import com.yzrilyzr.FAQ.Data.User;
-import java.net.SocketAddress;
+import com.yzrilyzr.FAQ.Main.LoginClient;
+import java.net.InetSocketAddress;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.mail.Address;
 
 public class Data extends RU
 {
@@ -22,9 +24,9 @@ public class Data extends RU
 	//k:ip,v:long
 	public final ConcurrentHashMap<String,String> mailCd=new ConcurrentHashMap<String,String>();
 	//k:ip,v:LoginClient
-	public final ConcurrentHashMap<String,LoginClient> loginClient=new ConcurrentHashMap<String,LoginClient>();
+	public final ConcurrentHashMap<InetSocketAddress,LoginClient> loginClient=new ConcurrentHashMap<InetSocketAddress,LoginClient>();
 	//k:ip,v:LoginClient
-	public final ConcurrentHashMap<String,LoginClient> loginControl=new ConcurrentHashMap<String,LoginClient>();
+	public final ConcurrentHashMap<InetSocketAddress,LoginClient> loginControl=new ConcurrentHashMap<InetSocketAddress,LoginClient>();
 	//k:ip,v:type
 	public final ConcurrentHashMap<String,String> blacklist=new ConcurrentHashMap<String,String>();
 	//ip

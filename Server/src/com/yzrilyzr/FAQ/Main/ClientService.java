@@ -19,6 +19,10 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import org.apache.commons.codec.binary.Base64;
 import java.net.SocketAddress;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.net.InetSocketAddress;
 
 public class ClientService extends UdpService
 {
@@ -35,9 +39,9 @@ public class ClientService extends UdpService
 		byte[] byt=p.getData();
 		byte cmd=byt[0];
 		String str=new String(byt,p.getOffset()+1,p.getLength()-1);
-		LoginClient cli=Data.loginClient.get(IP);
-		deckey=cli.deckey;
-		if(cli.deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(cli.deckey,str);
+		LoginClient cli=Data.loginClient.get(address);
+		if(cli!=null)deckey=cli.deckey;
+		if(deckey!=null&&str!=null&&!"".equals(str))str=AES.decrypt(deckey,str);
 		if(cmd==C.ENC)
 		{
 			int r=new Random().nextInt(866511684)+100000;
@@ -45,19 +49,22 @@ public class ClientService extends UdpService
 			sendMsg(C.ENC,r+"");
 			cli.deckey=enc;
 		}
+		else if(cmd==C.CON){
+			Data.loginClient.put(address,new LoginClient());
+			sendMsg(C.CON);
+		}
 		else if(cmd==C.LGN)
 		{
-			User u=(User) ToStrObj.s2o(str);
-			User u2=Data.users.get(u.faq+"");
-			if(u2==null)sendMsg(C.LFL);
-			else if(u2.pwd.equals(u.pwd))
+			User user=(User) ToStrObj.s2o(str);//用户提供
+			User db=Data.users.get(user.faq+"");//数据库的
+			if(db==null)sendMsg(C.LFL);
+			else if(db.pwd.equals(user.pwd))
 			{
 				sendMsg(C.LSU);
-				Data.users.get(Integer.toString(u2.faq)).ip=IP;
-				LoginClient sc=Data.loginClient.get(IP);
-				if(sc!=null)
-					UdpService.sendMsg(C.FLO,sc.deckey,sc.address,"您的帐号在另外一个客户端登录，您已被强制下线");
-				Data.loginClient.put(IP,new LoginClient(null,u2,address));
+				Data.users.get(Integer.toString(db.faq)).ip=IP;
+				cli.user=db;
+				cli.isLogin=true;
+				//if(cli!=null)UdpService.sendMsg(C.FLO,sc.deckey,sc.address,"您的帐号在另外一个客户端登录，您已被强制下线");
 			}
 			else sendMsg(C.LFL);
 		}
@@ -77,7 +84,7 @@ public class ClientService extends UdpService
 		}
 		else if(cmd==C.LGO)
 		{
-			Data.loginClient.remove(IP);
+			cli.isLogin=false;
 			Toast("Thread","用户登出");
 		}
 		else if(cmd==C.LOG)
@@ -108,7 +115,7 @@ public class ClientService extends UdpService
 				byte[] cc=getIBytes(Integer.parseInt(str));
 				for(int ic=0;ic<4;ic++)bbbb[ic]=cc[ic];
 				his.read(bbbb,4,bbbb.length-4);his.close();
-				sendMsg(C.GHU,new String(Base64.encodeBase64(bbbb)));
+				//sendMsg(C.GHU,new String(Base64.encodeBase64(bbbb)));
 				Toast("getHead",str);
 			}
 			catch(Throwable e)
@@ -125,7 +132,7 @@ public class ClientService extends UdpService
 				byte[] cc=getIBytes(Integer.parseInt(str));
 				for(int ic=0;ic<4;ic++)bbbb[ic]=cc[ic];
 				his.read(bbbb,4,bbbb.length-4);his.close();
-				sendMsg(C.GHG,new String(Base64.encodeBase64(bbbb)));
+				//sendMsg(C.GHG,new String(Base64.encodeBase64(bbbb)));
 				Toast("getGroupHead",str);
 			}
 			catch(Throwable e)
@@ -164,7 +171,7 @@ public class ClientService extends UdpService
 			//最新，最低支持=
 			sendMsg(C.UPD,new String(getIBytes(2))+"/"+new String(getIBytes(2)));
 		}
-		else if(cli.user!=null)
+		else if(cli.isLogin)
 		{
 			if(cmd==C.MSG)
 			{
@@ -172,19 +179,9 @@ public class ClientService extends UdpService
 				if(m.isGroup)
 				{
 					Group g=Data.groups.get(m.to+"");
-					for(int f:g.members)
-					{
-						String ip=Data.users.get(Integer.toString(f)).ip;
-						LoginClient cl=Data.loginClient.get(ip);
-						if(cl!=null)UdpService.sendMsg(C.MSG,cl.deckey,cl.address,str);
-					}
+					for(int f:g.members)sendMsgToOther(C.MSG,f,str);
 				}
-				else
-				{
-					String ip=Data.users.get(m.to+"").ip;
-					LoginClient cl=Data.loginClient.get(ip);
-					if(cl!=null)UdpService.sendMsg(C.MSG,cl.deckey,cl.address,str);
-				}
+				else sendMsgToOther(C.MSG,m.to,str);
 				if(m.type==T.MSG||m.type==T.VMS)
 				{
 					Toast("Thread",String.format("指令:%d,来自:%d,发给:%d,种类:%d,是否群组:%b,消息:%s",cmd,m.from,m.to,m.type,m.isGroup,m.msg));
@@ -207,16 +204,16 @@ public class ClientService extends UdpService
 					Data.saveUserData();
 					sendMsg(C.GUS,u1.o2s());
 					sendMsg(C.MSG,new MessageObj(u2.faq,u1.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
-					LoginClient ll=Data.loginClient.get(u2.ip);
-					if(ll!=null)
-					{
-						UdpService.sendMsg(C.GUS,ll.deckey,ll.address,u2.o2s());
-						UdpService.sendMsg(C.MSG,ll.deckey,ll.address,new MessageObj(u1.faq,u2.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
-					}
+					sendMsgToOther(C.GUS,u2.faq,u2.o2s());
+					sendMsgToOther(C.MSG,u2.faq,new MessageObj(u1.faq,u2.faq,T.MSG,false,"我们已经是好友了，快来一起开车吧！").setTime().o2s());
 				}
 			}
 		}
 		else Toast("Thread","指令:"+cmd+",接收:"+str);
+	}
+	public void sendMsgToOther(byte cmd,int to,String str) throws Exception
+	{
+		sendMsgToOther(Data,cmd,to,str);
 	}
 	public void sendEmail(final String sender,final String pwd,final String sub,final String to,final String s)
 	{

@@ -27,5 +27,6 @@ public class C
 	UPD=25,//check update
 	EXE=26,//execute console cm
 	CLV=27,//clear control console view
-	GFE=28;//get File list
+	GFE=28,//get File list
+	CON=29;//udp connect
 }
