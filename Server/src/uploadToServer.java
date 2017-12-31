@@ -63,7 +63,7 @@ public class uploadToServer
 			}
 			else throw new Exception("拒绝传输");
 			
-			ByteArrayOutputStream os=new ByteArrayOutputStream();
+			ByteArrayOutputStream os;
 			os=new ByteArrayOutputStream();
 			os.write(C.CON);
 			os.flush();
@@ -72,6 +72,7 @@ public class uploadToServer
 			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("连接成功");
 			
+			os=new ByteArrayOutputStream();
 			os.write(C.LGN);
 			os.flush();
 			os.close();

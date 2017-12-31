@@ -55,6 +55,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 					server.exec(new Scan(mCmds));
 			}
 		}).start();
+		mCmds.add("astart");
 		Scanner s=new Scanner(System.in);
 		while(true)
 			mCmds.add(s.next());

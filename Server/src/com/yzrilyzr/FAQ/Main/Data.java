@@ -87,10 +87,12 @@ public class Data extends RU
 	}
 	public void readBlackList() throws IOException
 	{
-		BufferedInputStream b=new BufferedInputStream(new FileInputStream(new SafeFile(this,false,datafile+"/blacklist")));
-		int f=readInt(b);
+		File f=new SafeFile(this,false,datafile+"/blacklist");
+		if(!f.exists())f.createNewFile();
+		BufferedInputStream b=new BufferedInputStream(new FileInputStream(f));
+		int ff=readInt(b);
 		blacklist.clear();
-		for(int i=0;i<f;i++)blacklist.put(readStr(b),"2");
+		for(int i=0;i<ff;i++)blacklist.put(readStr(b),"2");
 		b.close();
 	}
 	public void saveUserData() throws IOException
