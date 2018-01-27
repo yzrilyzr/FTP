@@ -27,5 +27,6 @@ public final class C
 	UPD=25,
 	EXE=26,
 	CLV=27,
-	GFE=28;
+	GFE=28,
+	CON=29;
 }

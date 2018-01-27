@@ -28,7 +28,7 @@ public class SplashActivity extends BaseActivity
 			SharedPreferences sp=getSharedPreferences("server",MODE_PRIVATE);
 			ClientService.hostIp=sp.getString("ip","127.0.0.1");
 			ClientService.startService();
-			ClientService.sendMsg(C.LGN);
+			ClientService.sendMsg(C.CON);
 		}
 		else
 		{
@@ -39,7 +39,8 @@ public class SplashActivity extends BaseActivity
 	@Override
 	public void rev(byte cmd, String msg)
 	{
-		if(cmd==C.LGN)runOnUiThread(new Runnable(){
+		if(cmd==C.CON)ClientService.sendMsg(C.LGN);
+		else if(cmd==C.LGN)runOnUiThread(new Runnable(){
 					@Override
 					public void run()
 					{
