@@ -32,7 +32,6 @@ public class myProgressBar extends View
     @Override
     protected void onDraw(Canvas canvas)
     {
-        // TODO: Implement this metho
         if(progress<0)progress=0;
         if(progress>maxpro)progress=maxpro;
         if(secondProgress<0)secondProgress=0;

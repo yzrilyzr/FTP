@@ -2,22 +2,26 @@ package com.yzrilyzr.FAQ.Controller;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import com.yzrilyzr.FAQ.Main.C;
 import com.yzrilyzr.FAQ.Main.ClientService;
-import com.yzrilyzr.myclass.myActivity;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myAlertDialog;
 import com.yzrilyzr.ui.myDialogInterface;
 import com.yzrilyzr.ui.myEditText;
 import com.yzrilyzr.ui.uidata;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.io.ByteArrayOutputStream;
 
-public class SplashActivity extends BaseActivity
+public class SplashActivity extends BaseActivity implements Thread.UncaughtExceptionHandler 
 {
 	static boolean inited=false;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Thread.setDefaultUncaughtExceptionHandler(this);
 		super.onCreate(savedInstanceState);
 		if(!inited)
 		{
@@ -35,6 +39,21 @@ public class SplashActivity extends BaseActivity
 			startActivity(new Intent(ctx,MainActivity.class));
 			finish();
 		}
+	}
+	@Override
+	public void uncaughtException(Thread p1, Throwable p2)
+	{
+		try
+		{
+			FileOutputStream os=new FileOutputStream(util.mainDir+"/ERROR_LOG_CONTROL.txt");
+			PrintWriter ps=new PrintWriter(os);
+			p2.printStackTrace(ps);
+			ps.flush();
+			ps.close();
+		}
+		catch (Exception e)
+		{}
+		System.exit(0);
 	}
 	@Override
 	public void rev(byte cmd, String msg)

@@ -25,65 +25,81 @@ import com.yzrilyzr.myclass.myActivity;
 import com.yzrilyzr.myclass.util;
 import com.yzrilyzr.ui.myAlertDialog;
 import com.yzrilyzr.ui.myDialogInterface;
+import com.yzrilyzr.ui.myProgressBar;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
-import com.yzrilyzr.ui.myProgressBar;
+import java.util.Collections;
 
 public class FileActivity extends BaseActivity
 {
-	ListView local,remote;
+	BaseAdapter local,remote;
 	TextView pathview,infoview;
-	File[] localFiles;
-	FileObj[] remoteFiles;
+	ArrayList<File> localFiles=new ArrayList<File>();
+	ArrayList<FileObj> remoteFiles=new ArrayList<FileObj>();
+	ArrayList<FileObj> remoteFilesTmp=new ArrayList<FileObj>();
 	File localFile;
 	String remoteFile;
 	String remoteInfo1,remoteInfo2;
 	String localInfo1,localInfo2;
+	uiRunnable remotePro;
 	myProgressBar prog;
 	UploadThread upload;
+	Comparator<File> localCom=new Comparator<File>(){
+		@Override
+		public int compare(File p1, File p2)
+		{
+			return p1.getName().compareToIgnoreCase(p2.getName());
+		}
+	};
+	Comparator<FileObj> remoteCom=new Comparator<FileObj>(){
+		@Override
+		public int compare(FileObj p1, FileObj p2)
+		{
+			return p1.name.compareToIgnoreCase(p2.name);
+		}
+	};
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		// TODO: Implement this method
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.file);
-		local=(ListView) findViewById(R.id.filemyListView1);
-		remote=(ListView) findViewById(R.id.filemyListView2);
+		ListView locall=(ListView) findViewById(R.id.filemyListView1);
+		ListView remotel=(ListView) findViewById(R.id.filemyListView2);
 		pathview=(TextView) findViewById(R.id.fileTextView1);
 		infoview=(TextView) findViewById(R.id.fileTextView2);
 		prog=(myProgressBar) findViewById(R.id.filemyProgressBar1);
 		SharedPreferences s=getSharedPreferences("fileManager",MODE_PRIVATE);
 		localFile=new File(s.getString("local",Environment.getExternalStorageDirectory().getAbsolutePath()));
 		remoteFile=s.getString("remote","");
-		local.setOnTouchListener(new OnTouchListener(){
-				@Override
-				public boolean onTouch(View p1, MotionEvent p2)
-				{
-					if(p2.getAction()==MotionEvent.ACTION_DOWN)setInfo(0);
-					return false;
-				}
-			});
-		remote.setOnTouchListener(new OnTouchListener(){
-				@Override
-				public boolean onTouch(View p1, MotionEvent p2)
-				{
-					if(p2.getAction()==MotionEvent.ACTION_DOWN)setInfo(1);
-					return false;
-				}
-			});
-		local.setOnItemClickListener(new OnItemClickListener(){
+		/*locall.setOnTouchListener(new OnTouchListener(){
+		 @Override
+		 public boolean onTouch(View p1, MotionEvent p2)
+		 {
+		 if(p2.getAction()==MotionEvent.ACTION_DOWN)setInfo(0);
+		 return false;
+		 }
+		 });
+		 remotel.setOnTouchListener(new OnTouchListener(){
+		 @Override
+		 public boolean onTouch(View p1, MotionEvent p2)
+		 {
+		 if(p2.getAction()==MotionEvent.ACTION_DOWN)setInfo(1);
+		 return false;
+		 }
+		 });*/
+		locall.setOnItemClickListener(new OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
 				{
-					File f=localFiles[p3];
+					File f=localFiles.get(p3);
 					if(f.isDirectory())
 					{
 						localFile=f;
-						local.setAdapter(new LocalAdapter());
+						local.notifyDataSetChanged();
 					}
 					else if(f.isFile())
 					{
@@ -92,16 +108,16 @@ public class FileActivity extends BaseActivity
 					else
 					{
 						localFile=localFile.getParentFile();
-						local.setAdapter(new LocalAdapter());
+						local.notifyDataSetChanged();
 					}
 					setInfo(0);
 				}
 			});
-		remote.setOnItemClickListener(new OnItemClickListener(){
+		remotel.setOnItemClickListener(new OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> p1, View p2, int p3, long p4)
 				{
-					FileObj f=remoteFiles[p3];
+					FileObj f=remoteFiles.get(p3);
 					if(f.isDir)
 					{
 						remoteFile=f.path;
@@ -118,7 +134,7 @@ public class FileActivity extends BaseActivity
 					}
 				}
 			});
-		local.setOnItemLongClickListener(new OnItemLongClickListener(){
+		locall.setOnItemLongClickListener(new OnItemLongClickListener(){
 				@Override
 				public boolean onItemLongClick(AdapterView<?> p1, View p2, final int p3, long p4)
 				{
@@ -128,12 +144,14 @@ public class FileActivity extends BaseActivity
 							.setItems("上传".split(","),new myDialogInterface(){
 								@Override public void click(View p1,int p2)
 								{
-									if(p2==0){
-										if(upload==null){
-											upload=new UploadThread(localFiles[p3],remoteFile);
+									if(p2==0)
+									{
+										if(upload==null)
+										{
+											upload=new UploadThread(localFiles.get(p3),remoteFile);
 											upload.start();
 										}
-										else upload.getFile(localFiles[p3]);
+										else upload.getFile(localFiles.get(p3));
 									}
 								}
 							})
@@ -142,7 +160,7 @@ public class FileActivity extends BaseActivity
 					return true;
 				}
 			});
-		remote.setOnItemLongClickListener(new OnItemLongClickListener(){
+		remotel.setOnItemLongClickListener(new OnItemLongClickListener(){
 				@Override
 				public boolean onItemLongClick(AdapterView<?> p1, View p2, int p3, long p4)
 				{
@@ -150,10 +168,13 @@ public class FileActivity extends BaseActivity
 					return true;
 				}
 			});
-		local.setAdapter(new LocalAdapter());
+		locall.setAdapter(local=new LocalAdapter());
+		remotel.setAdapter(remote=new RemoteAdapter());
 		ClientService.sendMsg(C.GFE,remoteFile);
 		pathview.setTextSize(util.dip2px(3));
 		infoview.setTextSize(util.dip2px(3));
+		local.notifyDataSetChanged();
+		remotePro=new uiRunnable();
 	}
 	@Override
 	protected void onDestroy()
@@ -182,99 +203,97 @@ public class FileActivity extends BaseActivity
 	{
 		if(cmd==C.GFE)
 		{
-			if("FNE".equals(msg))
+			char c=msg.charAt(0);
+			if(c=='F'){
+				remoteFilesTmp.add((FileObj)ToStrObj.s2o(msg.substring(1)));
+				remotePro.setProg(remoteFilesTmp.size(),remotePro.s,remotePro.m);
+			}
+			else if(c=='N')
 			{
 				util.toast(ctx,"远程文件不存在");
 				ClientService.sendMsg(C.GFE,"");
 				return;
 			}
-			String[] s=msg.split("<\\?\\|\\*>");
-			remoteInfo1=getUnit(Long.parseLong(s[0]));
-			remoteInfo2=getUnit(Long.parseLong(s[1]));
-			int len=s.length-2;
-			if(len<0)len=0;
-			FileObj[] fs=new FileObj[len];
-			for(int i=0;i<fs.length;i++)
+			else if(c=='H')
 			{
-				fs[i]=(FileObj)ToStrObj.s2o(s[i+2]);
+				String[] s=msg.substring(1).split(",");
+				remoteInfo1=getUnit(Long.parseLong(s[0]));
+				remoteInfo2=getUnit(Long.parseLong(s[1]));
+				remotePro.setProg(0,remotePro.s,Integer.parseInt(s[2]));
+				remoteFilesTmp.clear();
 			}
-			FileObj[] dst=new FileObj[fs.length+1];
-			Arrays.sort(fs,new Comparator<FileObj>(){
-					@Override
-					public int compare(FileObj p1, FileObj p2)
-					{
-						// TODO: Implement this method
-						return p1.name.compareToIgnoreCase(p2.name);
-					}
-				});
-			int k=0;
-			FileObj par=new FileObj();
-			par.name="…";
-			dst[k++]=par;
-			for(FileObj f:fs)if(f.isDir)dst[k++]=f;
-			for(FileObj f:fs)if(f.isFile)dst[k++]=f;
-			remoteFiles=dst;
-			runOnUiThread(new Runnable(){
-					@Override
-					public void run()
-					{
-						remote.setAdapter(new RemoteAdapter());
-						setInfo(1);
-					}
-				});
+			else if(c=='E')
+			{
+				if(remotePro.m!=remoteFilesTmp.size()&&(remotePro.s+=remotePro.m/4)<remotePro.m){
+					util.toast(ctx,"发生丢包，个数为:"+(remotePro.m-remoteFilesTmp.size())+"\n还将重试"+(4-remotePro.s*4/remotePro.m)+"次");
+					ClientService.sendMsg(C.GFE,remoteFile);
+				}
+				else
+				{
+					Collections.sort(remoteFilesTmp,remoteCom);
+					remoteFiles.clear();
+					FileObj par=new FileObj();
+					par.name="…";
+					remoteFiles.add(par);
+					for(FileObj f:remoteFilesTmp)if(f.isDir)remoteFiles.add(f);
+					for(FileObj f:remoteFilesTmp)if(f.isFile)remoteFiles.add(f);
+					runOnUiThread(new Runnable(){
+							@Override
+							public void run()
+							{
+								remote.notifyDataSetChanged();
+								setInfo(1);
+							}
+						});
+				}
+			}
+			
 		}
 	}
 	class LocalAdapter extends BaseAdapter
 	{
-		public LocalAdapter()
+		@Override
+		public void notifyDataSetChanged()
 		{
 			localInfo1=getUnit(localFile.getTotalSpace());
 			localInfo2=getUnit(localFile.getFreeSpace());
 			File[] src=localFile.listFiles();
-			File[] dst=new File[src.length+1];
-			Arrays.sort(src,new Comparator<File>(){
-					@Override
-					public int compare(File p1, File p2)
-					{
-						// TODO: Implement this method
-						return p1.getName().compareToIgnoreCase(p2.getName());
-					}
-				});
-			int k=0;
-			dst[k++]=new File("…");
-			for(File f:src)if(f.isDirectory())dst[k++]=f;
-			for(File f:src)if(f.isFile())dst[k++]=f;
-			localFiles=dst;
+			Arrays.sort(src,localCom);
+			localFiles.clear();
+			localFiles.add(new File("…"));
+			for(File f:src)if(f.isDirectory())localFiles.add(f);
+			for(File f:src)if(f.isFile())localFiles.add(f);
+			setInfo(0);
+			super.notifyDataSetChanged();
 		}
 		@Override
 		public int getCount()
 		{
-			// TODO: Implement this method
-			return localFiles.length;
+			return localFiles.size();
 		}
 		@Override
 		public Object getItem(int p1)
 		{
-			// TODO: Implement this method
 			return null;
 		}
 		@Override
 		public long getItemId(int p1)
 		{
-			// TODO: Implement this method
 			return 0;
 		}
 		@Override
 		public View getView(int p1, View p2, ViewGroup p3)
 		{
-			// TODO: Implement this method
 			ViewHolder h=new ViewHolder(ctx);
-			File f=localFiles[p1];
+			File f=localFiles.get(p1);
 			h.setText(f.getName());
 			if(p1!=0)
 			{
 				h.setSubText(new SimpleDateFormat("yy-MM-dd hh:mm").format(f.lastModified())+" "+getUnit(f.length()));
+				if(f.isFile())h.setImage(R.drawable.file);
+				else if(f.isDirectory())h.setImage(R.drawable.folder);
 			}
+			else h.setImage(R.drawable.upparent);
 			return h.v;
 		}
 	}
@@ -296,32 +315,31 @@ public class FileActivity extends BaseActivity
 		@Override
 		public int getCount()
 		{
-			// TODO: Implement this method
-			return remoteFiles.length;
+			return remoteFiles.size();
 		}
 		@Override
 		public Object getItem(int p1)
 		{
-			// TODO: Implement this method
 			return null;
 		}
 		@Override
 		public long getItemId(int p1)
 		{
-			// TODO: Implement this method
 			return 0;
 		}
 		@Override
 		public View getView(int p1, View p2, ViewGroup p3)
 		{
-			// TODO: Implement this method
 			ViewHolder h=new ViewHolder(ctx);
-			FileObj f=remoteFiles[p1];
+			FileObj f=remoteFiles.get(p1);
 			h.setText(f.name);
 			if(p1!=0)
 			{
 				h.setSubText(new SimpleDateFormat("yy-MM-dd hh:mm").format(f.lastMod)+" "+getUnit(f.length));
+				if(f.isFile)h.setImage(R.drawable.file);
+				else if(f.isDir)h.setImage(R.drawable.folder);
 			}
+			else h.setImage(R.drawable.upparent);
 			return h.v;
 		}
 	}
@@ -347,6 +365,10 @@ public class FileActivity extends BaseActivity
 		public void setImage(Bitmap s)
 		{
 			((ImageView)v.findViewById(R.id.fileentryImageView1)).setImageBitmap(s);
+		}
+		public void setImage(int s)
+		{
+			((ImageView)v.findViewById(R.id.fileentryImageView1)).setImageResource(s);
 		}
 	}
 	class UploadThread extends Thread implements FileService.CallBack
@@ -424,7 +446,7 @@ public class FileActivity extends BaseActivity
 	class uiRunnable implements Runnable
 	{
 		int m,f,s;
-		long time=0;
+		//long time=0;
 		@Override
 		public void run()
 		{
@@ -432,14 +454,16 @@ public class FileActivity extends BaseActivity
 			prog.setProgress(f);
 			prog.setSecondaryProgress(s);
 		}
-		public void setProg(int f,int s,int m){
+		public void setProg(int f,int s,int m)
+		{
+			if(m==0)m=1;
 			this.f=f;
 			this.s=s;
 			this.m=m;
-			if(System.currentTimeMillis()>time+200)
+			//if(System.currentTimeMillis()>time+100)
 			{
 				runOnUiThread(this);
-				time=System.currentTimeMillis();
+				//time=System.currentTimeMillis();
 			}
 		}
 	}
