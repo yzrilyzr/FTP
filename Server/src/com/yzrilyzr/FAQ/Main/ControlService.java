@@ -57,20 +57,23 @@ public class ControlService extends UdpService
 			else if(cmd==C.GFE)
 			{
 				File file=new SafeFile(Data,true,Data.rootFile+str);
-				if(!file.exists())sendMsg(C.GFE,"FNE");
+				if(!file.exists())sendMsg(C.GFE,"N");
 				File[] fs=file.listFiles();
 				StringBuilder bd=new StringBuilder();
-				bd.append(file.getTotalSpace());
-				bd.append("<?|*>");
-				bd.append(file.getFreeSpace());
-				bd.append("<?|*>");
+				bd.append("H")
+				.append(file.getTotalSpace())
+				.append(",")
+				.append(file.getFreeSpace())
+				.append(",")
+				.append(fs.length);
+				sendMsg(C.GFE,bd.toString());
 				for(File f:fs)
 				{
 					FileObj o=new FileObj(Data.rootFile,f);
-					bd.append(o.o2s());
-					bd.append("<?|*>");
+					sendMsg(C.GFE,new StringBuilder().append("F").append(o.o2s()).toString());
 				}
-				sendMsg(C.GFE,bd.toString());
+				Thread.sleep(100);
+				sendMsg(C.GFE,"E");
 			}
 		}
 		///else

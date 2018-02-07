@@ -9,6 +9,9 @@ import java.net.Socket;
 import java.nio.channels.FileChannel;
 import java.net.SocketAddress;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
+import com.yzrilyzr.FAQ.Server.Server;
 
 public class uploadToServer
 {
@@ -62,7 +65,7 @@ public class uploadToServer
 				else throw new Exception("传输出错");
 			}
 			else throw new Exception("拒绝传输");
-			
+
 			ByteArrayOutputStream os;
 			os=new ByteArrayOutputStream();
 			os.write(C.CON);
@@ -71,7 +74,7 @@ public class uploadToServer
 			byte[] bb=os.toByteArray();
 			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("连接成功");
-			
+
 			os=new ByteArrayOutputStream();
 			os.write(C.LGN);
 			os.flush();
@@ -79,7 +82,7 @@ public class uploadToServer
 			bb=os.toByteArray();
 			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("登录成功");
-			
+
 			os=new ByteArrayOutputStream();
 			os.write(C.EXE);
 			os.write("reload".getBytes());
@@ -88,9 +91,38 @@ public class uploadToServer
 			bb=os.toByteArray();
 			so2.send(new DatagramPacket(bb,bb.length,InetAddress.getByName(ip),20000));
 			System.out.println("重载完毕");
-			
-			Thread.sleep(1000);
-			System.exit(0);
+
+			URL u=new URL("https://yzrilyzr.wodemo.net/entry/458017");
+			URLConnection c=u.openConnection();
+			InputStream id=c.getInputStream();
+			os=new ByteArrayOutputStream();
+			bb=new byte[2048];
+			int i=0;
+			while((i=id.read(bb))!=-1)os.write(bb,0,i);
+			id.close();
+			String uip=os.toString();
+			uip=uip.substring(uip.indexOf("THIS")+4,uip.indexOf("ENDL"));
+			String strIP="";
+			URL ur= new URL("http://m.tool.chinaz.com/ipsel"); 
+			URLConnection conn = ur.openConnection(); 
+			BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8")); 
+			String line = null; 
+			StringBuffer result = new StringBuffer(); 
+			while((line = reader.readLine()) != null)result.append(line);
+			reader.close();
+			strIP=result.toString();
+			strIP=strIP.substring(strIP.indexOf("您的IP地址")+30);
+			strIP=strIP.substring(0,strIP.indexOf("</b>"));
+			if(!strIP.equals(uip))
+			{
+				System.out.println("ip不匹配,请修改为:");
+				System.out.println(strIP);
+			}
+			else
+			{
+				Thread.sleep(1000);
+				System.exit(0);
+			}
 		}
 		catch(Exception e)
 		{

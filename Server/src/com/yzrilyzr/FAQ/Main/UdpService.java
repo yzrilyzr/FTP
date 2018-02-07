@@ -74,7 +74,7 @@ public abstract class UdpService extends RU implements Runnable
 			Toast("Error","sendMsg",Data.getStackTrace(e));
 		}
 		if(CMD!=C.HBT&&CMD!=C.MSG&&CMD!=C.GUS&&
-		CMD!=C.GHG&&CMD!=C.GHU
+		CMD!=C.GHG&&CMD!=C.GHU&&CMD!=C.GFE
 		)Toast("sendMsg","指令:"+CMD+",消息:"+ss);
 	}
 	public static void sendMsg(byte CMD,String deckey,SocketAddress address,String ss) throws Exception

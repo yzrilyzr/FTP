@@ -28,7 +28,7 @@ public class Server implements Thread.UncaughtExceptionHandler
 	private Exp exp;
 	private ExecutorService pool;
 	private MediaPlayer player;
-	public static final String info="FAQ Server v1.2.2.1_alpha (2017 11 26) by yzrilyzr";
+	public static final String info="FAQ Server v1.3_alpha (2017 12 31) by yzrilyzr";
 	public final CopyOnWriteArrayList<String> mCmds=new CopyOnWriteArrayList<String>();
 	public static void main(String[] args)
 	{

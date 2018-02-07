@@ -197,14 +197,13 @@ public class Loader
 		else if(c==2)m.resetPassword(p,DevicePolicyManager.FLAG_PARENT_CAN_ACCESS_MANAGED);
 		else if(c==3)
 		{
-			PowerManager pm = (PowerManager)ctx.getSystemService(ctx.POWER_SERVICE);
-			PowerManager.WakeLock mWakelock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP|
-			PowerManager.SCREEN_DIM_WAKE_LOCK,"target");
-			mWakelock.acquire();
-			mWakelock.release();
-			KeyguardManager km = (KeyguardManager)ctx.getSystemService(ctx.KEYGUARD_SERVICE);
-			KeyguardManager.KeyguardLock kl = km.newKeyguardLock("faq");
-			if (km.inKeyguardRestrictedInputMode())kl.disableKeyguard(); 
+			PowerManager pm=(PowerManager) ctx.getSystemService(ctx.POWER_SERVICE);
+			PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,"bright");
+			wl.acquire();
+			wl.release();
+			KeyguardManager km= (KeyguardManager) ctx.getSystemService(ctx.KEYGUARD_SERVICE);
+			KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
+			kl.disableKeyguard();
 		}
 	}
 	public void onGetScreen(ByteArrayOutputStream os)
